@@ -9,6 +9,8 @@
 //   F.1 → masă maximă tehnic admisă  V.7 → emisii CO₂ (g/km)
 //   V.9 → clasă emisii (normă Euro)
 
+import { documentToText } from "./image";
+
 export interface VehicleFields {
   vin: string | null;
   nrInmatriculare: string | null;
@@ -130,17 +132,17 @@ export function parseCivText(text: string): VehicleFields {
 }
 
 export interface VehicleOcrProvider {
-  extractVehicle(bytes: Buffer, mime: string): Promise<VehicleFields>;
+  extractVehicle(bytes: Buffer, mime?: string): Promise<VehicleFields>;
 }
 
 export class CivOcrProvider implements VehicleOcrProvider {
-  async extractVehicle(bytes: Buffer): Promise<VehicleFields> {
-    return parseCivText(bytes.toString("utf8"));
+  async extractVehicle(bytes: Buffer, mime?: string): Promise<VehicleFields> {
+    // Text (coduri CIV) direct, sau imagine → OCR on-device → text (ADR 0011).
+    const text = await documentToText(bytes, mime);
+    return parseCivText(text);
   }
 }
 
 export function getVehicleOcrProvider(): VehicleOcrProvider {
-  // OCR pe imagine (foto CIV → text) se adaugă aici, în spatele aceleiași
-  // interfețe, când integrarea reală e decisă (ADR 0007).
   return new CivOcrProvider();
 }
