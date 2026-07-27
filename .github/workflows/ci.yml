@@ -6,7 +6,23 @@ on:
   pull_request:
 
 jobs:
+  secrets:
+    name: Scanner de secrete
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        env:
+          GITLEAKS_VERSION: 8.21.2
+        run: |
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz gitleaks
+          ./gitleaks detect --source . --redact --no-banner --exit-code 1
+
   verify:
+    name: Typecheck, teste, build
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -24,34 +40,15 @@ jobs:
     env:
       DATABASE_URL: postgresql://app:app@localhost:5432/app
     steps:
-      - uses: actions/checkout@v4
-
-      # Template-ul gol (fără package.json) nu are ce verifica — CI trece (skip).
-      # După `create-next-app` (vezi SETUP.md) toți pașii rulează normal.
-      - name: Check bootstrap
-        id: bootstrap
-        run: |
-          if [ -f package.json ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "Niciun package.json (template gol) — sar peste CI până la bootstrap (vezi SETUP.md)."
-          fi
-
-      - uses: actions/setup-node@v4
-        if: steps.bootstrap.outputs.ready == 'true'
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
-      - if: steps.bootstrap.outputs.ready == 'true'
-        run: npm ci
-      - if: steps.bootstrap.outputs.ready == 'true'
-        run: npx prisma generate
-      - if: steps.bootstrap.outputs.ready == 'true'
-        run: npm run typecheck
-      - if: steps.bootstrap.outputs.ready == 'true'
-        run: npm test
-      - if: steps.bootstrap.outputs.ready == 'true'
-        run: npx playwright install --with-deps
-      - if: steps.bootstrap.outputs.ready == 'true'
-        run: npm run test:e2e
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npx playwright install --with-deps
+      - run: npm run test:e2e
