@@ -3,7 +3,14 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
-**Task 0.1 Bootstrap — gata: PR #1, CI verde, de dat merge.** (2026-07-27)
+**M0 — fundația de securitate: implementată, pe branch `feat/m0-security-foundation`.** (2026-07-27)
+- 0.2: config validat Zod (`src/lib/config/env.ts`), gitleaks în CI, actions bump v5 (ADR 0004).
+- 0.4: threat model (`docs/threat-model.md`) + logger cu redactare PII (`src/lib/log/`).
+- 0.3: envelope encryption (`src/lib/crypto/field-encryption.ts`, ADR 0005) — AES-256-GCM, DEK împachetat cu KEK.
+- 20 teste unit verzi; lint (max-warnings 0) + typecheck curate; gitleaks local: no leaks.
+- **Rămas la 1.2:** integrarea criptării în Prisma + test pe Postgres real că valoarea stocată nu e în clar.
+
+**Task 0.1 Bootstrap — gata: PR #1, mers în main.** (2026-07-27)
 - Baza Next.js 16 generată (`create-next-app` — TS, ESLint, App Router, `src/`, fără Tailwind) peste template.
 - Dependențe standard instalate: Prisma 7, Zod 4, pg-boss, Vitest 4, Playwright. Scripturi + configuri (`vitest.config.ts`, `playwright.config.ts`, `output: "standalone"`).
 - Adaptare Prisma 7: `prisma.config.ts` la root, `url` scos din schema (vezi ADR 0002).

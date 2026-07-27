@@ -7,11 +7,11 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
 ## Faza 0 — Setup & fundație de securitate
 - [x] **0.1 Bootstrap** din template: repo, CI, lint/format, `CLAUDE.md`, `SPEC.md`. *(PR #1, CI verde 2026-07-27; cele două brief-uri încă lipsesc din `docs/` — de adăugat când le primim)*
   - *Acceptare:* CI verde pe un skeleton gol; `CLAUDE.md` + `SPEC.md` în repo.
-- [ ] **0.2 Management secrete & config** (nimic hardcodat).
+- [x] **0.2 Management secrete & config** (nimic hardcodat). *(config Zod `src/lib/config/env.ts`; gitleaks în CI; actions bump v5 — ADR 0004)*
   - *Acceptare:* secretele vin din vault/env; scanner de secrete în CI.
-- [ ] **0.3 Strat de criptare per-câmp** (envelope encryption + KMS) ca utilitar reutilizabil.
-  - *Acceptare:* CNP/CI se scriu criptat; test care dovedește că valoarea în DB nu e în clar.
-- [ ] **0.4 Threat model scurt + politică de logare fără PII.**
+- [x] **0.3 Strat de criptare per-câmp** (envelope encryption + KMS) ca utilitar reutilizabil. *(`src/lib/crypto/field-encryption.ts` — ADR 0005; integrarea Prisma + test pe DB reală la 1.2)*
+  - *Acceptare:* CNP/CI se scriu criptat; test care dovedește că valoarea în DB nu e în clar. *(unit: ciphertext nu conține plaintext, roundtrip, tamper-detection; testul pe DB reală vine la 1.2)*
+- [x] **0.4 Threat model scurt + politică de logare fără PII.** *(`docs/threat-model.md`; logger cu redactare `src/lib/log/`)*
   - *Acceptare:* document de 1 pagină; middleware/filtru care blochează PII în loguri.
 
 ## Faza 1 — Felia verticală: formular 230 (production-ready)
