@@ -1,0 +1,83 @@
+# BACKLOG — Autopilot acte cetățean (RO)
+
+Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de acceptare îndeplinite + teste + CI verde (vezi definiția din `CLAUDE.md`). Implementarea urmează template-ul din repo. Ordinea feliilor: vezi `docs/roadmap-formulare.md` + ADR 0003.
+
+---
+
+## Faza 0 — Setup & fundație de securitate
+- [ ] **0.1 Bootstrap** din template: repo, CI, lint/format, docs/ (cele două brief-uri), `CLAUDE.md`, `SPEC.md`.
+  - *Acceptare:* CI verde pe un skeleton gol; `CLAUDE.md` + `SPEC.md` în repo.
+- [ ] **0.2 Management secrete & config** (nimic hardcodat).
+  - *Acceptare:* secretele vin din vault/env; scanner de secrete în CI.
+- [ ] **0.3 Strat de criptare per-câmp** (envelope encryption + KMS) ca utilitar reutilizabil.
+  - *Acceptare:* CNP/CI se scriu criptat; test care dovedește că valoarea în DB nu e în clar.
+- [ ] **0.4 Threat model scurt + politică de logare fără PII.**
+  - *Acceptare:* document de 1 pagină; middleware/filtru care blochează PII în loguri.
+
+## Faza 1 — Felia verticală: formular 230 (production-ready)
+- [ ] **1.1 Auth + cont utilizator** (conform template).
+  - *Acceptare:* signup/login/logout; RBAC minim; teste.
+- [ ] **1.2 Model canonic „cetățean"** (schema din SPEC) + migrări.
+  - *Acceptare:* CRUD pe profil; câmpuri sensibile criptate; validare (checksum CNP, IBAN). Entitățile se modelează explicit (nu `Bun` generic); `Vehicul`/`Imobil` se adaugă la feliile lor.
+- [ ] **1.3 Seif de documente + upload CI** + OCR → pre-completare profil.
+  - *Acceptare:* upload securizat; OCR extrage câmpurile de bază; user confirmă înainte de salvare; scan criptat + retenție.
+- [ ] **1.4 Consimțământ + drepturi GDPR** (consent ledger, export & ștergere date).
+  - *Acceptare:* consimțământ per categorie; user poate exporta și șterge datele; audit fără PII.
+- [ ] **1.5 Motor de template-uri (bază) + definiția formularului 230.**
+  - *Acceptare:* definiția = **manifest versionat** (autoritate, jurisdicție, cod, revizie, valabilitate, sursă+hash, workflow, semnătură — vezi SPEC); selecție după jurisdicție + dată; mapare declarativă profil→230; generare PDF corect completat; test pe date de eșantion.
+- [ ] **1.6 Preview „exact ce semnezi" + abstracție semnătură (provider mock).**
+  - *Acceptare:* preview fidel; interfață de semnătură cu provider mock în dev; document „semnat" arhivat.
+- [ ] **1.7 Dispatch „generate + handoff" pentru 230.**
+  - *Acceptare:* PDF final + checklist + deep-link SPV + instrucțiuni; stare dosar „de depus/depus".
+- [ ] **1.8 Tracking termen 230 (25.05) + reminder.**
+  - *Acceptare:* dosarul are termen; notificare/reminder; test.
+- [ ] **1.9 E2E felia 230.**
+  - *Acceptare:* un test end-to-end: onboarding → 230 completat → preview → semnat (mock) → handoff.
+
+## Faza 2 — Dosar auto: „am cumpărat / am vândut o mașină"
+Cea mai bună extindere după 230: userul repetă aceleași date în 4–5 documente, prin mai multe instituții. Cluj întâi; manifeste versionate per UAT (ITL-005 revizuit 2026: normă poluare, CO₂ hibride, putere electrice).
+- [ ] **2.1 Entitatea `Vehicul`** în modelul canonic (câmpurile din SPEC) + migrare.
+  - *Acceptare:* CRUD vehicul legat de profil; validări de bază; teste.
+- [ ] **2.2 OCR CIV + contract/factură** → pre-completare vehicul.
+  - *Acceptare:* upload CIV; câmpurile extrase pre-completează entitatea; user confirmă.
+- [ ] **2.3 Definițiile formularelor auto** ca manifeste versionate: ITL-054, ITL-005, ITL-016, ITL-010, cererea DGPCI.
+  - *Acceptare:* fiecare cu sursă oficială + hash + revizie + valabilitate; PDF generat corect pe date de eșantion.
+- [ ] **2.4 Wizard eveniment** „am cumpărat / am vândut" → generează documentele potrivite.
+  - *Acceptare:* selecție eveniment → set corect de documente; goluri completate de user; preview per document.
+- [ ] **2.5 Dosar cu checklist-uri separate** (taxe locale / DGPCI / RCA-CASCO / păstrare număr) + tracking per pas.
+  - *Acceptare:* stări urmărite: „fiscal obținut", „scos din evidență", „transcris", „RCA reziliat"; reminder pe pași rămași.
+- [ ] **2.6 E2E dosar auto** (vânzare + cumpărare).
+
+## Faza 3 — C168: închiriere (OPANAF 161/2025)
+- [ ] **3.1 Entitatea `Imobil`** (minim necesar pentru C168) + migrare.
+- [ ] **3.2 OCR contract de închiriere** → locator, coproprietari, chiriași, cote, adresă, chirie, monedă, perioadă.
+- [ ] **3.3 Definiția C168** (înregistrare/modificare/încetare) + atașare contract.
+  - *Acceptare:* C168 generat aproape integral din profil + OCR; valoarea = OCR + reutilizare + tracking, nu „încă un formular" (ANAF are deja formular web).
+- [ ] **3.4 Tracking modificare/încetare** contract + pregătire date pentru D212 ulterior.
+- [ ] **3.5 E2E felia C168.**
+
+## Faze ulterioare (ordinea din docs/roadmap-formulare.md)
+4. **Impozit clădiri/teren** — ITL-001, ITL-003 + scoatere din evidență, certificat fiscal.
+5. **Dosar copil** — alocație, CIC, stimulent, adeverințe, declarații (DASM).
+6. **Dosar șomaj + prime ANOFM.**
+7. **Cadastru/CF** — înscriere, radiere, eroare materială, copii.
+8. **Dosar pensie/deces** (CNPP).
+9. **PFA lifecycle** (ONRC handoff).
+10. **Urbanism/construcții.**
+11. **Petiții universale** (PetitionBuilder + adaptoare instituții).
+- **D212 + DUKIntegrator** (deprioritizat — SPV precompletează din 2026): spike DUKIntegrator headless izolat (nu porni definiția D212 înainte ca spike-ul să confirme fezabilitatea), definiție D212 + XML, import precompletate ANAF.
+- **Integrare QTSP reală** (certSIGN/Trans Sped, CSC API) — când apare primul flux care cere semnătură calificată reală + contract QTSP semnat; până atunci mock. Comutare mock↔real prin config.
+
+## Hardening înainte de lansare
+- [ ] **H.1 DPIA + pachet GDPR** (registru art. 30, contracte art. 28 subprocesatori, politici de retenție).
+- [ ] **H.2 Pen-test / audit de securitate** pe fluxurile cu date personale.
+- [ ] **H.3 Observabilitate** (metrici, alerting) fără PII + rate limiting.
+- [ ] **H.4 Review juridic** al poziționării și textelor (unealtă, nu consultant; fără „garantat").
+
+---
+
+### Note de execuție
+- Formularele intră ca **manifeste versionate** cu sursă oficială verificată — nu inventa link-uri, coduri sau câmpuri; verifică în `docs/` sau întreabă.
+- Formularele sezoniere (încălzire, APIA, programe verzi) se încarcă ca versiuni anuale, nu se hardcodează.
+- Semnătura reală depinde de contractul QTSP — până atunci mock; nu bloca fazele 1–3.
+- Fluxurile cu semnare doar la ghișeu (ex. evidența persoanelor) afișează explicit acest lucru în checklist.

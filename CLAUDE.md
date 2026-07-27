@@ -3,7 +3,27 @@
 Acest fișier e citit automat de agentul AI (Claude Code / Cursor) la începutul lucrului. **Respectă-l strict.** Context complet în [STANDARD.md](STANDARD.md); bootstrap în [SETUP.md](SETUP.md).
 
 ## Context proiect
-<!-- Completează la pornirea unui proiect nou: ce face aplicația, cine o folosește, integrări specifice. -->
+**Autopilot acte cetățean (RO).** SaaS care ține un profil unic al utilizatorului (date + documente urcate o dată) și generează formulare/cereri oficiale pre-completate, validate, semnabile electronic, gata de descărcat și depus. Piață: România. Spec v1: [SPEC.md](SPEC.md); backlog: [instructions/BACKLOG.md](instructions/BACKLOG.md). Sursa de adevăr pentru scope și fezabilitate: `docs/acte-ro-brief.md` și `docs/acte-ro-verificare.md` (de adăugat în `docs/` — până atunci, SPEC.md).
+
+**Principiul #1 de arhitectură: „generate, don't submit".** Aplicația generează dosarul perfect și duce userul până la butonul de trimitere; userul depune cu propriile credențiale (SPV/certificat). Nu construim auto-depunere.
+
+**Principiul #2 de produs: „dosare pentru evenimente de viață".** Userul spune „am vândut mașina", nu „vreau ITL-016". Fiecare formular intră ca **manifest versionat** (autoritate, jurisdicție, revizie, valabilitate, sursă+hash) — niciodată un PDF nedatat. Roadmap după 230: dosar auto → C168 → clădiri/teren → copil (D212 deprioritizat) — vezi `docs/roadmap-formulare.md` + ADR 0003.
+
+## Guardrails proiect (reguli dure — nu le încălca)
+- **Unealtă, nu consultant.** Fără opinii/optimizări fiscale sau juridice personalizate. Transformăm mecanic datele introduse de user în formular. (Consultanța fiscală fără drept e infracțiune — OG 71/2001 art. 25.)
+- **Fără auto-submit ANAF prin API** — nu există API de depunere generică. Nu implementa asta.
+- **Fără automatizare de browser pe SPV** în v1 (zonă gri ToS).
+- **Fără CEI/ROeID pentru semnătură** în v1 (CEI = doar avansată, respinsă de ANAF; ROeID = doar autentificare). Semnătura calificată se face prin QTSP (CSC API).
+- **Marketing/UX:** niciodată „100% corect", „garantat", „ca un avocat/contabil". Formularea corectă: userul verifică, semnează și depune pe propria răspundere.
+- **Nu inventa** coduri de formulare, câmpuri, rute sau API-uri. Dacă un fapt lipsește, caută în `docs/` sau întreabă — nu presupune.
+- Partea riscantă (ANAF/DUKIntegrator) se face în sesiune separată de spike, izolat.
+
+## Reguli de date (GDPR — obligatorii)
+- CNP + serie/nr CI + scanuri = date protejate (Legea 190/2018 art. 4). **Criptare per-câmp** (envelope encryption cu KMS), nu în clar în DB.
+- **Nu loga niciodată PII** (CNP, nume, scanuri, venituri). Log-uri și mesaje de eroare fără date personale.
+- **Minimizare** + temei legal explicit per categorie de date + **retenție definită** (ștergere scanuri după utilizare).
+- **Consent ledger** + audit log (cine/ce/când), fără PII în audit.
+- Rezidența datelor: RO/UE.
 
 ## Stack (FIX — nu schimba)
 TypeScript (strict) · Node.js (LTS) · Next.js (App Router) · PostgreSQL · Prisma · Zod · pg-boss · better-auth · Playwright + Vitest · Docker/Compose · GitHub.
@@ -62,3 +82,5 @@ TypeScript (strict) · Node.js (LTS) · Next.js (App Router) · PostgreSQL · Pr
 - [ ] migrare DB inclusă dacă s-a schimbat schema
 - [ ] documentația actualizată (architecture / ADR / runbook, după caz)
 - [ ] status task actualizat în GitHub Projects
+
+Specific proiectului (production-ready): tratare de erori, validare de input (Zod), RBAC pe rutele cu date personale, fără secrete în cod, fără TODO-uri lăsate pe fluxuri critice. Felii verticale mici, una per branch — nu ataca mai multe module deodată.
