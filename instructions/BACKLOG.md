@@ -23,7 +23,7 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
   - *Acceptare:* upload securizat; OCR extrage câmpurile de bază; user confirmă înainte de salvare; scan criptat + retenție.
 - [x] **1.4 Consimțământ + drepturi GDPR** (consent ledger, export & ștergere date). *(`src/lib/gdpr/`: consent ledger + export + ștergere + audit fără PII; pagină confidențialitate; rate limiting ON — ADR 0008)*
   - *Acceptare:* consimțământ per categorie; user poate exporta și șterge datele; audit fără PII.
-- [ ] **1.5 Motor de template-uri (bază) + definiția formularului 230.**
+- [x] **1.5 Motor de template-uri (bază) + definiția formularului 230.** *(`src/lib/forms/`: registry + selecție versionată, mapare declarativă, PDF cu pdf-lib; manifest 230; API + pagină + e2e — ADR 0009)*
   - *Acceptare:* definiția = **manifest versionat** (autoritate, jurisdicție, cod, revizie, valabilitate, sursă+hash, workflow, semnătură — vezi SPEC); selecție după jurisdicție + dată; mapare declarativă profil→230; generare PDF corect completat; test pe date de eșantion.
 - [ ] **1.6 Preview „exact ce semnezi" + abstracție semnătură (provider mock).**
   - *Acceptare:* preview fidel; interfață de semnătură cu provider mock în dev; document „semnat" arhivat.
