@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { FormManifest } from "./manifest";
 import { registerManifest } from "./manifest";
 
@@ -59,6 +60,15 @@ export const F230_MANIFEST: FormManifest = {
     },
   ],
 };
+
+// Validare la granița formularului 230 (input extern → Zod, ca la restul
+// rutelor). Plafonează lungimile → nu ajunge text nemărginit în PDF/DB.
+export const F230BodySchema = z.object({
+  beneficiarDenumire: z.string().max(200).optional(),
+  beneficiarCif: z.string().max(20).optional(),
+  beneficiarIban: z.string().max(34).optional(),
+  doiAni: z.union([z.boolean(), z.string().max(10)]).optional(),
+});
 
 export function registerF230(): void {
   registerManifest(F230_MANIFEST);

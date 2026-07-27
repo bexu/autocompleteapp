@@ -1,7 +1,15 @@
 import { prisma } from "@/lib/db/prisma";
 import { getProfile, type DecryptedProfile } from "@/lib/profile/repository";
-import { listDocuments, type DocumentMeta } from "@/lib/documents/repository";
-import { listSignedForms, type SignedFormMeta } from "@/lib/signature/repository";
+import {
+  getDocumentContent,
+  listDocuments,
+  type DocumentMeta,
+} from "@/lib/documents/repository";
+import {
+  getSignedFormContent,
+  listSignedForms,
+  type SignedFormMeta,
+} from "@/lib/signature/repository";
 import { listDossiers, type DossierMeta } from "@/lib/dispatch/repository";
 import { listVehicule, type Vehicul } from "@/lib/vehicle/repository";
 import { listImobile, type Imobil } from "@/lib/imobil/repository";
@@ -18,14 +26,25 @@ export interface ReminderExport {
   deadlineAt: Date;
 }
 
+// Metadate + conținutul efectiv (base64). Formularele generate și scanurile sunt
+// deseori SINGURA copie a unor date personale (ex. CNP-ul copilului dintr-un PDF
+// de alocație, corpul unei petiții) — accesul (art. 15) trebuie să le includă.
+export interface SignedFormExport extends SignedFormMeta {
+  contentBase64: string | null;
+}
+
+export interface DocumentExport extends DocumentMeta {
+  contentBase64: string | null;
+}
+
 export interface UserDataExport {
   generatedAt: string;
   account: { email: string; name: string; createdAt: Date } | null;
   profile: DecryptedProfile | null;
   vehicule: Vehicul[];
   imobile: Imobil[];
-  documents: DocumentMeta[];
-  signedForms: SignedFormMeta[];
+  documents: DocumentExport[];
+  signedForms: SignedFormExport[];
   dossiers: DossierMeta[];
   reminders: ReminderExport[];
   consents: ConsentStatus[];
@@ -48,6 +67,22 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
       getConsentStatus(userId),
     ]);
 
+  // Atașează conținutul efectiv (decriptat) pentru scanuri și formulare semnate.
+  const [documentsFull, signedFormsFull] = await Promise.all([
+    Promise.all(
+      documents.map(async (m) => {
+        const c = await getDocumentContent(userId, m.id);
+        return { ...m, contentBase64: c ? c.bytes.toString("base64") : null };
+      }),
+    ),
+    Promise.all(
+      signedForms.map(async (m) => {
+        const c = await getSignedFormContent(userId, m.id);
+        return { ...m, contentBase64: c ? c.bytes.toString("base64") : null };
+      }),
+    ),
+  ]);
+
   await audit(userId, "DATA_EXPORT");
 
   return {
@@ -56,8 +91,8 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
     profile,
     vehicule,
     imobile,
-    documents,
-    signedForms,
+    documents: documentsFull,
+    signedForms: signedFormsFull,
     dossiers,
     reminders: reminderRows.map((r) => ({
       formCode: r.formCode,

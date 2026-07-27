@@ -1,16 +1,21 @@
 import { NextResponse } from "next/server";
+import { ZodError } from "zod";
 import { requireUser, UnauthorizedError } from "@/lib/auth/session";
 import {
   FormValidationError,
   ManifestNotFoundError,
   signForm,
 } from "@/lib/forms/engine";
+import { F230BodySchema } from "@/lib/forms/f230";
+import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
 // Semnează (provider mock/QTSP) + arhivează criptat, apoi întoarce PDF-ul semnat.
 export async function POST(req: Request) {
   try {
     const user = await requireUser();
-    const inputs = await req.json().catch(() => ({}));
+    guardGeneration(user.id);
+    const body = await req.json().catch(() => ({}));
+    const inputs = F230BodySchema.parse(body);
     const { signedPdf, signedFormId, dossierId } = await signForm(user.id, {
       formCode: "230",
       inputs,
@@ -26,6 +31,13 @@ export async function POST(req: Request) {
   } catch (e) {
     if (e instanceof UnauthorizedError) {
       return NextResponse.json({ error: "neautentificat" }, { status: 401 });
+    }
+    if (e instanceof RateLimitError) return rateLimitResponse();
+    if (e instanceof ZodError) {
+      return NextResponse.json(
+        { error: "validare", fields: e.issues.map((i) => i.path.join(".")) },
+        { status: 400 },
+      );
     }
     if (e instanceof FormValidationError) {
       return NextResponse.json(

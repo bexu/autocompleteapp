@@ -19,5 +19,10 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    // Suita creează multe conturi de pe același IP (localhost) → relaxăm rate-
+    // limit-ul de auth DOAR pentru e2e. Producția păstrează pragurile stricte.
+    // Setat pentru întreaga comandă (build + start), deci ține și dacă valoarea
+    // e inline-ată la build.
+    env: { AUTH_RATE_LIMIT_RELAXED: "true" },
   },
 });

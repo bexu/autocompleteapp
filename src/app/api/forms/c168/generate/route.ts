@@ -7,11 +7,13 @@ import {
   generateAndFileForm,
 } from "@/lib/forms/engine";
 import { C168BodySchema } from "@/lib/forms/c168";
+import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
 // Generează + arhivează C168 și deschide un dosar „de depus" (SPV).
 export async function POST(req: Request) {
   try {
     const user = await requireUser();
+    guardGeneration(user.id);
     const body = await req.json().catch(() => ({}));
     const { imobilId, ...inputs } = C168BodySchema.parse(body);
     const { pdf, dossierId } = await generateAndFileForm(user.id, {
@@ -28,6 +30,7 @@ export async function POST(req: Request) {
     });
   } catch (e) {
     if (e instanceof UnauthorizedError) return NextResponse.json({ error: "neautentificat" }, { status: 401 });
+    if (e instanceof RateLimitError) return rateLimitResponse();
     if (e instanceof ZodError) {
       return NextResponse.json({ error: "validare", fields: e.issues.map((i) => i.path.join(".")) }, { status: 400 });
     }

@@ -35,6 +35,19 @@ describe("redact — chei PII", () => {
     expect(out.count).toBe(3);
   });
 
+  it("redactează data nașterii și expirarea CI (camelCase: dataNasterii, ciExp)", () => {
+    const out = redact({
+      dataNasterii: new Date("1992-07-07T00:00:00.000Z"),
+      ciExp: new Date("2030-01-01T00:00:00.000Z"),
+      birthDate: "1992-07-07",
+      sex: "M",
+    }) as Record<string, unknown>;
+    expect(out.dataNasterii).toBe("[REDACTED]");
+    expect(out.ciExp).toBe("[REDACTED]");
+    expect(out.birthDate).toBe("[REDACTED]");
+    expect(out.sex).toBe("M"); // non-identificator direct rămâne
+  });
+
   it("acoperă forma user better-auth ({ id, name, email })", () => {
     const out = redact({ id: "u_1", name: "Maria I.", email: "m@ex.com" }) as Record<
       string,

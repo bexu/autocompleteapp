@@ -1,6 +1,7 @@
 import { PgBoss } from "pg-boss";
 import { logger } from "@/lib/log/logger";
 import { REMINDERS_QUEUE, runRemindersJob } from "./reminders";
+import { RETENTION_QUEUE, runRetentionJob } from "./retention";
 
 // Logica worker-ului pg-boss. Importată dinamic din worker.ts DUPĂ încărcarea
 // mediului. Conexiune din DATABASE_URL.
@@ -18,8 +19,14 @@ export async function startWorker(): Promise<void> {
     await runRemindersJob();
   });
 
-  // Scanare zilnică a termenelor la 06:00.
-  await boss.schedule(REMINDERS_QUEUE, "0 6 * * *");
+  await boss.createQueue(RETENTION_QUEUE);
+  await boss.work(RETENTION_QUEUE, async () => {
+    await runRetentionJob();
+  });
 
-  logger.info("Worker pg-boss pornit", { queue: REMINDERS_QUEUE });
+  // Scanare zilnică a termenelor la 06:00; purjarea scanurilor expirate la 03:30.
+  await boss.schedule(REMINDERS_QUEUE, "0 6 * * *");
+  await boss.schedule(RETENTION_QUEUE, "30 3 * * *");
+
+  logger.info("Worker pg-boss pornit", { queues: [REMINDERS_QUEUE, RETENTION_QUEUE] });
 }

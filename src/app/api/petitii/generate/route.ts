@@ -4,23 +4,25 @@ import { requireUser, UnauthorizedError } from "@/lib/auth/session";
 import {
   FormValidationError,
   ManifestNotFoundError,
-  previewForm,
 } from "@/lib/forms/engine";
-import { F230BodySchema } from "@/lib/forms/f230";
+import { generatePetitie } from "@/lib/petitii/service";
+import { PetitieBodySchema } from "@/lib/forms/petitii";
+import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
-// Preview „exact ce semnezi": întoarce valorile mapate (pentru revizuire),
-// fără a genera/semna. Owner-ul își vede propriile date peste sesiune.
+// Builder petiții: profil + text → o cerere generată + dosar de depus.
 export async function POST(req: Request) {
   try {
     const user = await requireUser();
+    guardGeneration(user.id);
     const body = await req.json().catch(() => ({}));
-    const inputs = F230BodySchema.parse(body);
-    const { fields, manifest } = await previewForm(user.id, { formCode: "230", inputs });
-    return NextResponse.json({ title: manifest.title, fields });
+    const input = PetitieBodySchema.parse(body);
+    const result = await generatePetitie(user.id, input);
+    return NextResponse.json(result);
   } catch (e) {
     if (e instanceof UnauthorizedError) {
       return NextResponse.json({ error: "neautentificat" }, { status: 401 });
     }
+    if (e instanceof RateLimitError) return rateLimitResponse();
     if (e instanceof ZodError) {
       return NextResponse.json(
         { error: "validare", fields: e.issues.map((i) => i.path.join(".")) },
