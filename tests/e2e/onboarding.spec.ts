@@ -36,7 +36,8 @@ test("upload CI → OCR → confirmare → profil pre-completat", async ({ page 
   await expect(page.getByTestId("f-serie")).toHaveValue("TR");
   await expect(page.getByTestId("f-dob")).toHaveValue("1996-01-01");
 
-  // Confirmă → salvare în profil → redirect la profil, cu CNP mascat.
+  // Confirmă (cu consimțământ) → salvare în profil → redirect la profil.
+  await page.getByTestId("consent").check();
   await page.getByTestId("confirm").click();
   await expect(page).toHaveURL(/\/dashboard\/profil/);
   await expect(page.getByTestId("cnp-mask")).toContainText("3143");

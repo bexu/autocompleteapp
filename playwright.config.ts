@@ -6,7 +6,9 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "tests/e2e",
-  // Un flux ratat nu trebuie să treacă din cauza flakiness; dar nici să blocheze.
+  // Server + DB partajate + hashing de parolă (scrypt) intenționat lent →
+  // serializăm ca să nu apară timeout-uri din contenție, nu din bug-uri.
+  workers: 1,
   retries: process.env.CI ? 1 : 0,
   use: {
     baseURL: "http://localhost:3000",
@@ -17,5 +19,8 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    // Rate limiting rămâne ON în producție; îl relaxăm doar pentru suita e2e
+    // (multe fluxuri de auth de pe același IP).
+    env: { ...process.env, AUTH_RATE_LIMIT: "off" },
   },
 });
