@@ -145,21 +145,21 @@ export function AutoWizard({ vehicule }: { vehicule: VehiculOpt[] }) {
               <div className="grid-2">
                 <div className="field">
                   <label className="field__label" htmlFor="aw-cnume">Cumpărător — nume</label>
-                  <input id="aw-cnume" className="input" name="contrapartaNume" placeholder="Nume complet" data-testid="contraparta-nume" />
+                  <input id="aw-cnume" className="input" name="contrapartaNume" placeholder="Nume complet" required data-testid="contraparta-nume" />
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="aw-ccnp">Cumpărător — CNP</label>
-                  <input id="aw-ccnp" className="input input--mono" name="contrapartaCnp" placeholder="13 cifre" data-testid="contraparta-cnp" />
+                  <input id="aw-ccnp" className="input input--mono" name="contrapartaCnp" placeholder="13 cifre" required data-testid="contraparta-cnp" />
                 </div>
               </div>
               <div className="grid-2">
                 <div className="field">
                   <label className="field__label" htmlFor="aw-pret">Preț (lei)</label>
-                  <input id="aw-pret" className="input input--mono" name="pret" placeholder="15000" data-testid="pret" />
+                  <input id="aw-pret" className="input input--mono" name="pret" placeholder="15000" required data-testid="pret" />
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="aw-data">Data tranzacției</label>
-                  <input id="aw-data" className="input input--mono" name="data" placeholder="2026-03-01" data-testid="data" />
+                  <input id="aw-data" className="input input--mono" name="data" placeholder="2026-03-01" required data-testid="data" />
                 </div>
               </div>
             </>
