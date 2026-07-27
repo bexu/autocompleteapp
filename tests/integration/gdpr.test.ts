@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db/prisma";
 import { resetEnvCache } from "@/lib/config/env";
 import { upsertProfile } from "@/lib/profile/repository";
 import { saveDocument } from "@/lib/documents/repository";
+import { createVehicul } from "@/lib/vehicle/repository";
 import { signForm } from "@/lib/forms/engine";
 import {
   getConsentStatus,
@@ -72,6 +73,7 @@ describe("GDPR (integration, DB reală)", () => {
       bytes: Buffer.from("x"),
     });
     await grantConsent(userId, "IDENTITATE");
+    await createVehicul(userId, { marca: "Dacia", model: "Logan" });
     // Semnează un 230 → creează SignedForm + Dossier.
     await signForm(userId, {
       formCode: "230",
@@ -87,10 +89,11 @@ describe("GDPR (integration, DB reală)", () => {
     expect(data.profile?.cnp).toBe("1960101223143"); // decriptat pentru owner
     expect(data.documents).toHaveLength(1);
     expect(data.consents.find((c) => c.category === "IDENTITATE")?.granted).toBe(true);
-    // Fără breșă de acces: semnate + dosare sunt incluse.
+    // Fără breșă de acces: semnate + dosare + vehicule sunt incluse.
     expect(data.signedForms.length).toBeGreaterThanOrEqual(1);
     expect(data.dossiers.length).toBeGreaterThanOrEqual(1);
     expect(data.dossiers[0].formCode).toBe("230");
+    expect(data.vehicule.length).toBeGreaterThanOrEqual(1);
   });
 
   it("ștergere date: profil/documente/consimțăminte dispar, contul rămâne", async () => {
@@ -104,12 +107,14 @@ describe("GDPR (integration, DB reală)", () => {
       bytes: Buffer.from("x"),
     });
     await grantConsent(userId, "IDENTITATE");
+    await createVehicul(userId, { marca: "Dacia" });
 
     await deleteUserData(userId);
 
     expect(await prisma.profile.count({ where: { userId } })).toBe(0);
     expect(await prisma.document.count({ where: { userId } })).toBe(0);
     expect(await prisma.consent.count({ where: { userId } })).toBe(0);
+    expect(await prisma.vehicul.count({ where: { userId } })).toBe(0);
     expect(await prisma.user.count({ where: { id: userId } })).toBe(1); // contul rămâne
     // Auditul de ștergere există.
     expect(

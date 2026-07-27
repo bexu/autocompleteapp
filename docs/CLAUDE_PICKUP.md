@@ -3,6 +3,15 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Faza 2 pornită — Task 2.1 Vehicul, pe branch `feat/m2-vehicle-entity`.** (2026-07-27)
+- Entitate `Vehicul` (câmpurile SPEC + ITL-005 Cluj: normaPoluare/emisiiCo2GKm/putereKw) + migrare.
+- `src/lib/vehicle/` (schema Zod cu validare VIN/an, repository CRUD cu verificare proprietate); API `/api/vehicule` + `[id]`; pagină `/dashboard/vehicule`.
+- Inclus în export + ștergere GDPR (parita­te menținută).
+- **Fix securitate:** rate limit better-auth — default-ul strict (~3/fereastră pe /sign-up) pica e2e; NU se poate comuta prin env (Next inline-ază process.env la build). Soluție: `customRules` explicite 100/60s pe rutele de auth (protectiv, testabil).
+- Verificat: 76 unit + 29 integrare + 7 e2e — verzi.
+- **Următorul: 2.2 OCR CIV + contract → pre-completare vehicul; apoi 2.3 manifeste auto (ITL-054/005/016/010 + DGPCI), 2.4 wizard eveniment, 2.5 checklist-uri dosar, 2.6 e2e.**
+
+
 **FAZA 1 COMPLETĂ — felia verticală 230 production-ready.** (2026-07-27)
 - Toate taskurile 1.1–1.9 gata, fiecare pe PR separat cu CI verde.
 - 1.9: `tests/e2e/golden-path.spec.ts` leagă tot parcursul într-un singur test.

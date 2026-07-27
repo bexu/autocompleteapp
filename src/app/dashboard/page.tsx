@@ -51,6 +51,9 @@ export default async function DashboardPage() {
         <Link href="/dashboard/dosare" data-testid="link-dosare">
           Dosarele mele
         </Link>
+        <Link href="/dashboard/vehicule" data-testid="link-vehicule">
+          Vehiculele mele
+        </Link>
       </p>
       <LogoutButton />
     </main>
