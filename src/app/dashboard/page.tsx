@@ -20,7 +20,10 @@ export default async function DashboardPage() {
       <p>
         Rol: <span data-testid="user-role">{role}</span>
       </p>
-      <p>
+      <p style={{ display: "flex", gap: 12 }}>
+        <Link href="/dashboard/onboarding" data-testid="link-onboarding">
+          Încarcă buletinul
+        </Link>
         <Link href="/dashboard/profil" data-testid="link-profil">
           Profilul meu
         </Link>

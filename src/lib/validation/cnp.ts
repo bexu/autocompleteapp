@@ -25,3 +25,40 @@ export function isValidCnp(cnp: string): boolean {
 
   return control === digits[12];
 }
+
+export interface CnpInfo {
+  sex: "M" | "F" | null;
+  birthDate: Date | null;
+}
+
+// Prima cifră (S) → secolul nașterii. 7/8 (rezidenți) și 9 (străini) nu codează
+// secolul determinist — le lăsăm fără dată.
+const CENTURY_BY_S: Record<number, number> = { 1: 1900, 2: 1900, 3: 1800, 4: 1800, 5: 2000, 6: 2000 };
+
+/** Derivă sexul și data nașterii dintr-un CNP valid (null dacă e invalid). */
+export function parseCnp(cnp: string): CnpInfo | null {
+  if (!isValidCnp(cnp)) return null;
+  const d = cnp.split("").map(Number);
+  const s = d[0];
+
+  const sex = s === 9 ? null : s % 2 === 1 ? "M" : "F";
+
+  const century = CENTURY_BY_S[s];
+  let birthDate: Date | null = null;
+  if (century !== undefined) {
+    const year = century + d[1] * 10 + d[2];
+    const month = d[3] * 10 + d[4];
+    const day = d[5] * 10 + d[6];
+    const dt = new Date(Date.UTC(year, month - 1, day));
+    // Verifică că data e reală (ex. respinge 31 februarie).
+    if (
+      dt.getUTCFullYear() === year &&
+      dt.getUTCMonth() === month - 1 &&
+      dt.getUTCDate() === day
+    ) {
+      birthDate = dt;
+    }
+  }
+
+  return { sex, birthDate };
+}
