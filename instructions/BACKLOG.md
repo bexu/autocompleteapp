@@ -48,7 +48,9 @@ Cea mai bună extindere după 230: userul repetă aceleași date în 4–5 docum
   - *Acceptare:* selecție eveniment → set corect de documente; goluri completate de user; preview per document. *(vânzare: ITL-010/054/016; cumpărare: ITL-005/DGPCI)*
 - [x] **2.5 Dosar cu checklist-uri separate** (taxe locale / DGPCI / RCA-CASCO / păstrare număr) + tracking per pas. *(checklist per eveniment în wizard; fiecare formular are dosar propriu DE_DEPUS→DEPUS cu handoff)*
   - *Acceptare:* stări urmărite: „fiscal obținut", „scos din evidență", „transcris", „RCA reziliat"; reminder pe pași rămași. *(checklist cross-instituție afișat; tracking per dosar prin stările existente)*
-- [ ] **2.6 E2E dosar auto** (vânzare + cumpărare).
+- [x] **2.6 E2E dosar auto** (vânzare + cumpărare). *(`auto-wizard.spec.ts` vânzare + `auto-cumparare.spec.ts` cumpărare)*
+
+> **Faza 2 COMPLETĂ** (2026-07-27) — dosar auto production-ready. + sistem de design UI/UX pentru toată aplicația (full-width dashboard cu KPI, accent civic-blue, coduri în mono, light/dark).
 
 ## Faza 3 — C168: închiriere (OPANAF 161/2025)
 - [ ] **3.1 Entitatea `Imobil`** (minim necesar pentru C168) + migrare.
