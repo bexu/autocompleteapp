@@ -19,7 +19,7 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
   - *Acceptare:* signup/login/logout; RBAC minim; teste. *(e2e: signup→dashboard→logout→guard→login; unit RBAC)*
 - [x] **1.2 Model canonic „cetățean"** (schema din SPEC) + migrări. *(Profile/Address + migrare; repository cu criptare per-câmp + AAD=user; validatori CNP/IBAN; API `/api/profile` + pagină; test integrare pe DB reală: CNP nu e în clar. Completează și partea DB rămasă din 0.3.)*
   - *Acceptare:* CRUD pe profil; câmpuri sensibile criptate; validare (checksum CNP, IBAN). Entitățile se modelează explicit (nu `Bun` generic); `Vehicul`/`Imobil` se adaugă la feliile lor.
-- [x] **1.3 Seif de documente + upload CI** + OCR → pre-completare profil. *(seif criptat + retenție/purjare `src/lib/documents/`; OCR MRZ TD1 + **imagine on-device (Tesseract) — ADR 0011**; flux upload→extrage→confirmă→profil; e2e onboarding)*
+- [x] **1.3 Seif de documente + upload CI** + OCR → pre-completare profil. *(seif criptat + retenție/purjare `src/lib/documents/`; OCR MRZ TD1 + extractor robust de text `src/lib/ocr/`; date de exemplu pentru demo; flux upload→extrage→confirmă→profil; e2e onboarding. OCR pe imagine (Tesseract) încercat și scos — ADR 0011.)*
   - *Acceptare:* upload securizat; OCR extrage câmpurile de bază; user confirmă înainte de salvare; scan criptat + retenție.
 - [x] **1.4 Consimțământ + drepturi GDPR** (consent ledger, export & ștergere date). *(`src/lib/gdpr/`: consent ledger + export + ștergere + audit fără PII; pagină confidențialitate; rate limiting ON — ADR 0008)*
   - *Acceptare:* consimțământ per categorie; user poate exporta și șterge datele; audit fără PII.

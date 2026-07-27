@@ -15,5 +15,3 @@ prisma/*.db
 next-env.d.ts
 .vercel
 *.pem
-eng.traineddata
-*.traineddata

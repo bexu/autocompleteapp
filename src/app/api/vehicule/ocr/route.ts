@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       mimeType: file.type || "application/octet-stream",
       bytes,
     });
-    const extracted = await getVehicleOcrProvider().extractVehicle(bytes, file.type);
+    const extracted = await getVehicleOcrProvider().extractVehicle(bytes);
 
     return NextResponse.json({ document: meta, extracted });
   } catch (e) {

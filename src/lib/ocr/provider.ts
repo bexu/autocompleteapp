@@ -1,11 +1,11 @@
 import { isValidCnp, parseCnp } from "@/lib/validation/cnp";
 import { parseTd1Mrz } from "./mrz";
-import { documentToText } from "./image";
 
-// Abstracție OCR pentru documente de identitate. Acceptă fișier TEXT cu MRZ SAU
-// o IMAGINE (poză/scan CI) — imaginea trece prin OCR on-device (Tesseract),
-// apoi textul e parsat. Robust la zgomotul de OCR: dacă MRZ-ul nu e citit
-// perfect, cade pe scanarea directă a textului după un CNP valid. Vezi ADR 0011.
+// Abstracție OCR pentru documente de identitate. Acceptă TEXT (zona MRZ, sau un
+// export text al datelor). Robust la text zgomotos: dacă MRZ-ul nu e complet,
+// cade pe scanarea directă a textului după un CNP valid + serie/nr + nume.
+// OCR pe imagine (foto → text) a fost încercat cu Tesseract, dar nu era fiabil
+// pe poze reale de CI — vezi ADR 0011 (respins). Fața CI se completează manual.
 
 export interface IdCardFields {
   nume: string | null;
@@ -20,7 +20,7 @@ export interface IdCardFields {
 }
 
 export interface OcrProvider {
-  extractIdCard(bytes: Buffer, mime?: string): Promise<IdCardFields>;
+  extractIdCard(bytes: Buffer): Promise<IdCardFields>;
 }
 
 const EMPTY: IdCardFields = {
@@ -111,11 +111,10 @@ export function extractIdentityFromText(text: string): IdCardFields {
   };
 }
 
-/** Provider CI: acceptă text (MRZ) sau imagine (poză/scan → OCR). */
+/** Provider CI: parsează textul (MRZ) al documentului. */
 export class MrzOcrProvider implements OcrProvider {
-  async extractIdCard(bytes: Buffer, mime?: string): Promise<IdCardFields> {
-    const text = await documentToText(bytes, mime);
-    return extractIdentityFromText(text);
+  async extractIdCard(bytes: Buffer): Promise<IdCardFields> {
+    return extractIdentityFromText(bytes.toString("utf8"));
   }
 }
 
