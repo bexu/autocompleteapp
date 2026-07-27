@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { computeCheckDigit, parseTd1Mrz } from "@/lib/ocr/mrz";
-import { MrzOcrProvider } from "@/lib/ocr/provider";
+import { MrzOcrProvider, extractIdentityFromText } from "@/lib/ocr/provider";
 
 // MRZ TD1 valid (CI românesc sintetic) cu CNP 1960101223143 și check-digits
 // corecte — generat cu algoritmul standard.
@@ -57,5 +57,36 @@ describe("MrzOcrProvider", () => {
     const fields = await new MrzOcrProvider().extractIdCard(Buffer.from("poză fără MRZ"));
     expect(fields.source).toBe("none");
     expect(fields.cnp).toBeNull();
+  });
+});
+
+describe("extractIdentityFromText (robust la zgomot OCR)", () => {
+  it("recuperează CNP + serie/nr din text OCR chiar dacă MRZ e stricat", () => {
+    // Simulează OCR de pe fața CI: MRZ incomplet, dar CNP + serie/nr lizibile.
+    const ocr = [
+      "ROMANIA CARTE DE IDENTITATE",
+      "Nume IONESCU",
+      "Prenume ANA MARIA",
+      "CNP 1960101223143",
+      "Seria TR nr 123456",
+      "IDROUTR123456<51960101223143<<",
+    ].join("\n");
+    const f = extractIdentityFromText(ocr);
+    expect(f.cnp).toBe("1960101223143");
+    expect(f.ciSerie).toBe("TR");
+    expect(f.ciNr).toBe("123456");
+    expect(f.nume).toBe("IONESCU"); // din eticheta „Nume"
+    expect(f.prenume).toBe("ANA MARIA"); // din eticheta „Prenume"
+    expect(f.sex).toBe("M"); // din CNP
+    expect(f.dataNasterii).toBe("1996-01-01"); // din CNP
+    expect(["mrz", "ocr"]).toContain(f.source);
+  });
+
+  it("source none dacă nu găsește niciun CNP valid", () => {
+    expect(extractIdentityFromText("text fără date").source).toBe("none");
+  });
+
+  it("ignoră un CNP cu checksum greșit din zgomot", () => {
+    expect(extractIdentityFromText("cod 1111111111111 aici").cnp).toBeNull();
   });
 });

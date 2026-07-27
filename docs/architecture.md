@@ -14,7 +14,7 @@ Produsul e organizat pe **„dosare pentru evenimente de viață"** (ex. „am v
 - Task-uri pe fundal (pg-boss): worker separat `src/jobs/` (`npm run jobs`) — scanează zilnic dosarele „de depus" cu termen apropiat și creează remindere (praguri T30/T7/T1). Termenul dosarului (`deadlineAt`) se calculează din regula manifestului (25.05 pentru 230). Retenție/ștergere scanuri.
 
 ## Fluxuri principale
-1. **Onboarding:** cont → upload CI (seif criptat + retenție, `src/lib/documents/`) → OCR MRZ (`src/lib/ocr/`) → pre-completare profil → confirmare user + consimțământ per categorie.
+1. **Onboarding:** cont → upload CI text SAU **poză/scan** (seif criptat + retenție, `src/lib/documents/`) → OCR (MRZ TD1 + **imagine on-device cu Tesseract**, `src/lib/ocr/`, ADR 0011) → pre-completare profil → confirmare user + consimțământ per categorie.
 2. **Completare formular:** alegere formular → motor `src/lib/forms/` (manifest versionat `selectManifest` → mapare declarativă profil→câmpuri → generare PDF cu pdf-lib) → validare → preview. Formular 230 livrat (felia 1).
 3. **Semnare:** semnare calificată prin QTSP (CSC API; provider mock în dev), arhivare document semnat.
 4. **Depunere (handoff):** motor `src/lib/dispatch/` — semnarea deschide un `Dossier` (DE_DEPUS→DEPUS); handoff (checklist + canale SPV/borderou + termen) derivat din manifest. PDF + checklist + deep-link + instrucțiuni; userul marchează „depus" (nu depunem noi).
