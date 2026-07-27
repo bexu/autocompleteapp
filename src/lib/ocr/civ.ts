@@ -46,24 +46,26 @@ function toInt(v: string): number | null {
 
 function mapFuel(v: string): string | null {
   const s = v.toUpperCase();
+  const electric = /ELECTRIC|ELEKTR/.test(s);
+  const fossil = /BENZIN|PETROL|GASOLINE|MOTORIN|DIESEL/.test(s);
+  // Hibridul e prioritar: cuvântul „hibrid" SAU electric + fosil în același câmp.
+  if (/HIBRID|HYBRID|PHEV/.test(s) || (electric && fossil)) return "HIBRID";
+  if (electric) return "ELECTRIC";
   if (/BENZIN|PETROL|GASOLINE/.test(s)) return "BENZINA";
-  if (/MOTORIN|DIESEL|MOTORINA/.test(s)) return "MOTORINA";
-  if (/HIBRID|HYBRID/.test(s)) return "HIBRID";
-  if (/ELECTRIC|ELEKTR/.test(s)) return "ELECTRIC";
+  if (/MOTORIN|DIESEL/.test(s)) return "MOTORINA";
   if (/\bGPL\b|LPG/.test(s)) return "GPL";
   return null;
 }
 
-function extractYear(v: string): number | null {
-  const m = /\b(19|20)\d{2}\b/.exec(v);
-  return m ? Number(m[0]) : null;
+function isPlausibleVin(vin: string | null): boolean {
+  return !!vin && /^[A-HJ-NPR-Z0-9]{11,17}$/.test(vin);
 }
 
 /** Parsează textul unui CIV pe codurile UE. Întoarce câmpurile găsite. */
 export function parseCivText(text: string): VehicleFields {
   const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
   const result: VehicleFields = { ...EMPTY };
-  let found = false;
+  const matched = new Set<string>();
 
   for (const line of lines) {
     // cod = literă + eventual „.cifră" la începutul liniei, urmat de separator
@@ -75,52 +77,55 @@ export function parseCivText(text: string): VehicleFields {
     switch (code) {
       case "A":
         result.nrInmatriculare = value.replace(/\s+/g, " ");
-        found = true;
+        matched.add(code);
         break;
       case "E":
         result.vin = value.replace(/\s+/g, "").toUpperCase();
-        found = true;
+        matched.add(code);
         break;
-      case "B":
-        result.anFabricatie = extractYear(value);
-        found = true;
-        break;
+      // Nota: B = data PRIMEI ÎNMATRICULĂRI, nu anul fabricației — pe CIV nu
+      // există un cod armonizat pentru anul fabricației, deci nu îl deducem.
       case "D.1":
         result.marca = value;
-        found = true;
+        matched.add(code);
         break;
       case "D.3":
         result.model = value;
-        found = true;
+        matched.add(code);
         break;
       case "P.1":
         result.cilindreeCm3 = toInt(value);
-        found = true;
+        matched.add(code);
         break;
       case "P.2":
         result.putereKw = toInt(value);
-        found = true;
+        matched.add(code);
         break;
       case "P.3":
         result.combustibil = mapFuel(value);
-        found = true;
+        matched.add(code);
         break;
       case "F.1":
         result.masaMaximaKg = toInt(value);
-        found = true;
+        matched.add(code);
         break;
       case "V.7":
         result.emisiiCo2GKm = toInt(value);
-        found = true;
+        matched.add(code);
         break;
       case "V.9":
         result.normaPoluare = value;
-        found = true;
+        matched.add(code);
         break;
     }
   }
 
-  result.source = found ? "civ" : "none";
+  // Codurile cu o literă (A/B/E) apar și în contracte/CI ca enumerări. Semnalul
+  // tare e un cod cu punct (D.1, P.2, V.9 — nu apar în enumerări) SAU un VIN
+  // plauzibil pe câmpul E. Fără el, nu declarăm textul drept CIV.
+  const hasDottedCode = [...matched].some((c) => c.includes("."));
+  const isCiv = hasDottedCode || isPlausibleVin(result.vin);
+  result.source = isCiv ? "civ" : "none";
   return result;
 }
 

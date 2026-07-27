@@ -54,6 +54,11 @@ describe("mapForm (230)", () => {
     expect(r.errors.some((e) => e.key === "cnp")).toBe(true);
   });
 
+  it("respinge o valoare obligatorie doar cu spații (trim)", () => {
+    const r = mapForm(F230_MANIFEST, { profile: { ...profile, nume: "   " } }, goodInputs);
+    expect(r.errors.some((e) => e.key === "nume")).toBe(true);
+  });
+
   it("semnalează IBAN beneficiar invalid", () => {
     const r = mapForm(F230_MANIFEST, { profile }, {
       ...goodInputs,

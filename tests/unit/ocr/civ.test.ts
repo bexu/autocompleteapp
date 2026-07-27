@@ -28,7 +28,7 @@ describe("parseCivText", () => {
     expect(v.putereKw).toBe(140);
     expect(v.combustibil).toBe("MOTORINA");
     expect(v.masaMaximaKg).toBe(1980);
-    expect(v.anFabricatie).toBe(2019);
+    expect(v.anFabricatie).toBeNull(); // B = data primei înmatriculări, nu anul fabricației
     expect(v.emisiiCo2GKm).toBe(120);
     expect(v.normaPoluare).toBe("Euro 6");
   });
@@ -41,5 +41,28 @@ describe("parseCivText", () => {
 
   it("întoarce source none pentru text fără coduri", () => {
     expect(parseCivText("doar niște text").source).toBe("none");
+  });
+
+  it("NU confundă enumerările cu o literă (A/B/E) dintr-un contract cu un CIV", () => {
+    const contract = ["A. Vânzătorul Ion", "B. Cumpărătorul Ana", "E. Observații diverse"].join("\n");
+    expect(parseCivText(contract).source).toBe("none");
+  });
+
+  it("acceptă CIV pe baza unui cod cu punct (D.1) chiar fără VIN plauzibil", () => {
+    expect(parseCivText("D.1 BMW\nD.3 320d").source).toBe("civ");
+  });
+
+  it("acceptă CIV pe baza unui VIN plauzibil pe E, fără coduri cu punct", () => {
+    expect(parseCivText("A: CJ 12 ABC\nE: WBA3A5C50FF123456").source).toBe("civ");
+  });
+
+  it("clasifică hibridul corect chiar dacă P.3 numește și un combustibil fosil", () => {
+    expect(parseCivText("D.1 Toyota\nP.3 Benzina/Electric (hibrid)").combustibil).toBe("HIBRID");
+    expect(parseCivText("D.1 Toyota\nP.3 Benzina + Electric").combustibil).toBe("HIBRID");
+  });
+
+  it("NU pune data primei înmatriculări (B) în anul fabricației", () => {
+    const v = parseCivText("D.1 BMW\nB: 15.03.2019");
+    expect(v.anFabricatie).toBeNull();
   });
 });

@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 // Evenimente de viață auto → setul corect de formulare + inputurile lor +
 // checklist cross-instituție (taxe locale / DGPCI / RCA / plăcuțe). „Dosare
 // pentru evenimente de viață": userul spune „am vândut mașina", nu „vreau ITL-016".
@@ -9,15 +11,17 @@ export function isAutoEvent(v: string): v is AutoEvent {
   return (AUTO_EVENTS as readonly string[]).includes(v);
 }
 
-export interface AutoWizardInput {
-  event: AutoEvent;
-  vehicleId: string;
-  // Contraparte (cumpărător la vânzare / vânzător la cumpărare) — la vânzare.
-  contrapartaNume?: string;
-  contrapartaCnp?: string;
-  pret?: string;
-  data?: string; // data tranzacției
-}
+// Validare la granița wizardului auto (input extern → Zod, ca la Vehicul/Imobil).
+export const AutoWizardSchema = z.object({
+  event: z.enum(AUTO_EVENTS),
+  vehicleId: z.string().min(1, "vehicul lipsă"),
+  contrapartaNume: z.string().max(200).optional(),
+  contrapartaCnp: z.string().max(20).optional(),
+  pret: z.string().max(30).optional(),
+  data: z.string().max(30).optional(),
+});
+
+export type AutoWizardInput = z.infer<typeof AutoWizardSchema>;
 
 interface AutoFormRef {
   formCode: string;

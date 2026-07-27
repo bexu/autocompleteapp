@@ -57,7 +57,8 @@ export function mapForm(
     else if (def.source.from === "input") raw = inputs[def.source.key];
     else raw = def.source.value;
 
-    const value = toStr(raw);
+    // Trim: o valoare doar-spații e „lipsă", nu validă. Curăță și PDF-ul.
+    const value = toStr(raw).trim();
 
     if (def.required && value === "") {
       errors.push({ key: def.key, message: `${def.label} e obligatoriu` });

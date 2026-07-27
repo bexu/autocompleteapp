@@ -69,4 +69,18 @@ describe("dosar auto (integration, DB reală)", () => {
     });
     expect(result.forms.map((f) => f.formCode)).toEqual(["ITL-005", "DGPCI"]);
   });
+
+  it("atomicitate: o validare eșuată NU lasă dosare orfane (ITL-010 nu se creează)", async () => {
+    const before = await prisma.dossier.count({ where: { userId } });
+    const signedBefore = await prisma.signedForm.count({ where: { userId } });
+
+    // VANZARE fără datele cumpărătorului → ITL-054 e invalid; validarea trebuie
+    // să pice ÎNAINTE de a persista ITL-010 (primul din set).
+    await expect(
+      generateAutoCase(userId, { event: "VANZARE", vehicleId: vehiculId }),
+    ).rejects.toThrow();
+
+    expect(await prisma.dossier.count({ where: { userId } })).toBe(before);
+    expect(await prisma.signedForm.count({ where: { userId } })).toBe(signedBefore);
+  });
 });
