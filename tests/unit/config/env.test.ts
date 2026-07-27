@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getEnv, resetEnvCache } from "@/lib/config/env";
+import {
+  getEncryptionMasterKey,
+  getEnv,
+  resetEnvCache,
+} from "@/lib/config/env";
 
 function withEnv(vars: Record<string, string | undefined>, fn: () => void) {
   const original = { ...process.env };
@@ -69,9 +73,86 @@ describe("config/env", () => {
         DATABASE_URL: "postgresql://app:app@db:5432/app",
         ENCRYPTION_MASTER_KEY: "",
         BETTER_AUTH_SECRET: "",
+        BETTER_AUTH_URL: "https://app.example.ro",
       },
       () => {
-        expect(() => getEnv()).toThrow(/producție incomplet/);
+        expect(() => getEnv()).toThrow(/producție/);
+      },
+    );
+  });
+
+  it("aplică verificările fail-closed când NODE_ENV e nesetat", () => {
+    withEnv(
+      {
+        NODE_ENV: undefined,
+        DATABASE_URL: "postgresql://app:app@db:5432/app",
+        ENCRYPTION_MASTER_KEY: "",
+        BETTER_AUTH_SECRET: "",
+      },
+      () => {
+        // Fără NODE_ENV explicit dev/test → nu are voie să treacă fail-open.
+        expect(() => getEnv()).toThrow(/producție/);
+      },
+    );
+  });
+
+  it("cere https non-localhost pe BETTER_AUTH_URL în producție", () => {
+    const key = Buffer.alloc(32, 1).toString("base64");
+    withEnv(
+      {
+        NODE_ENV: "production",
+        DATABASE_URL: "postgresql://app:app@db:5432/app",
+        ENCRYPTION_MASTER_KEY: key,
+        BETTER_AUTH_SECRET: "x".repeat(32),
+        BETTER_AUTH_URL: "http://localhost:3000",
+      },
+      () => {
+        expect(() => getEnv()).toThrow(/BETTER_AUTH_URL/);
+      },
+    );
+  });
+
+  it("acceptă un config de producție complet și sigur", () => {
+    const key = Buffer.alloc(32, 1).toString("base64");
+    withEnv(
+      {
+        NODE_ENV: "production",
+        DATABASE_URL: "postgresql://app:app@db:5432/app",
+        ENCRYPTION_MASTER_KEY: key,
+        BETTER_AUTH_SECRET: "x".repeat(32),
+        BETTER_AUTH_URL: "https://app.example.ro",
+      },
+      () => {
+        expect(getEnv().NODE_ENV).toBe("production");
+      },
+    );
+  });
+});
+
+describe("getEncryptionMasterKey", () => {
+  afterEach(() => resetEnvCache());
+
+  it("aruncă dacă lipsește cheia", () => {
+    withEnv({ ENCRYPTION_MASTER_KEY: undefined }, () => {
+      expect(() => getEncryptionMasterKey()).toThrow(/lipsește/);
+    });
+  });
+
+  it("aruncă la lungime greșită", () => {
+    withEnv(
+      { ENCRYPTION_MASTER_KEY: Buffer.alloc(16, 1).toString("base64") },
+      () => {
+        expect(() => getEncryptionMasterKey()).toThrow(/32 bytes/);
+      },
+    );
+  });
+
+  it("întoarce un Buffer de 32 bytes pentru o cheie validă", () => {
+    withEnv(
+      { ENCRYPTION_MASTER_KEY: Buffer.alloc(32, 5).toString("base64") },
+      () => {
+        const key = getEncryptionMasterKey();
+        expect(key).toHaveLength(32);
       },
     );
   });

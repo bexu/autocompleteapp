@@ -3,6 +3,10 @@ import { redact } from "./redact";
 // Logger structurat, minimal, care redactează PII la fiecare apel. Toate
 // mesajele și contextul trec prin `redact` înainte să iasă din proces.
 // Nu folosi console.* direct pe fluxuri cu date personale — folosește asta.
+//
+// LIMITARE: `msg` e text liber; redactarea prinde tipare (CNP, IBAN, email,
+// telefon, serie/nr), dar NU nume proprii (nu au tipar). Nu interpola PII în
+// mesaj — pune identificatorii ca id-uri opace în `context`.
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
 
@@ -22,7 +26,16 @@ interface LogRecord {
 export type LogSink = (record: LogRecord) => void;
 
 const defaultSink: LogSink = (record) => {
-  const line = JSON.stringify(record);
+  // Plasă de siguranță: o eroare de serializare nu trebuie să dărâme apelantul,
+  // iar un bigint scăpat nu trebuie să arunce în JSON.stringify.
+  let line: string;
+  try {
+    line = JSON.stringify(record, (_k, v) =>
+      typeof v === "bigint" ? v.toString() : v,
+    );
+  } catch {
+    line = JSON.stringify({ level: record.level, msg: record.msg, time: record.time });
+  }
   if (record.level === "error") console.error(line);
   else if (record.level === "warn") console.warn(line);
   else console.log(line);

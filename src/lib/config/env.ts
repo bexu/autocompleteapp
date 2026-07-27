@@ -62,14 +62,25 @@ export function getEnv(): Env {
     );
   }
 
-  // Reguli suplimentare, doar în producție (dev/test rulează fără secrete reale).
-  if (parsed.data.NODE_ENV === "production") {
-    const missing: string[] = [];
-    if (parsed.data.ENCRYPTION_MASTER_KEY === "") missing.push("ENCRYPTION_MASTER_KEY");
-    if (parsed.data.BETTER_AUTH_SECRET.length < 32) missing.push("BETTER_AUTH_SECRET");
-    if (missing.length > 0) {
+  // Reguli suplimentare, aplicate fail-closed: rulează pentru ORICE mediu care
+  // nu e explicit `development`/`test` (inclusiv NODE_ENV nesetat), ca postura
+  // de securitate să nu depindă de o valoare implicită.
+  const rawNodeEnv = process.env.NODE_ENV;
+  const isRelaxed = rawNodeEnv === "development" || rawNodeEnv === "test";
+  if (!isRelaxed) {
+    const problems: string[] = [];
+    if (parsed.data.ENCRYPTION_MASTER_KEY === "") problems.push("ENCRYPTION_MASTER_KEY");
+    if (parsed.data.BETTER_AUTH_SECRET.length < 32) problems.push("BETTER_AUTH_SECRET (min 32)");
+    if (!/^https:\/\//.test(parsed.data.BETTER_AUTH_URL)) {
+      problems.push("BETTER_AUTH_URL (https obligatoriu)");
+    }
+    if (/localhost|127\.0\.0\.1/.test(parsed.data.BETTER_AUTH_URL)) {
+      problems.push("BETTER_AUTH_URL (nu poate fi localhost)");
+    }
+    if (problems.length > 0) {
       throw new Error(
-        `Config de producție incomplet: ${missing.join(", ")} sunt obligatorii în production.`,
+        `Config de producție incomplet/nesigur: ${problems.join(", ")}. ` +
+          `Setează NODE_ENV=development explicit dacă e un mediu de dezvoltare.`,
       );
     }
   }

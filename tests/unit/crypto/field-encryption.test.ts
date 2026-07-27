@@ -1,3 +1,4 @@
+import { createDecipheriv } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resetEnvCache } from "@/lib/config/env";
 import {
@@ -9,6 +10,20 @@ import {
 // Cheie de test deterministă (32 bytes base64).
 const TEST_KEY = Buffer.alloc(32, 7).toString("base64");
 const CNP = "1920707123456";
+
+// Descifrează DEK-ul împachetat direct din payload — reproduce „seam-ul" ca să
+// putem dovedi unicitatea DEK per valoare (nu doar că ciphertext-ul diferă).
+function unwrapDek(payload: string, kekB64: string): Buffer {
+  const segs = payload.split(":");
+  const kek = Buffer.from(kekB64, "base64");
+  const wrapIv = Buffer.from(segs[4], "base64");
+  const wrapTag = Buffer.from(segs[5], "base64");
+  const wrapCt = Buffer.from(segs[6], "base64");
+  const d = createDecipheriv("aes-256-gcm", kek, wrapIv, { authTagLength: 16 });
+  d.setAAD(Buffer.from("v1|wrap", "utf8"));
+  d.setAuthTag(wrapTag);
+  return Buffer.concat([d.update(wrapCt), d.final()]);
+}
 
 describe("field-encryption", () => {
   let original: string | undefined;
@@ -40,14 +55,36 @@ describe("field-encryption", () => {
     expect(encryptField(CNP)).not.toBe(encryptField(CNP));
   });
 
-  it("detectează alterarea (GCM auth tag)", () => {
-    const enc = encryptField(CNP);
-    const segs = enc.split(":");
-    // stricăm ciphertext-ul datelor
-    const ct = Buffer.from(segs[3], "base64");
-    ct[0] ^= 0xff;
-    segs[3] = ct.toString("base64");
-    expect(() => decryptField(segs.join(":"))).toThrow();
+  it("folosește un DEK unic per valoare (32 bytes, diferit)", () => {
+    const dek1 = unwrapDek(encryptField(CNP), TEST_KEY);
+    const dek2 = unwrapDek(encryptField(CNP), TEST_KEY);
+    expect(dek1.length).toBe(32);
+    expect(dek1.equals(Buffer.alloc(32))).toBe(false); // nu e cheie nulă
+    expect(dek1.equals(dek2)).toBe(false); // unic per apel
+  });
+
+  it("detectează alterarea pe FIECARE segment (ambele straturi GCM)", () => {
+    // segmente: [0]=v1 [1]=dataIv [2]=dataTag [3]=dataCt [4]=wrapIv [5]=wrapTag [6]=wrapDek
+    for (const idx of [1, 2, 3, 4, 5, 6]) {
+      const segs = encryptField(CNP).split(":");
+      const buf = Buffer.from(segs[idx], "base64");
+      buf[0] ^= 0xff;
+      segs[idx] = buf.toString("base64");
+      expect(() => decryptField(segs.join(":"))).toThrow();
+    }
+  });
+
+  it("respinge tag-uri trunchiate (authTagLength fixat la 16)", () => {
+    const segs = encryptField(CNP).split(":");
+    segs[2] = Buffer.from(segs[2], "base64").subarray(0, 4).toString("base64");
+    expect(() => decryptField(segs.join(":"))).toThrow(/tag/i);
+  });
+
+  it("leagă contextul (AAD): descriptarea cu alt context eșuează", () => {
+    const enc = encryptField(CNP, "user-1:cnp");
+    expect(decryptField(enc, "user-1:cnp")).toBe(CNP);
+    expect(() => decryptField(enc, "user-2:cnp")).toThrow();
+    expect(() => decryptField(enc)).toThrow(); // context implicit ≠ cel folosit
   });
 
   it("eșuează la descriptare cu altă cheie", () => {

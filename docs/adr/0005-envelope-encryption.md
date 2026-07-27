@@ -13,6 +13,10 @@ CNP, serie/nr CI și alte date de risc înalt (Legea 190/2018 art. 4) nu pot sta
 - DEK-ul e **împachetat** cu KEK (AES-256-GCM). Se stochează: versiune + IV-uri + tag-uri + DEK împachetat + ciphertext, ca string compact `v1:...`.
 - Non-determinist: fiecare apel produce alt ciphertext (fără leak prin egalitate). Consecință: **nu se poate căuta după egalitate pe câmp criptat** — dacă apare nevoia (ex. lookup după CNP), se adaugă un index blind separat (HMAC determinist cu cheie dedicată), decis atunci.
 
+### Întăriri (post-review adversarial M0)
+- **Tag GCM cu lungime fixă (16 bytes)** verificat pe ambele straturi (`authTagLength: 16` + respingere explicită dacă tag/IV n-au lungimea corectă) — altfel un tag trunchiat controlat de atacator (T1: acces la DB/backup) ar slăbi autentificarea de la 2^128 spre 2^32.
+- **AAD (context)**: `encryptField(value, context)` leagă criptografic versiunea + un context opțional (`${userId}:${field}`). Un blob nu poate fi mutat pe alt rând/user fără a fi respins la descriptare. Integrarea Prisma (1.2) furnizează contextul unde e disponibil.
+
 ### De ce KMS local (cheie în env/vault) în v1, nu cloud KMS
 - Zero dependență de furnizor + rezidență RO/UE garantată.
 - Interfața wrap/unwrap izolează KEK-ul: migrarea la un KMS (UE) înseamnă înlocuirea a două funcții, nu re-criptarea datelor.
