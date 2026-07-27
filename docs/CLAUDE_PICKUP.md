@@ -3,6 +3,15 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Impozit clădiri/teren (ITL-001/003) — implementat, pe branch `feat/m4-impozit-imobil`.** (2026-07-27)
+- `src/lib/forms/impozit.ts`: manifeste ITL-001 (clădiri) + ITL-003 (teren) Cluj, din profil + imobil + inputuri (dobândire, cotă, valoare/categorie) + Zod.
+- Wizard `/dashboard/impozit`: alege formularul după tipul imobilului; preview→generare→dosar (handoff DITL Cluj).
+- Reutilizează entitatea Imobil + sursa „imobil" din motor. API `/api/forms/impozit/{preview,generate}`.
+- **OCR pe imagine scos** (nefiabil pe poze reale — ADR 0011 respins); onboarding are „Folosește date de exemplu" + fallback demo.
+- Verificat: 104 unit + 42 integrare + 14 e2e — verzi.
+- **Următorul (roadmap): dosar copil (alocație+indemnizație), șomaj/ANOFM, cadastru/CF, pensie/deces, PFA, urbanism, petiții; SAU hardening H.1–H.4. Recomand review adversarial pe C168+impozit înainte de a merge mult mai departe.**
+
+
 **Faza 3 C168 — implementat, pe branch `feat/m3-c168`.** (2026-07-27)
 - Motor extins cu sursă „imobil" (FieldSource + mapForm + engine `opts.imobilId`).
 - `src/lib/forms/c168.ts`: manifest C168 (locator din profil + imobil + contract inputuri) + Zod la graniță.

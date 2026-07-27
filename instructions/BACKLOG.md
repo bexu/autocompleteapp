@@ -63,7 +63,7 @@ Cea mai bună extindere după 230: userul repetă aceleași date în 4–5 docum
 > **Faza 3 (C168) COMPLETĂ** (2026-07-27). Motorul are acum surse: profil + vehicul + imobil. OCR-ul de contract free-form (3.2) rămâne îmbunătățire ulterioară — completare manuală funcțională acum.
 
 ## Faze ulterioare (ordinea din docs/roadmap-formulare.md)
-4. **Impozit clădiri/teren** — ITL-001, ITL-003 + scoatere din evidență, certificat fiscal.
+4. [x] **Impozit clădiri/teren** — ITL-001 (clădiri), ITL-003 (teren). *(`src/lib/forms/impozit.ts` manifeste Cluj; wizard `/dashboard/impozit` alege formularul după tipul imobilului; preview→generare→dosar; reutilizează entitatea Imobil.)*
 5. **Dosar copil** — alocație, CIC, stimulent, adeverințe, declarații (DASM).
 6. **Dosar șomaj + prime ANOFM.**
 7. **Cadastru/CF** — înscriere, radiere, eroare materială, copii.
