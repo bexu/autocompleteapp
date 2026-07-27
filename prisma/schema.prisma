@@ -15,19 +15,20 @@ datasource db {
 // Nu edita manual câmpurile cerute de better-auth fără a regenera cu CLI-ul.
 
 model User {
-  id            String     @id
+  id            String       @id
   name          String
-  email         String     @unique
-  emailVerified Boolean    @default(false)
+  email         String       @unique
+  emailVerified Boolean      @default(false)
   image         String?
-  role          String     @default("user")
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  role          String       @default("user")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
   sessions      Session[]
   accounts      Account[]
   profile       Profile?
   documents     Document[]
   consents      Consent[]
+  signedForms   SignedForm[]
 
   @@map("user")
 }
@@ -188,4 +189,26 @@ model AuditLog {
   @@index([userId])
   @@index([action])
   @@map("audit_log")
+}
+
+// --- Formulare semnate + arhivate (task 1.6) ---
+// Documentul semnat se stochează CRIPTAT (envelope, AAD=user), cu hash-ul de
+// integritate și metadatele semnăturii. Provider mock în dev; QTSP real (CSC)
+// în spatele aceleiași abstracții — ADR 0010.
+
+model SignedForm {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  formCode    String
+  manifestId  String
+  provider    String // mock | certsign | transsped
+  status      String // SIGNED
+  contentHash String // sha256 al PDF-ului semnat (integritate)
+  contentEnc  String // bytes semnați, criptați
+  signedAt    DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@map("signed_form")
 }

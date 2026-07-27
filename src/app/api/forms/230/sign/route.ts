@@ -3,22 +3,23 @@ import { requireUser, UnauthorizedError } from "@/lib/auth/session";
 import {
   FormValidationError,
   ManifestNotFoundError,
-  generateForm,
+  signForm,
 } from "@/lib/forms/engine";
 
-// Generează PDF-ul formularului 230 din profil + entitatea beneficiară.
-// Rută cu PII → guard. Nu logăm inputurile/PDF-ul.
+// Semnează (provider mock/QTSP) + arhivează criptat, apoi întoarce PDF-ul semnat.
 export async function POST(req: Request) {
   try {
     const user = await requireUser();
     const inputs = await req.json().catch(() => ({}));
-
-    const { pdf } = await generateForm(user.id, { formCode: "230", inputs });
-
-    return new NextResponse(Buffer.from(pdf), {
+    const { signedPdf, signedFormId } = await signForm(user.id, {
+      formCode: "230",
+      inputs,
+    });
+    return new NextResponse(Buffer.from(signedPdf), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="formular-230.pdf"',
+        "Content-Disposition": 'attachment; filename="formular-230-semnat.pdf"',
+        "X-Signed-Form-Id": signedFormId,
       },
     });
   } catch (e) {

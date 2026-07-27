@@ -3,6 +3,15 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Task 1.6 Preview + semnătură — implementat, pe branch `feat/m1-preview-signature`.** (2026-07-27)
+- `previewForm` (aceleași valori mapate ca PDF-ul) → UI „exact ce semnezi".
+- `src/lib/signature/`: `SignatureProvider` + MockSignatureProvider (ștampilă + sha256); arhivă `SignedForm` criptată (AAD=user) cu hash de integritate — ADR 0010.
+- Motor: `signForm` (generează → semnează → arhivează). API `/api/forms/230/{preview,sign}`.
+- QTSP real (CSC) se comută prin factory-ul providerului, fără a atinge restul.
+- Verificat: 70 unit + 17 integrare + 5 e2e — verzi.
+- **Următorul: 1.7 dispatch „generate + handoff" pentru 230 (PDF + checklist + deep-link SPV + stare dosar).**
+
+
 **Task 1.5 Motor formulare + 230 — implementat, pe branch `feat/m1-form-engine-230`.** (2026-07-27)
 - `src/lib/forms/`: registry + `selectManifest` (jurisdicție+dată), mapare declarativă (`mapping.ts`), PDF cu pdf-lib (`pdf.ts`), motor (`engine.ts`), manifest 230 (`f230.ts`).
 - API `/api/forms/230` (POST → PDF sau 400 validare); pagină `/dashboard/formulare/230`.
