@@ -9,6 +9,9 @@ import { audit } from "./audit";
 
 export async function deleteUserData(userId: string): Promise<void> {
   await prisma.$transaction([
+    prisma.reminder.deleteMany({ where: { userId } }),
+    prisma.dossier.deleteMany({ where: { userId } }),
+    prisma.signedForm.deleteMany({ where: { userId } }),
     prisma.document.deleteMany({ where: { userId } }),
     prisma.profile.deleteMany({ where: { userId } }), // cascadă pe adrese
     prisma.consent.deleteMany({ where: { userId } }),

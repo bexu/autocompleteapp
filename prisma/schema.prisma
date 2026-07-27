@@ -30,6 +30,7 @@ model User {
   consents      Consent[]
   signedForms   SignedForm[]
   dossiers      Dossier[]
+  reminders     Reminder[]
 
   @@map("user")
 }
@@ -229,9 +230,29 @@ model Dossier {
   status       String // DE_DEPUS | DEPUS
   submittedAt  DateTime?
   deadline     String? // informativ (ex. „25 mai")
+  deadlineAt   DateTime? // termen calculat (pentru remindere)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
   @@index([userId])
   @@map("dossier")
+}
+
+// --- Remindere de termen (task 1.8) ---
+// Generate de un job pg-boss (src/jobs/) pentru dosarele „de depus" cu termen
+// apropiat. Unic per (dosar, prag) — idempotent. Fără PII.
+
+model Reminder {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dossierId  String
+  kind       String // T30 | T7 | T1 (zile până la termen)
+  formCode   String
+  deadlineAt DateTime
+  createdAt  DateTime @default(now())
+
+  @@unique([dossierId, kind])
+  @@index([userId])
+  @@map("reminder")
 }

@@ -29,8 +29,8 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
   - *Acceptare:* preview fidel; interfață de semnătură cu provider mock în dev; document „semnat" arhivat.
 - [x] **1.7 Dispatch „generate + handoff" pentru 230.** *(`src/lib/dispatch/`: model `Dossier` DE_DEPUS→DEPUS; handoff (checklist + canale SPV/borderou din manifest); pagini dosare; semnarea deschide dosarul)*
   - *Acceptare:* PDF final + checklist + deep-link SPV + instrucțiuni; stare dosar „de depus/depus". *(deep-link SPV = url null până la verificare — guardrail)*
-- [ ] **1.8 Tracking termen 230 (25.05) + reminder.**
-  - *Acceptare:* dosarul are termen; notificare/reminder; test.
+- [x] **1.8 Tracking termen 230 (25.05) + reminder.** *(dosar cu `deadlineAt` calculat; `src/lib/reminders/` scanDueReminders la praguri T30/T7/T1 idempotent; job pg-boss `src/jobs/` + `npm run jobs`; remindere afișate pe dashboard)*
+  - *Acceptare:* dosarul are termen; notificare/reminder; test. *(verificat prin integrare — remindere time/cron-driven; s-a închis și o breșă GDPR: deleteUserData șterge acum și dosare/semnate/remindere)*
 - [ ] **1.9 E2E felia 230.**
   - *Acceptare:* un test end-to-end: onboarding → 230 completat → preview → semnat (mock) → handoff.
 
