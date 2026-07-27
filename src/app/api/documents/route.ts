@@ -53,7 +53,7 @@ export async function POST(req: Request) {
     // OCR doar pentru CI (extragere câmpuri de identitate).
     let extracted: IdCardFields | null = null;
     if (tip === "CI") {
-      extracted = await getOcrProvider().extractIdCard(bytes, file.type);
+      extracted = await getOcrProvider().extractIdCard(bytes);
     }
 
     return NextResponse.json({ document: meta, extracted });

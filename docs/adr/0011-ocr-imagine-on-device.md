@@ -1,19 +1,20 @@
-# ADR 0011 — OCR pe imagine, on-device (Tesseract)
+# ADR 0011 — OCR pe imagine, on-device (Tesseract) — RESPINS
 
-- Status: acceptat
+- Status: **respins / scos** (încercat 2026-07-27, scos în aceeași zi)
 - Data: 2026-07-27
 
 ## Context
-ADR 0007 a amânat OCR-ul pe imagine: parsam doar text (MRZ / coduri CIV). Pentru un user real asta e insuficient — nimeni nu tastează MRZ-ul; oamenii urcă o poză a buletinului/CIV-ului. Fără OCR pe imagine, onboarding-ul afișa câmpuri goale („completează manual") = percepție că funcția nu merge.
+OCR-ul citea datele doar din MRZ ca text; o poză reală de buletin ieșea goală. Am încercat OCR pe imagine cu `tesseract.js` (WASM), rulat on-device (poza nu pleacă la terți; doar modelul se descarcă o dată).
 
-## Decizie
-- **OCR pe imagine cu `tesseract.js` (WASM), rulat ON-DEVICE** pe server (`src/lib/ocr/image.ts`). Imaginea NU pleacă la niciun terț — se procesează local; doar modelul lingvistic (`eng.traineddata`) se descarcă o dată (nu e PII → GDPR OK).
-- `documentToText(bytes, mime)`: dacă e imagine (magic bytes PNG/JPEG sau `image/*`) → OCR; altfel → text utf8. Parserele existente (MRZ TD1, coduri CIV) primesc mereu text.
-- **Robustețe la zgomotul de OCR** (`extractIdentityFromText`): OCR-ul poate strica o linie MRZ (parserul strict cere 3×30). Dacă MRZ nu iese curat, cădem pe **scanarea directă a textului după un CNP valid** (checksum) + serie/nr (2 litere + 6 cifre). Sursa devine `mrz` (MRZ curat, check-digits OK), `ocr` (CNP recuperat din text) sau `none`.
-- Confirmarea manuală rămâne obligatorie (userul verifică înainte de salvare).
+## Ce am încercat
+- `documentToText`: imagine (PNG/JPEG) → Tesseract → text; text → utf8.
+- `next.config: serverExternalPackages: ['tesseract.js']` (altfel worker-ul Node se strica: „Cannot find module .../worker-script/node").
+- Pe o imagine curată (MRZ randat) mergea (CNP extras în ~0.6s).
 
-## Consecințe
-- O poză clară a buletinului (mai ales zona MRZ) sau a CIV-ului pre-completează acum profilul/vehiculul.
-- Costul: cerere mai lentă la OCR (secunde) — acceptabil la onboarding. `tesseract.js` = dependență nouă justificată (ADR).
-- E2e rămân pe text MRZ/CIV (rapide, deterministe); calea imagine e testată separat. Pentru offline strict, `eng.traineddata` se poate împacheta local (langPath) — de făcut la deploy.
-- Fiabilitatea pe poze de telefon slabe rămâne limitată; fallback-ul manual acoperă cazurile.
+## De ce l-am scos
+Pe **poze reale de buletin** (telefon, diacritice, layout, calitate variabilă) Tesseract vanilla **nu citea fiabil** — rezultate goale/greșite. Un OCR care merge doar pe imagini perfecte dă o impresie mai proastă decât o completare manuală onestă. Decizia utilizatorului: scos.
+
+## Ce rămâne
+- **Parsare MRZ (text) + extractor robust de text** (`extractIdentityFromText`): dacă cineva furnizează zona MRZ ca text sau un export text, recuperăm CNP (checksum) + serie/nr + nume/prenume. Fiabil și testat.
+- **Completare cu date de exemplu** în onboarding (demo) + completare manuală — vezi fluxul onboarding.
+- OCR real pe imagine rămâne o integrare viitoare, dar cu un serviciu specializat pe acte RO (nu Tesseract generic), decisă separat. `sourceUrl`/model verificate atunci.

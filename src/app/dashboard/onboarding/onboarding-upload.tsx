@@ -12,19 +12,43 @@ interface Extracted {
   sex: "M" | "F" | null;
   dataNasterii: string | null;
   ciExp: string | null;
-  source: "mrz" | "none";
+  source: "mrz" | "ocr" | "none";
 }
+
+// Date de EXEMPLU (demo) — CNP sintetic valid, consistent (Andrei = M). Se
+// pre-completează când OCR-ul nu citește, ca fluxul să se poată parcurge; userul
+// le înlocuiește cu ale lui înainte de salvare.
+const DEMO: Extracted = {
+  nume: "Popescu",
+  prenume: "Andrei",
+  cnp: "1960101223143",
+  ciSerie: "TR",
+  ciNr: "123456",
+  sex: "M",
+  dataNasterii: "1996-01-01",
+  ciExp: "2030-01-01",
+  source: "none",
+};
 
 export function OnboardingUpload() {
   const router = useRouter();
   const [phase, setPhase] = useState<"upload" | "review">("upload");
   const [extracted, setExtracted] = useState<Extracted | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  function useDemo() {
+    setError(null);
+    setInfo("Date de exemplu — verifică-le și înlocuiește-le cu ale tale.");
+    setExtracted(DEMO);
+    setPhase("review");
+  }
 
   async function onUpload(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    setInfo(null);
     setBusy(true);
     const form = new FormData(e.currentTarget);
     form.set("tip", "CI");
@@ -36,8 +60,9 @@ export function OnboardingUpload() {
     }
     const data = await res.json();
     if (!data.extracted || data.extracted.source === "none") {
-      setError("Nu am putut citi datele automat. Completează-le manual în profil.");
-      setExtracted(null);
+      // Nu am citit automat → pre-completăm cu date de exemplu (demo), clar marcate.
+      setInfo("Nu am putut citi automat. Am pus date de exemplu — înlocuiește-le cu ale tale.");
+      setExtracted(DEMO);
       setPhase("review");
       return;
     }
@@ -98,13 +123,22 @@ export function OnboardingUpload() {
         <div className="card card--pad">
           <form onSubmit={onUpload} className="form">
             <div className="field">
-              <label className="field__label" htmlFor="ob-file">Fișier CI</label>
+              <label className="field__label" htmlFor="ob-file">Fișier CI (zona MRZ ca text, sau scan)</label>
               <input id="ob-file" className="input" type="file" name="file" required data-testid="file" />
             </div>
-            <button type="submit" className="btn btn--primary" disabled={busy} data-testid="upload">
-              {busy ? "Se procesează..." : "Încarcă și extrage"}
-            </button>
+            <div className="form-actions">
+              <button type="submit" className="btn btn--primary" disabled={busy} data-testid="upload">
+                {busy ? "Se procesează..." : "Încarcă și extrage"}
+              </button>
+              <button type="button" className="btn btn--ghost" onClick={useDemo} disabled={busy} data-testid="demo">
+                Folosește date de exemplu
+              </button>
+            </div>
           </form>
+          <p className="help" style={{ marginTop: "0.8rem" }}>
+            Citirea automată merge din zona MRZ; pentru o poză, completează manual
+            sau pornește de la datele de exemplu.
+          </p>
           {error && (
             <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>{error}</p>
           )}
@@ -121,6 +155,12 @@ export function OnboardingUpload() {
         <h1 className="page-title">Confirmă datele extrase</h1>
         <p className="lead">Verifică și corectează dacă e nevoie, apoi salvează în profil.</p>
       </div>
+      {info && (
+        <div className="notice" data-testid="info" style={{ marginBottom: "1rem" }}>
+          <span aria-hidden="true">ℹ️</span>
+          <span>{info}</span>
+        </div>
+      )}
       <div className="card card--pad">
         <form onSubmit={onConfirm} className="form">
           <div className="grid-2">
