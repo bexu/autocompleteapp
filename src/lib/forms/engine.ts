@@ -1,4 +1,6 @@
 import { getProfile } from "@/lib/profile/repository";
+import { getSignatureProvider } from "@/lib/signature/provider";
+import { archiveSignedForm } from "@/lib/signature/repository";
 import { selectManifest, type FormManifest } from "./manifest";
 import { mapForm, type MapResult } from "./mapping";
 import { generateFormPdf } from "./pdf";
@@ -38,10 +40,7 @@ export interface GenerateOptions {
   inputs?: Record<string, unknown>;
 }
 
-export async function generateForm(
-  userId: string,
-  opts: GenerateOptions,
-): Promise<GenerateResult> {
+async function resolveAndMap(userId: string, opts: GenerateOptions) {
   const manifest = selectManifest(
     opts.formCode,
     opts.jurisdiction ?? "national",
@@ -52,7 +51,55 @@ export async function generateForm(
   const profile = await getProfile(userId);
   const mapped = mapForm(manifest, profile, opts.inputs ?? {});
   if (mapped.errors.length > 0) throw new FormValidationError(mapped.errors);
+  return { manifest, fields: mapped.fields };
+}
 
-  const pdf = await generateFormPdf(manifest, mapped.fields);
-  return { manifest, fields: mapped.fields, pdf };
+/** Preview „exact ce semnezi": doar valorile mapate, fără PDF. */
+export async function previewForm(
+  userId: string,
+  opts: GenerateOptions,
+): Promise<{ manifest: FormManifest; fields: MapResult["fields"] }> {
+  return resolveAndMap(userId, opts);
+}
+
+export async function generateForm(
+  userId: string,
+  opts: GenerateOptions,
+): Promise<GenerateResult> {
+  const { manifest, fields } = await resolveAndMap(userId, opts);
+  const pdf = await generateFormPdf(manifest, fields);
+  return { manifest, fields, pdf };
+}
+
+export interface SignResultMeta {
+  signedFormId: string;
+  signedPdf: Uint8Array;
+  contentHash: string;
+  manifest: FormManifest;
+}
+
+/** Generează, semnează (provider mock/QTSP) și arhivează criptat documentul. */
+export async function signForm(
+  userId: string,
+  opts: GenerateOptions,
+  now: Date = new Date(),
+): Promise<SignResultMeta> {
+  const { manifest, pdf } = await generateForm(userId, opts);
+  const provider = getSignatureProvider();
+  const result = await provider.sign(
+    pdf,
+    { formCode: manifest.formCode, signerLabel: userId.slice(0, 8) },
+    now,
+  );
+  const meta = await archiveSignedForm(userId, {
+    formCode: manifest.formCode,
+    manifestId: manifest.id,
+    result,
+  });
+  return {
+    signedFormId: meta.id,
+    signedPdf: result.signedPdf,
+    contentHash: result.contentHash,
+    manifest,
+  };
 }

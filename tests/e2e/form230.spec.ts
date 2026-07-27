@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 
-// Felie 230: signup → completează profil (nume+CNP) → formular 230 → generează
-// PDF (validare + mapare + generare). Cazul incomplet e respins.
-test("generare 230 din profil + entitate beneficiară", async ({ page }) => {
+// Felia 230 completă: profil → completare beneficiar → preview „exact ce
+// semnezi" → semnătură (mock) → PDF semnat descărcat + arhivat.
+test("230: profil → preview → semnătură + arhivare", async ({ page }) => {
   const email = `e2e_${Date.now()}_${Math.floor(Math.random() * 1e6)}@example.com`;
   const password = "parola-tare-123";
 
@@ -13,15 +13,15 @@ test("generare 230 din profil + entitate beneficiară", async ({ page }) => {
   await page.getByTestId("submit").click();
   await expect(page).toHaveURL(/\/dashboard/);
 
-  // Fără profil → generarea e respinsă (câmpuri obligatorii lipsă).
+  // Fără profil → preview respins.
   await page.goto("/dashboard/formulare/230");
   await page.getByTestId("benef-denumire").fill("Asociația Test");
   await page.getByTestId("benef-cif").fill("12345678");
   await page.getByTestId("benef-iban").fill("RO49AAAA1B31007593840000");
-  await page.getByTestId("genereaza").click();
+  await page.getByTestId("previzualizeaza").click();
   await expect(page.getByTestId("error")).toContainText("profilul");
 
-  // Completează profilul (nume + prenume + CNP).
+  // Completează profilul.
   await page.goto("/dashboard/profil");
   await page.getByTestId("nume").fill("Ionescu");
   await page.getByTestId("prenume").fill("Ana");
@@ -29,19 +29,27 @@ test("generare 230 din profil + entitate beneficiară", async ({ page }) => {
   await page.getByTestId("save").click();
   await expect(page.getByTestId("cnp-mask")).toContainText("3143");
 
-  // Acum generarea reușește și descarcă un PDF.
+  // Preview: datele din profil + beneficiar sunt afișate „exact ce semnezi".
   await page.goto("/dashboard/formulare/230");
   await page.getByTestId("benef-denumire").fill("Asociația Test");
   await page.getByTestId("benef-cif").fill("12345678");
   await page.getByTestId("benef-iban").fill("RO49AAAA1B31007593840000");
+  await page.getByTestId("previzualizeaza").click();
+
+  await expect(page.getByTestId("preview")).toBeVisible();
+  await expect(page.getByTestId("pv-nume")).toHaveText("Ionescu");
+  await expect(page.getByTestId("pv-cnp")).toHaveText("1960101223143");
+  await expect(page.getByTestId("pv-beneficiarDenumire")).toHaveText("Asociația Test");
+
+  // Semnează → descarcă PDF semnat.
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.getByTestId("genereaza").click(),
+    page.getByTestId("semneaza").click(),
   ]);
   const stream = await download.createReadStream();
   const chunks: Buffer[] = [];
   for await (const c of stream) chunks.push(c as Buffer);
   const pdf = Buffer.concat(chunks);
   expect(pdf.subarray(0, 5).toString("latin1")).toBe("%PDF-");
-  await expect(page.getByTestId("done")).toBeVisible();
+  await expect(page.getByTestId("signed")).toBeVisible();
 });

@@ -25,7 +25,7 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
   - *Acceptare:* consimțământ per categorie; user poate exporta și șterge datele; audit fără PII.
 - [x] **1.5 Motor de template-uri (bază) + definiția formularului 230.** *(`src/lib/forms/`: registry + selecție versionată, mapare declarativă, PDF cu pdf-lib; manifest 230; API + pagină + e2e — ADR 0009)*
   - *Acceptare:* definiția = **manifest versionat** (autoritate, jurisdicție, cod, revizie, valabilitate, sursă+hash, workflow, semnătură — vezi SPEC); selecție după jurisdicție + dată; mapare declarativă profil→230; generare PDF corect completat; test pe date de eșantion.
-- [ ] **1.6 Preview „exact ce semnezi" + abstracție semnătură (provider mock).**
+- [x] **1.6 Preview „exact ce semnezi" + abstracție semnătură (provider mock).** *(`previewForm` = aceleași valori mapate; `src/lib/signature/` provider mock + arhivă `SignedForm` criptată cu hash; flux preview→semnătură în UI — ADR 0010)*
   - *Acceptare:* preview fidel; interfață de semnătură cu provider mock în dev; document „semnat" arhivat.
 - [ ] **1.7 Dispatch „generate + handoff" pentru 230.**
   - *Acceptare:* PDF final + checklist + deep-link SPV + instrucțiuni; stare dosar „de depus/depus".
