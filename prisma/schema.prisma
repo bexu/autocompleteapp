@@ -31,6 +31,7 @@ model User {
   signedForms   SignedForm[]
   dossiers      Dossier[]
   reminders     Reminder[]
+  vehicule      Vehicul[]
 
   @@map("user")
 }
@@ -255,4 +256,34 @@ model Reminder {
   @@unique([dossierId, kind])
   @@index([userId])
   @@map("reminder")
+}
+
+// --- Entitatea Vehicul (Faza 2 — dosar auto, task 2.1) ---
+// Câmpurile din SPEC. ITL-005 Cluj (rev. 2026) cere normă poluare, emisii CO₂
+// (hibride) și putere (electrice) — de aceea sunt modelate explicit. Datele de
+// vehicul nu sunt „date protejate" (ca CNP/CI) → stocate în clar.
+
+model Vehicul {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vin             String?
+  marca           String?
+  model           String?
+  nrInmatriculare String?
+  civSerie        String?
+  serieMotor      String?
+  cilindreeCm3    Int?
+  masaMaximaKg    Int?
+  anFabricatie    Int?
+  combustibil     String? // BENZINA | MOTORINA | HIBRID | ELECTRIC | GPL | ...
+  normaPoluare    String? // ex. Euro 6
+  emisiiCo2GKm    Int?
+  putereKw        Int?
+  dataDobandire   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("vehicul")
 }

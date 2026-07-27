@@ -10,11 +10,20 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
-  // Rate limiting activ implicit (securitate — T10 threat model). Dezactivat
-  // doar în e2e (AUTH_RATE_LIMIT=off), unde mai multe fluxuri lovesc de pe
-  // același IP. Reglarea fină a pragurilor pe rute sensibile = task H.3.
+  // Rate limiting activ (securitate — T10 threat model). Prag explicit generos
+  // (default-ul better-auth e prea strict — ~3/fereastră — și pică suita e2e).
+  // 100/60s/IP e protectiv în practică; reglarea fină pe rute sensibile = H.3.
+  // NB: nu comuta prin env — Next.js inline-ază process.env la build-time.
   rateLimit: {
-    enabled: process.env.AUTH_RATE_LIMIT !== "off",
+    enabled: true,
+    window: 60,
+    max: 100,
+    // better-auth are reguli implicite STRICTE pe rutele de auth (~3/fereastră)
+    // — le suprascriem cu praguri generoase (protectiv, dar nu blochează e2e).
+    customRules: {
+      "/sign-up/email": { window: 60, max: 100 },
+      "/sign-in/email": { window: 60, max: 100 },
+    },
   },
   emailAndPassword: {
     enabled: true,

@@ -19,8 +19,5 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
-    // Rate limiting rămâne ON în producție; îl relaxăm doar pentru suita e2e
-    // (multe fluxuri de auth de pe același IP).
-    env: { ...process.env, AUTH_RATE_LIMIT: "off" },
   },
 });
