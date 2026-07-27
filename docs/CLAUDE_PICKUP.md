@@ -3,6 +3,16 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Task 1.1 Auth — implementat, pe branch `feat/m1-auth`.** (2026-07-27)
+- better-auth (email+parolă) + Prisma 7 cu `@prisma/adapter-pg`; client singleton `src/lib/db/prisma.ts`.
+- Modele `user/session/account/verification` + `role`; migrare `init_auth`.
+- RBAC pur `src/lib/auth/rbac.ts` + guard-uri `session.ts` (`requireUser`/`requireRole`).
+- Pagini: `/signup`, `/login`, `/dashboard` (protejat), logout. Home refăcut.
+- E2E pe **build de producție** (`next build && next start`) — evită cursa de hidratare din dev; secrete de test generate la runtime în CI.
+- Verificat local: lint, typecheck, 43 unit, e2e golden path — verzi.
+- **Rămas la 1.2:** model canonic „cetățean" cu câmpuri criptate (folosește ADR 0005 + AAD=user context) + test pe DB reală că CNP nu e în clar.
+
+
 **M0 — fundația de securitate: implementată, pe branch `feat/m0-security-foundation`.** (2026-07-27)
 - 0.2: config validat Zod (`src/lib/config/env.ts`), gitleaks în CI, actions bump v5 (ADR 0004).
 - 0.4: threat model (`docs/threat-model.md`) + logger cu redactare PII (`src/lib/log/`).
