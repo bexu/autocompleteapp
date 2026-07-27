@@ -30,6 +30,9 @@ export default async function DashboardPage() {
         <Link href="/dashboard/confidentialitate" data-testid="link-confidentialitate">
           Confidențialitate
         </Link>
+        <Link href="/dashboard/formulare/230" data-testid="link-230">
+          Formular 230
+        </Link>
       </p>
       <LogoutButton />
     </main>

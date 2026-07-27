@@ -3,6 +3,14 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Task 1.5 Motor formulare + 230 — implementat, pe branch `feat/m1-form-engine-230`.** (2026-07-27)
+- `src/lib/forms/`: registry + `selectManifest` (jurisdicție+dată), mapare declarativă (`mapping.ts`), PDF cu pdf-lib (`pdf.ts`), motor (`engine.ts`), manifest 230 (`f230.ts`).
+- API `/api/forms/230` (POST → PDF sau 400 validare); pagină `/dashboard/formulare/230`.
+- 230 workflow „generated" până la PDF-ul oficial ANAF (sourceUrl/hash = null, de completat) — ADR 0009.
+- Verificat: 68 unit + 15 integrare + 5 e2e (auth, profil, onboarding, gdpr, form230) — verzi.
+- **Următorul: 1.6 preview „exact ce semnezi" + abstracție semnătură (provider mock).**
+
+
 **Task 1.4 GDPR — implementat, pe branch `feat/m1-gdpr`.** (2026-07-27)
 - `src/lib/gdpr/`: consent ledger (per categorie, versionat), export (JSON), ștergere (date/cont), audit fără PII.
 - API `/api/gdpr/{consent,export,delete}`; pagină `/dashboard/confidentialitate`; consimțământ în onboarding.
