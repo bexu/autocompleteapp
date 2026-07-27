@@ -40,7 +40,23 @@ export const F230_MANIFEST: FormManifest = {
     { key: "beneficiarIban", label: "IBAN entitate", required: true, validate: "iban" },
     { key: "doiAni", label: "Redirecționez pe 2 ani", type: "checkbox" },
   ],
-  submissionChannels: ["SPV", "borderou ONG"],
+  deadline: "25 mai",
+  channels: [
+    {
+      id: "spv",
+      label: "Spațiul Privat Virtual (SPV) — ANAF",
+      url: null, // deep-link oficial SPV — de completat după verificare
+      instructions:
+        "Autentifică-te în SPV cu certificatul/credențialele tale și încarcă PDF-ul 230 la secțiunea de depuneri.",
+    },
+    {
+      id: "borderou-ong",
+      label: "Predare către ONG (borderou)",
+      url: null,
+      instructions:
+        "Trimite PDF-ul 230 către entitatea beneficiară; aceasta îl depune centralizat prin borderou.",
+    },
+  ],
 };
 
 export function registerF230(): void {

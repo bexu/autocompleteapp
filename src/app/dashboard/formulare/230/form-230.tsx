@@ -14,6 +14,7 @@ export function Form230() {
   const [preview, setPreview] = useState<Field[] | null>(null);
   const [inputs, setInputs] = useState<Record<string, unknown> | null>(null);
   const [signed, setSigned] = useState(false);
+  const [dossierId, setDossierId] = useState<string | null>(null);
 
   function readInputs(form: FormData): Record<string, unknown> {
     return {
@@ -68,6 +69,7 @@ export function Form230() {
       setError("Semnare eșuată.");
       return;
     }
+    setDossierId(res.headers.get("X-Dossier-Id"));
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -103,7 +105,16 @@ export function Form230() {
             {busy ? "Se semnează..." : "Semnează și arhivează"}
           </button>
         </div>
-        {signed && <p data-testid="signed" style={{ color: "green" }}>Semnat, arhivat și descărcat.</p>}
+        {signed && (
+          <p data-testid="signed" style={{ color: "green" }}>
+            Semnat, arhivat și descărcat.{" "}
+            {dossierId && (
+              <a href={`/dashboard/dosare/${dossierId}`} data-testid="vezi-dosar">
+                Vezi pașii de depunere
+              </a>
+            )}
+          </p>
+        )}
         {error && <p role="alert" data-testid="error" style={{ color: "crimson" }}>{error}</p>}
       </main>
     );

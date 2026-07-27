@@ -52,4 +52,13 @@ test("230: profil → preview → semnătură + arhivare", async ({ page }) => {
   const pdf = Buffer.concat(chunks);
   expect(pdf.subarray(0, 5).toString("latin1")).toBe("%PDF-");
   await expect(page.getByTestId("signed")).toBeVisible();
+
+  // Handoff: mergi la dosar → checklist + canale (SPV) → marchează depus.
+  await page.getByTestId("vezi-dosar").click();
+  await expect(page).toHaveURL(/\/dashboard\/dosare\//);
+  await expect(page.getByTestId("dossier-status")).toHaveText("De depus");
+  await expect(page.getByTestId("checklist")).toBeVisible();
+  await expect(page.getByTestId("channel-spv")).toContainText("SPV");
+  await page.getByTestId("marcheaza-depus").click();
+  await expect(page.getByTestId("status-depus")).toBeVisible();
 });

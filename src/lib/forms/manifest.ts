@@ -34,6 +34,14 @@ export type FormWorkflow =
 
 export type SignatureType = "none" | "qualified" | "counter";
 
+export interface SubmissionChannel {
+  id: string;
+  label: string;
+  // URL oficial — null până la verificare (guardrail: nu inventa link-uri).
+  url: string | null;
+  instructions: string;
+}
+
 export interface FormManifest {
   id: string;
   authority: string; // ex. "ANAF"
@@ -52,7 +60,8 @@ export interface FormManifest {
   fields: FieldDef[];
   inputs: InputDef[];
   attachments?: string[];
-  submissionChannels?: string[];
+  channels?: SubmissionChannel[];
+  deadline?: string; // ex. "25 mai" — termenul de depunere (informativ)
 }
 
 const registry: FormManifest[] = [];
@@ -65,6 +74,10 @@ export function registerManifest(m: FormManifest): void {
 /** Toate manifestele înregistrate (copie). */
 export function allManifests(): FormManifest[] {
   return [...registry];
+}
+
+export function getManifestById(id: string): FormManifest | null {
+  return registry.find((m) => m.id === id) ?? null;
 }
 
 /**

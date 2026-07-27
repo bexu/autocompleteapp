@@ -3,6 +3,15 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Task 1.7 Dispatch + handoff — implementat, pe branch `feat/m1-dispatch-handoff`.** (2026-07-27)
+- Model `Dossier` (DE_DEPUS→DEPUS); `src/lib/dispatch/` (repository + handoff din manifest).
+- Manifest cu `channels` structurate (SPV/borderou, url null până la verificare) + `deadline`.
+- `signForm` deschide dosar; pagini `/dashboard/dosare` + `[id]` (checklist + canale + marchează depus).
+- **Notă importantă:** manifestele se citesc prin `@/lib/forms/registered` (auto-înregistrare) — în build de producție bundle-urile separate au registry propriu; importul direct din `manifest.ts` dă registry gol.
+- Verificat: 72 unit + 21 integrare + 5 e2e — verzi.
+- **Următorul: 1.8 tracking termen 230 (25.05) + reminder (pg-boss). Apoi 1.9 e2e complet al feliei.**
+
+
 **Task 1.6 Preview + semnătură — implementat, pe branch `feat/m1-preview-signature`.** (2026-07-27)
 - `previewForm` (aceleași valori mapate ca PDF-ul) → UI „exact ce semnezi".
 - `src/lib/signature/`: `SignatureProvider` + MockSignatureProvider (ștampilă + sha256); arhivă `SignedForm` criptată (AAD=user) cu hash de integritate — ADR 0010.

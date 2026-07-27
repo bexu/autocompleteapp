@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   try {
     const user = await requireUser();
     const inputs = await req.json().catch(() => ({}));
-    const { signedPdf, signedFormId } = await signForm(user.id, {
+    const { signedPdf, signedFormId, dossierId } = await signForm(user.id, {
       formCode: "230",
       inputs,
     });
@@ -20,6 +20,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/pdf",
         "Content-Disposition": 'attachment; filename="formular-230-semnat.pdf"',
         "X-Signed-Form-Id": signedFormId,
+        "X-Dossier-Id": dossierId,
       },
     });
   } catch (e) {
