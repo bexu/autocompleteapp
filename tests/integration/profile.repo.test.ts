@@ -78,4 +78,27 @@ describe("profile repository (integration, DB reală)", () => {
       upsertProfile(userId, { iban: "RO49AAAA1B31007593840001" }),
     ).rejects.toThrow();
   });
+
+  it("pune DOMICILIU primul, deterministic (chiar dacă e adăugat al doilea)", async () => {
+    await upsertProfile(userId, {
+      addresses: [
+        { tip: "RESEDINTA", localitate: "București" },
+        { tip: "DOMICILIU", localitate: "Cluj-Napoca" },
+      ],
+    });
+    const p = await getProfile(userId);
+    // addresses[0] = domiciliul (folosit de formularul 230 ca adresă fiscală)
+    expect(p?.addresses[0]?.tip).toBe("DOMICILIU");
+    expect(p?.addresses[0]?.localitate).toBe("Cluj-Napoca");
+  });
+
+  it("null pe o dată nu o corupe la epoch (rămâne neschimbată)", async () => {
+    await upsertProfile(userId, { dataNasterii: "1990-05-05" });
+    const before = (await getProfile(userId))?.dataNasterii;
+    expect(before?.toISOString().slice(0, 10)).toBe("1990-05-05");
+    // null explicit (din JSON) → tratat ca absent, nu 1970-01-01
+    await upsertProfile(userId, { dataNasterii: null } as unknown as { dataNasterii?: Date });
+    const after = (await getProfile(userId))?.dataNasterii;
+    expect(after?.toISOString().slice(0, 10)).toBe("1990-05-05");
+  });
 });

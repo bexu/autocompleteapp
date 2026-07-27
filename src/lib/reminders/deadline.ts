@@ -11,8 +11,11 @@ export function computeNextDeadline(
   from: Date,
 ): Date {
   const year = from.getUTCFullYear();
+  // Comparăm la granularitate de ZI („la sau după" termen): dacă semnezi în
+  // cursul zilei termenului, rămâne aceeași dată, nu sare în anul următor.
+  const fromDay = Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate());
   let d = new Date(Date.UTC(year, rule.month - 1, rule.day));
-  if (d.getTime() < from.getTime()) {
+  if (d.getTime() < fromDay) {
     d = new Date(Date.UTC(year + 1, rule.month - 1, rule.day));
   }
   return d;
