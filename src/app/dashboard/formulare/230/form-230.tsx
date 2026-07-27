@@ -82,61 +82,88 @@ export function Form230() {
 
   if (preview) {
     return (
-      <main style={{ maxWidth: 480, margin: "3rem auto", padding: "0 1rem" }}>
-        <h1>Exact ce semnezi</h1>
-        <p>Verifică datele înainte de a semna. Semnezi și depui pe propria răspundere.</p>
-        <table data-testid="preview" style={{ width: "100%", borderCollapse: "collapse" }}>
-          <tbody>
-            {preview.map((f) => (
-              <tr key={f.key}>
-                <td style={{ padding: "4px 8px", fontWeight: 600 }}>{f.label}</td>
-                <td style={{ padding: "4px 8px" }} data-testid={`pv-${f.key}`}>
-                  {f.value || "—"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-          <button type="button" onClick={() => setPreview(null)} data-testid="inapoi">
-            Înapoi
-          </button>
-          <button type="button" onClick={onSign} disabled={busy} data-testid="semneaza">
-            {busy ? "Se semnează..." : "Semnează și arhivează"}
-          </button>
+      <main className="container container--narrow">
+        <div className="page-head">
+          <p className="eyebrow">Formular 230 · pas 2 din 2</p>
+          <h1 className="page-title">Exact ce semnezi</h1>
+          <p className="lead">Verifică datele. Semnezi și depui pe propria răspundere.</p>
         </div>
-        {signed && (
-          <p data-testid="signed" style={{ color: "green" }}>
-            Semnat, arhivat și descărcat.{" "}
-            {dossierId && (
-              <a href={`/dashboard/dosare/${dossierId}`} data-testid="vezi-dosar">
-                Vezi pașii de depunere
-              </a>
-            )}
-          </p>
-        )}
-        {error && <p role="alert" data-testid="error" style={{ color: "crimson" }}>{error}</p>}
+        <div className="card card--pad">
+          <table data-testid="preview" className="kv">
+            <tbody>
+              {preview.map((f) => (
+                <tr key={f.key}>
+                  <td>{f.label}</td>
+                  <td data-testid={`pv-${f.key}`}>{f.value || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="form-actions" style={{ marginTop: "1.1rem" }}>
+            <button type="button" className="btn btn--ghost" onClick={() => setPreview(null)} data-testid="inapoi">
+              Înapoi
+            </button>
+            <button type="button" className="btn btn--primary" onClick={onSign} disabled={busy} data-testid="semneaza">
+              {busy ? "Se semnează..." : "Semnează și arhivează"}
+            </button>
+          </div>
+          {signed && (
+            <p data-testid="signed" className="alert alert--ok" style={{ marginTop: "1rem" }}>
+              Semnat, arhivat și descărcat.{" "}
+              {dossierId && (
+                <a href={`/dashboard/dosare/${dossierId}`} data-testid="vezi-dosar">
+                  Vezi pașii de depunere →
+                </a>
+              )}
+            </p>
+          )}
+          {error && (
+            <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "1rem" }}>
+              {error}
+            </p>
+          )}
+        </div>
       </main>
     );
   }
 
   return (
-    <main style={{ maxWidth: 480, margin: "3rem auto", padding: "0 1rem" }}>
-      <h1>Formular 230 — redirecționare 3,5%</h1>
-      <p>Datele tale vin din profil. Completează entitatea beneficiară.</p>
-      <form onSubmit={onPreview} style={{ display: "grid", gap: 12 }}>
-        <input name="beneficiarDenumire" placeholder="Denumire entitate" required data-testid="benef-denumire" />
-        <input name="beneficiarCif" placeholder="CIF entitate" required data-testid="benef-cif" />
-        <input name="beneficiarIban" placeholder="IBAN entitate" required data-testid="benef-iban" />
-        <label style={{ display: "flex", gap: 8 }}>
-          <input type="checkbox" name="doiAni" data-testid="benef-doiani" />
-          Redirecționez pe 2 ani
-        </label>
-        <button type="submit" disabled={busy} data-testid="previzualizeaza">
-          {busy ? "Se procesează..." : "Previzualizează"}
-        </button>
-      </form>
-      {error && <p role="alert" data-testid="error" style={{ color: "crimson" }}>{error}</p>}
+    <main className="container container--narrow">
+      <div className="page-head">
+        <p className="eyebrow">Redirecționare 3,5% din impozit · pas 1 din 2</p>
+        <h1 className="page-title">Formular 230</h1>
+        <p className="lead">Datele tale vin din profil. Completează entitatea beneficiară.</p>
+      </div>
+      <div className="card card--pad">
+        <form onSubmit={onPreview} className="form">
+          <div className="field">
+            <label className="field__label" htmlFor="b-denumire">Denumire entitate</label>
+            <input id="b-denumire" className="input" name="beneficiarDenumire" placeholder="Asociația ..." required data-testid="benef-denumire" />
+          </div>
+          <div className="grid-2">
+            <div className="field">
+              <label className="field__label" htmlFor="b-cif">CIF entitate</label>
+              <input id="b-cif" className="input input--mono" name="beneficiarCif" placeholder="12345678" required data-testid="benef-cif" />
+            </div>
+            <div className="field">
+              <label className="field__label" htmlFor="b-iban">IBAN entitate</label>
+              <input id="b-iban" className="input input--mono" name="beneficiarIban" placeholder="RO49..." required data-testid="benef-iban" />
+            </div>
+          </div>
+          <label className="checkbox-row">
+            <input type="checkbox" name="doiAni" data-testid="benef-doiani" />
+            Redirecționez pe 2 ani
+          </label>
+          <button type="submit" className="btn btn--primary" disabled={busy} data-testid="previzualizeaza">
+            {busy ? "Se procesează..." : "Previzualizează"}
+          </button>
+        </form>
+        {error && (
+          <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
+            {error}
+          </p>
+        )}
+      </div>
     </main>
   );
 }

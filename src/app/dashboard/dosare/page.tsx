@@ -9,17 +9,37 @@ export default async function DosarePage() {
   const dossiers = await listDossiers(session.user.id);
 
   return (
-    <main style={{ maxWidth: 560, margin: "3rem auto", padding: "0 1rem" }}>
-      <h1>Dosarele mele</h1>
-      {dossiers.length === 0 && <p data-testid="empty">Niciun dosar încă.</p>}
-      <ul data-testid="dossier-list">
+    <main className="container container--wide">
+      <div className="page-head">
+        <p className="eyebrow">Urmărire</p>
+        <h1 className="page-title">Dosarele mele</h1>
+        <p className="lead">Fiecare formular generat, cu starea depunerii.</p>
+      </div>
+
+      {dossiers.length === 0 && (
+        <div className="card card--pad">
+          <p data-testid="empty" className="muted">Niciun dosar încă. Generează un formular din pagina principală.</p>
+        </div>
+      )}
+
+      <ul className="list" data-testid="dossier-list">
         {dossiers.map((d) => (
-          <li key={d.id} style={{ marginBottom: 8 }}>
-            <Link href={`/dashboard/dosare/${d.id}`} data-testid={`dossier-${d.formCode}`}>
-              Formular {d.formCode}
-            </Link>{" "}
-            — <span data-testid={`status-${d.id}`}>{d.status === "DEPUS" ? "Depus" : "De depus"}</span>
-            {d.deadline && ` (termen: ${d.deadline})`}
+          <li key={d.id} className="list__item">
+            <Link
+              href={`/dashboard/dosare/${d.id}`}
+              data-testid={`dossier-${d.formCode}`}
+              className="list__main"
+              style={{ fontWeight: 560 }}
+            >
+              <span className="mono">{d.formCode}</span>
+              {d.deadline && <span className="muted" style={{ fontSize: "var(--fs-sm)" }}> · termen {d.deadline}</span>}
+            </Link>
+            <span
+              data-testid={`status-${d.id}`}
+              className={`pill ${d.status === "DEPUS" ? "pill--ok" : "pill--warn"}`}
+            >
+              {d.status === "DEPUS" ? "Depus" : "De depus"}
+            </span>
           </li>
         ))}
       </ul>

@@ -12,7 +12,7 @@ export function LogoutButton() {
   }
 
   return (
-    <button type="button" onClick={onClick} data-testid="logout">
+    <button type="button" className="btn btn--ghost btn--sm" onClick={onClick} data-testid="logout">
       Deconectează-te
     </button>
   );

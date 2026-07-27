@@ -109,51 +109,109 @@ export function VehiculePanel({ initial }: { initial: Vehicul[] }) {
   }
 
   return (
-    <main style={{ maxWidth: 560, margin: "3rem auto", padding: "0 1rem" }}>
-      <h1>Vehiculele mele</h1>
+    <main className="container container--narrow">
+      <div className="page-head">
+        <p className="eyebrow">Vehicule</p>
+        <h1 className="page-title">Vehiculele mele</h1>
+        <p className="lead">Datele intră în formularele auto (ITL, DGPCI).</p>
+      </div>
 
-      <ul data-testid="vehicule-list">
+      <ul className="list" data-testid="vehicule-list" style={{ marginBottom: "1.6rem" }}>
+        {vehicule.length === 0 && (
+          <li className="muted" style={{ fontSize: "var(--fs-sm)" }}>
+            Niciun vehicul încă.
+          </li>
+        )}
         {vehicule.map((v) => (
-          <li key={v.id} data-testid={`vehicul-${v.id}`}>
-            {v.marca} {v.model} — {v.nrInmatriculare || v.vin || "fără nr."}{" "}
-            <button type="button" onClick={() => onDelete(v.id)} disabled={busy} data-testid={`del-${v.id}`}>
+          <li key={v.id} className="list__item" data-testid={`vehicul-${v.id}`}>
+            <span className="list__main">
+              <strong>{v.marca} {v.model}</strong>{" "}
+              <span className="mono muted" style={{ fontSize: "var(--fs-sm)" }}>
+                {v.nrInmatriculare || v.vin || "fără nr."}
+              </span>
+            </span>
+            <button type="button" className="btn btn--danger btn--sm" onClick={() => onDelete(v.id)} disabled={busy} data-testid={`del-${v.id}`}>
               șterge
             </button>
           </li>
         ))}
       </ul>
 
-      <h2>Adaugă vehicul</h2>
-      <p>
-        <label>
-          Încarcă CIV (pre-completează){" "}
-          <input type="file" onChange={onCivUpload} disabled={busy} data-testid="civ-file" />
-        </label>
-      </p>
+      <div className="card card--pad">
+        <p className="section-label" style={{ marginTop: 0 }}>Adaugă vehicul</p>
+        <div className="notice" style={{ marginBottom: "1.1rem" }}>
+          <span aria-hidden="true">📄</span>
+          <label>
+            Ai certificatul de înmatriculare (CIV)? Încarcă-l ca să pre-completăm câmpurile:{" "}
+            <input type="file" onChange={onCivUpload} disabled={busy} data-testid="civ-file" />
+          </label>
+        </div>
 
-      <form onSubmit={onAdd} style={{ display: "grid", gap: 8 }}>
-        <input value={draft.marca} onChange={(e) => set("marca", e.target.value)} placeholder="Marcă" data-testid="v-marca" />
-        <input value={draft.model} onChange={(e) => set("model", e.target.value)} placeholder="Model" data-testid="v-model" />
-        <input value={draft.nrInmatriculare} onChange={(e) => set("nrInmatriculare", e.target.value)} placeholder="Nr. înmatriculare" data-testid="v-nr" />
-        <input value={draft.vin} onChange={(e) => set("vin", e.target.value)} placeholder="VIN (17 caractere)" data-testid="v-vin" />
-        <input value={draft.normaPoluare} onChange={(e) => set("normaPoluare", e.target.value)} placeholder="Normă poluare" data-testid="v-norma" />
-        <input value={draft.emisiiCo2GKm} onChange={(e) => set("emisiiCo2GKm", e.target.value)} placeholder="Emisii CO2 (g/km)" data-testid="v-co2" />
-        <input value={draft.putereKw} onChange={(e) => set("putereKw", e.target.value)} placeholder="Putere (kW)" data-testid="v-putere" />
-        <input value={draft.cilindreeCm3} onChange={(e) => set("cilindreeCm3", e.target.value)} placeholder="Cilindree (cm³)" data-testid="v-cilindree" />
-        <select value={draft.combustibil} onChange={(e) => set("combustibil", e.target.value)} data-testid="v-combustibil">
-          <option value="">Combustibil...</option>
-          <option value="BENZINA">Benzină</option>
-          <option value="MOTORINA">Motorină</option>
-          <option value="HIBRID">Hibrid</option>
-          <option value="ELECTRIC">Electric</option>
-          <option value="GPL">GPL</option>
-        </select>
-        <button type="submit" disabled={busy} data-testid="v-add">
-          {busy ? "..." : "Adaugă"}
-        </button>
-      </form>
-      {info && <p data-testid="info" style={{ color: "green" }}>{info}</p>}
-      {error && <p role="alert" data-testid="error" style={{ color: "crimson" }}>{error}</p>}
+        <form onSubmit={onAdd} className="form">
+          <div className="grid-2">
+            <div className="field">
+              <label className="field__label">Marcă</label>
+              <input className="input" value={draft.marca} onChange={(e) => set("marca", e.target.value)} placeholder="BMW" data-testid="v-marca" />
+            </div>
+            <div className="field">
+              <label className="field__label">Model</label>
+              <input className="input" value={draft.model} onChange={(e) => set("model", e.target.value)} placeholder="320d" data-testid="v-model" />
+            </div>
+          </div>
+          <div className="grid-2">
+            <div className="field">
+              <label className="field__label">Nr. înmatriculare</label>
+              <input className="input input--mono" value={draft.nrInmatriculare} onChange={(e) => set("nrInmatriculare", e.target.value)} placeholder="CJ 12 ABC" data-testid="v-nr" />
+            </div>
+            <div className="field">
+              <label className="field__label">VIN</label>
+              <input className="input input--mono" value={draft.vin} onChange={(e) => set("vin", e.target.value)} placeholder="17 caractere" data-testid="v-vin" />
+            </div>
+          </div>
+          <div className="grid-2">
+            <div className="field">
+              <label className="field__label">Normă poluare</label>
+              <input className="input" value={draft.normaPoluare} onChange={(e) => set("normaPoluare", e.target.value)} placeholder="Euro 6" data-testid="v-norma" />
+            </div>
+            <div className="field">
+              <label className="field__label">Emisii CO₂ (g/km)</label>
+              <input className="input input--mono" value={draft.emisiiCo2GKm} onChange={(e) => set("emisiiCo2GKm", e.target.value)} placeholder="120" data-testid="v-co2" />
+            </div>
+          </div>
+          <div className="grid-2">
+            <div className="field">
+              <label className="field__label">Putere (kW)</label>
+              <input className="input input--mono" value={draft.putereKw} onChange={(e) => set("putereKw", e.target.value)} placeholder="140" data-testid="v-putere" />
+            </div>
+            <div className="field">
+              <label className="field__label">Cilindree (cm³)</label>
+              <input className="input input--mono" value={draft.cilindreeCm3} onChange={(e) => set("cilindreeCm3", e.target.value)} placeholder="1995" data-testid="v-cilindree" />
+            </div>
+          </div>
+          <div className="field">
+            <label className="field__label">Combustibil</label>
+            <select className="select" value={draft.combustibil} onChange={(e) => set("combustibil", e.target.value)} data-testid="v-combustibil">
+              <option value="">Alege...</option>
+              <option value="BENZINA">Benzină</option>
+              <option value="MOTORINA">Motorină</option>
+              <option value="HIBRID">Hibrid</option>
+              <option value="ELECTRIC">Electric</option>
+              <option value="GPL">GPL</option>
+            </select>
+          </div>
+          <div className="form-actions">
+            <button type="submit" className="btn btn--primary" disabled={busy} data-testid="v-add">
+              {busy ? "..." : "Adaugă"}
+            </button>
+            {info && <span data-testid="info" className="pill pill--ok">{info}</span>}
+          </div>
+        </form>
+        {error && (
+          <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
+            {error}
+          </p>
+        )}
+      </div>
     </main>
   );
 }
