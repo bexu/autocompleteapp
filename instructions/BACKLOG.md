@@ -10,14 +10,14 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
 - [x] **0.2 Management secrete & config** (nimic hardcodat). *(config Zod `src/lib/config/env.ts`; gitleaks în CI; actions bump v5 — ADR 0004)*
   - *Acceptare:* secretele vin din vault/env; scanner de secrete în CI.
 - [x] **0.3 Strat de criptare per-câmp** (envelope encryption + KMS) ca utilitar reutilizabil. *(`src/lib/crypto/field-encryption.ts` — ADR 0005; integrarea Prisma + test pe DB reală la 1.2)*
-  - *Acceptare:* CNP/CI se scriu criptat; test care dovedește că valoarea în DB nu e în clar. *(unit: ciphertext nu conține plaintext, roundtrip, tamper-detection; testul pe DB reală vine la 1.2)*
+  - *Acceptare:* CNP/CI se scriu criptat; test care dovedește că valoarea în DB nu e în clar. *(unit: ciphertext nu conține plaintext, roundtrip, tamper-detection; **test pe DB reală livrat la 1.2** — `tests/integration/profile.repo.test.ts`)*
 - [x] **0.4 Threat model scurt + politică de logare fără PII.** *(`docs/threat-model.md`; logger cu redactare `src/lib/log/`)*
   - *Acceptare:* document de 1 pagină; middleware/filtru care blochează PII în loguri.
 
 ## Faza 1 — Felia verticală: formular 230 (production-ready)
 - [x] **1.1 Auth + cont utilizator** (conform template). *(better-auth + Prisma 7 adapter-pg; RBAC pur `src/lib/auth/rbac.ts`; guard-uri `session.ts`; pagini signup/login/dashboard; E2E golden path — ADR 0006)*
   - *Acceptare:* signup/login/logout; RBAC minim; teste. *(e2e: signup→dashboard→logout→guard→login; unit RBAC)*
-- [ ] **1.2 Model canonic „cetățean"** (schema din SPEC) + migrări.
+- [x] **1.2 Model canonic „cetățean"** (schema din SPEC) + migrări. *(Profile/Address + migrare; repository cu criptare per-câmp + AAD=user; validatori CNP/IBAN; API `/api/profile` + pagină; test integrare pe DB reală: CNP nu e în clar. Completează și partea DB rămasă din 0.3.)*
   - *Acceptare:* CRUD pe profil; câmpuri sensibile criptate; validare (checksum CNP, IBAN). Entitățile se modelează explicit (nu `Bun` generic); `Vehicul`/`Imobil` se adaugă la feliile lor.
 - [ ] **1.3 Seif de documente + upload CI** + OCR → pre-completare profil.
   - *Acceptare:* upload securizat; OCR extrage câmpurile de bază; user confirmă înainte de salvare; scan criptat + retenție.

@@ -3,6 +3,15 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Task 1.2 Model canonic — implementat, pe branch `feat/m1-canonical-model`.** (2026-07-27)
+- Modele `Profile`/`Address` (1:1 cu User) + migrare `canonical_profile`.
+- `src/lib/profile/repository.ts`: upsert/get cu criptare per-câmp (AAD=`userId:field`), update parțial (absent=neschimbat, ""=șters). Validare Zod cu CNP checksum + IBAN mod-97 (`src/lib/validation/`).
+- API `/api/profile` (GET/PUT, guard requireUser, fără PII în erori). Pagină `/dashboard/profil` cu mascare CNP/IBAN.
+- **Test integrare pe DB reală** (`tests/integration/`, config + script `test:integration`): dovedește CNP/IBAN criptat în DB — completează partea rămasă din 0.3.
+- Verificat local: 53 unit + 5 integrare + 2 e2e (auth + profil round-trip) — verzi.
+- **Următorul:** 1.3 seif documente + upload CI + OCR → pre-completare profil.
+
+
 **Task 1.1 Auth — implementat, pe branch `feat/m1-auth`.** (2026-07-27)
 - better-auth (email+parolă) + Prisma 7 cu `@prisma/adapter-pg`; client singleton `src/lib/db/prisma.ts`.
 - Modele `user/session/account/verification` + `role`; migrare `init_auth`.

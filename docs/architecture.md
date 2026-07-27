@@ -10,7 +10,7 @@ Produsul e organizat pe **„dosare pentru evenimente de viață"** (ex. „am v
 ## Componente
 - Frontend (Next.js): onboarding, profil, completare formular, preview „exact ce semnezi", handoff. Auth: pagini signup/login/dashboard (better-auth).
 - API (Next.js route handlers): auth (`/api/auth/[...all]`, better-auth), CRUD profil, generare PDF, validare, semnătură (abstracție QTSP, mock în dev). Guard-uri `requireUser`/`requireRole` (RBAC) pe rutele cu date personale.
-- Bază de date (Postgres + Prisma): model canonic „cetățean"; câmpuri sensibile (CNP, CI) criptate per-câmp (envelope encryption). Consent ledger + audit log fără PII.
+- Bază de date (Postgres + Prisma): model canonic „cetățean" (`Profile`/`Address`, 1:1 cu `User`); câmpurile tari (CNP, serie/nr CI, IBAN) criptate per-câmp (envelope encryption, AAD = context user), accesate doar prin `src/lib/profile/repository.ts`. Validare CNP (checksum) + IBAN (mod-97). Consent ledger + audit log fără PII.
 - Task-uri pe fundal (pg-boss): reminders de termene (ex. 25.05 pentru 230), retenție/ștergere scanuri.
 
 ## Fluxuri principale
