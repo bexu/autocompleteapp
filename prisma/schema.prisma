@@ -15,17 +15,18 @@ datasource db {
 // Nu edita manual câmpurile cerute de better-auth fără a regenera cu CLI-ul.
 
 model User {
-  id            String    @id
+  id            String     @id
   name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  email         String     @unique
+  emailVerified Boolean    @default(false)
   image         String?
-  role          String    @default("user")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  role          String     @default("user")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
   sessions      Session[]
   accounts      Account[]
   profile       Profile?
+  documents     Document[]
 
   @@map("user")
 }
@@ -129,4 +130,28 @@ model Address {
   updatedAt  DateTime    @updatedAt
 
   @@map("address")
+}
+
+// --- Seif de documente (task 1.3) ---
+// Scanurile (CI, CIV, contracte) se stochează CRIPTAT (ADR 0005) cu retenție
+// definită (ștergere după utilizare — GDPR). `contentEnc` = payload `v1:...` al
+// bytes-ilor (base64). Conținutul se accesează doar prin repository, cu
+// verificare de proprietate.
+
+model Document {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tip         String // CI | CIV | CONTRACT | ALTUL
+  filename    String
+  mimeType    String
+  sizeBytes   Int
+  contentEnc  String // bytes criptați (envelope), niciodată în clar
+  retainUntil DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([retainUntil])
+  @@map("document")
 }

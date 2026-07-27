@@ -3,6 +3,14 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Task 1.3 Seif documente + OCR — implementat, pe branch `feat/m1-document-vault`.** (2026-07-27)
+- Seif criptat `src/lib/documents/repository.ts`: bytes criptați (envelope, AAD=user), retenție + `purgeExpiredDocuments` (job pg-boss vine la 1.8), verificare de proprietate.
+- OCR MRZ TD1 `src/lib/ocr/` (mrz.ts + provider.ts, ADR 0007): parsează CI, derivă CNP + sex + dată; imagine-OCR amânat în spatele interfeței.
+- Flux: `/api/documents` (upload+OCR) → `/dashboard/onboarding` (upload→confirmă) → PUT `/api/profile`.
+- Verificat: 59 unit + 9 integrare + 3 e2e (auth, profil, onboarding) — verzi.
+- **Următorul:** 1.4 consimțământ + drepturi GDPR (consent ledger, export & ștergere).
+
+
 **Task 1.2 Model canonic — implementat, pe branch `feat/m1-canonical-model`.** (2026-07-27)
 - Modele `Profile`/`Address` (1:1 cu User) + migrare `canonical_profile`.
 - `src/lib/profile/repository.ts`: upsert/get cu criptare per-câmp (AAD=`userId:field`), update parțial (absent=neschimbat, ""=șters). Validare Zod cu CNP checksum + IBAN mod-97 (`src/lib/validation/`).

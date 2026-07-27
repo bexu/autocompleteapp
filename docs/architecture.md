@@ -14,7 +14,7 @@ Produsul e organizat pe **„dosare pentru evenimente de viață"** (ex. „am v
 - Task-uri pe fundal (pg-boss): reminders de termene (ex. 25.05 pentru 230), retenție/ștergere scanuri.
 
 ## Fluxuri principale
-1. **Onboarding:** cont → upload CI → OCR → pre-completare profil → confirmare user + consimțământ per categorie.
+1. **Onboarding:** cont → upload CI (seif criptat + retenție, `src/lib/documents/`) → OCR MRZ (`src/lib/ocr/`) → pre-completare profil → confirmare user + consimțământ per categorie.
 2. **Completare formular:** alegere formular → mapare din profil → completare goluri → validare → preview.
 3. **Semnare:** semnare calificată prin QTSP (CSC API; provider mock în dev), arhivare document semnat.
 4. **Depunere (handoff):** PDF + checklist + deep-link (ex. SPV) + instrucțiuni; stare dosar „de depus/depus".
