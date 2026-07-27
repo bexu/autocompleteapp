@@ -15,8 +15,8 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
   - *Acceptare:* document de 1 pagină; middleware/filtru care blochează PII în loguri.
 
 ## Faza 1 — Felia verticală: formular 230 (production-ready)
-- [ ] **1.1 Auth + cont utilizator** (conform template).
-  - *Acceptare:* signup/login/logout; RBAC minim; teste.
+- [x] **1.1 Auth + cont utilizator** (conform template). *(better-auth + Prisma 7 adapter-pg; RBAC pur `src/lib/auth/rbac.ts`; guard-uri `session.ts`; pagini signup/login/dashboard; E2E golden path — ADR 0006)*
+  - *Acceptare:* signup/login/logout; RBAC minim; teste. *(e2e: signup→dashboard→logout→guard→login; unit RBAC)*
 - [ ] **1.2 Model canonic „cetățean"** (schema din SPEC) + migrări.
   - *Acceptare:* CRUD pe profil; câmpuri sensibile criptate; validare (checksum CNP, IBAN). Entitățile se modelează explicit (nu `Bun` generic); `Vehicul`/`Imobil` se adaugă la feliile lor.
 - [ ] **1.3 Seif de documente + upload CI** + OCR → pre-completare profil.

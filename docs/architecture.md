@@ -8,8 +8,8 @@
 Produsul e organizat pe **„dosare pentru evenimente de viață"** (ex. „am vândut mașina"), nu catalog de formulare; fiecare formular e un **manifest versionat** per autoritate/jurisdicție/perioadă (vezi [adr/0003](adr/0003-dosare-evenimente-de-viata.md) și [roadmap-formulare.md](roadmap-formulare.md)).
 
 ## Componente
-- Frontend (Next.js): onboarding, profil, completare formular, preview „exact ce semnezi", handoff.
-- API (Next.js route handlers): CRUD profil, generare PDF, validare, semnătură (abstracție QTSP, mock în dev).
+- Frontend (Next.js): onboarding, profil, completare formular, preview „exact ce semnezi", handoff. Auth: pagini signup/login/dashboard (better-auth).
+- API (Next.js route handlers): auth (`/api/auth/[...all]`, better-auth), CRUD profil, generare PDF, validare, semnătură (abstracție QTSP, mock în dev). Guard-uri `requireUser`/`requireRole` (RBAC) pe rutele cu date personale.
 - Bază de date (Postgres + Prisma): model canonic „cetățean"; câmpuri sensibile (CNP, CI) criptate per-câmp (envelope encryption). Consent ledger + audit log fără PII.
 - Task-uri pe fundal (pg-boss): reminders de termene (ex. 25.05 pentru 230), retenție/ștergere scanuri.
 
