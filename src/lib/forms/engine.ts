@@ -1,4 +1,5 @@
 import { getProfile } from "@/lib/profile/repository";
+import { getVehicul } from "@/lib/vehicle/repository";
 import { getSignatureProvider } from "@/lib/signature/provider";
 import { archiveSignedForm } from "@/lib/signature/repository";
 import { createDossier } from "@/lib/dispatch/repository";
@@ -37,6 +38,7 @@ export interface GenerateOptions {
   jurisdiction?: string;
   at?: Date;
   inputs?: Record<string, unknown>;
+  vehicleId?: string; // pentru formularele auto (mapare din vehicul)
 }
 
 async function resolveAndMap(userId: string, opts: GenerateOptions) {
@@ -47,8 +49,11 @@ async function resolveAndMap(userId: string, opts: GenerateOptions) {
   );
   if (!manifest) throw new ManifestNotFoundError();
 
-  const profile = await getProfile(userId);
-  const mapped = mapForm(manifest, profile, opts.inputs ?? {});
+  const [profile, vehicle] = await Promise.all([
+    getProfile(userId),
+    opts.vehicleId ? getVehicul(userId, opts.vehicleId) : Promise.resolve(null),
+  ]);
+  const mapped = mapForm(manifest, { profile, vehicle }, opts.inputs ?? {});
   if (mapped.errors.length > 0) throw new FormValidationError(mapped.errors);
   return { manifest, fields: mapped.fields };
 }

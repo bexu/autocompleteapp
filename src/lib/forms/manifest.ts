@@ -4,6 +4,7 @@
 
 export type FieldSource =
   | { from: "profile"; path: string } // ex. "nume", "cnp", "addresses.0.localitate"
+  | { from: "vehicle"; path: string } // ex. "vin", "nrInmatriculare", "putereKw"
   | { from: "input"; key: string } // valoare specifică formularului, dată de user
   | { from: "const"; value: string };
 

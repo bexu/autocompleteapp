@@ -3,6 +3,14 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Task 2.3 Manifeste auto — implementat, pe branch `feat/m2-auto-manifests`.** (2026-07-27)
+- Motor extins: `FieldSource` are sursă „vehicle"; `mapForm(manifest, {profile, vehicle}, inputs)`; engine încarcă vehiculul (`opts.vehicleId`).
+- `src/lib/forms/auto.ts`: ITL-005 Cluj 2026 (cu normă/CO2/putere), ITL-016, ITL-010, ITL-054 (contract, cumpărător ca input), DGPCI. Înregistrate în `registered.ts`.
+- `sanitize` PDF întărit (subscript CO₂, em-dash, fallback non-Latin1).
+- Verificat: 83 unit + 32 integrare + 8 e2e — verzi.
+- **Următorul: 2.4 wizard eveniment „am cumpărat/vândut" → generează setul corect de documente; apoi 2.5 checklist-uri dosar, 2.6 e2e.**
+
+
 **Task 2.2 OCR CIV — implementat, pe branch `feat/m2-ocr-civ`.** (2026-07-27)
 - `src/lib/ocr/civ.ts`: parser pe codurile armonizate UE (Directiva 1999/37/CE) + provider + factory.
 - API `/api/vehicule/ocr` (stochează CIV criptat în seif + extrage câmpuri); pagină vehicule pre-completează formularul din CIV.
