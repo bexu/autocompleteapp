@@ -31,8 +31,10 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
   - *Acceptare:* PDF final + checklist + deep-link SPV + instrucțiuni; stare dosar „de depus/depus". *(deep-link SPV = url null până la verificare — guardrail)*
 - [x] **1.8 Tracking termen 230 (25.05) + reminder.** *(dosar cu `deadlineAt` calculat; `src/lib/reminders/` scanDueReminders la praguri T30/T7/T1 idempotent; job pg-boss `src/jobs/` + `npm run jobs`; remindere afișate pe dashboard)*
   - *Acceptare:* dosarul are termen; notificare/reminder; test. *(verificat prin integrare — remindere time/cron-driven; s-a închis și o breșă GDPR: deleteUserData șterge acum și dosare/semnate/remindere)*
-- [ ] **1.9 E2E felia 230.**
+- [x] **1.9 E2E felia 230.** *(`tests/e2e/golden-path.spec.ts` — parcurs unic: signup → onboarding+OCR+consimțământ → profil → 230 → preview → semnat → dosar → handoff → depus)*
   - *Acceptare:* un test end-to-end: onboarding → 230 completat → preview → semnat (mock) → handoff.
+
+> **Faza 1 COMPLETĂ** (2026-07-27) — felia verticală 230 production-ready. 76 unit + 24 integrare + 6 e2e. Următoarea felie: **Faza 2 — dosar auto** (vezi roadmap).
 
 ## Faza 2 — Dosar auto: „am cumpărat / am vândut o mașină"
 Cea mai bună extindere după 230: userul repetă aceleași date în 4–5 documente, prin mai multe instituții. Cluj întâi; manifeste versionate per UAT (ITL-005 revizuit 2026: normă poluare, CO₂ hibride, putere electrice).
