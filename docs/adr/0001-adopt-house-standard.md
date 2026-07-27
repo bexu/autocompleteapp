@@ -1,7 +1,7 @@
 # ADR 0001 — Adoptăm standardul de casă
 
 - Status: acceptat
-- Data: <completează>
+- Data: 2026-07-27
 
 ## Context
 Avem nevoie de un stack și de reguli consistente pentru aplicații vibe-coded interne — nu „ce sugerează random unealta AI".

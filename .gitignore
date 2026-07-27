@@ -11,3 +11,7 @@ test-results/
 .env*.local
 prisma/*.db
 .DS_Store
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+*.pem
