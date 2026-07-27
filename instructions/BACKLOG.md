@@ -40,8 +40,8 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
 Cea mai bună extindere după 230: userul repetă aceleași date în 4–5 documente, prin mai multe instituții. Cluj întâi; manifeste versionate per UAT (ITL-005 revizuit 2026: normă poluare, CO₂ hibride, putere electrice).
 - [x] **2.1 Entitatea `Vehicul`** în modelul canonic (câmpurile din SPEC) + migrare. *(`src/lib/vehicle/` CRUD + validare VIN/an/CO2; API `/api/vehicule`; pagină; câmpuri ITL-005 Cluj 2026 — normă/CO2/putere; inclus în export+ștergere GDPR)*
   - *Acceptare:* CRUD vehicul legat de profil; validări de bază; teste. *(+ fix securitate: rate limit better-auth reglat corect — vezi commit)*
-- [ ] **2.2 OCR CIV + contract/factură** → pre-completare vehicul.
-  - *Acceptare:* upload CIV; câmpurile extrase pre-completează entitatea; user confirmă.
+- [x] **2.2 OCR CIV + contract/factură** → pre-completare vehicul. *(`src/lib/ocr/civ.ts` parser pe codurile UE 1999/37/CE: A/D.1/D.3/E/P.1/P.2/P.3/F.1/V.7/V.9; API `/api/vehicule/ocr` stochează CIV criptat + extrage; pagină pre-completează formularul)*
+  - *Acceptare:* upload CIV; câmpurile extrase pre-completează entitatea; user confirmă. *(contract/factură — la 2.4, cu evenimentul de vânzare)*
 - [ ] **2.3 Definițiile formularelor auto** ca manifeste versionate: ITL-054, ITL-005, ITL-016, ITL-010, cererea DGPCI.
   - *Acceptare:* fiecare cu sursă oficială + hash + revizie + valabilitate; PDF generat corect pe date de eșantion.
 - [ ] **2.4 Wizard eveniment** „am cumpărat / am vândut" → generează documentele potrivite.
