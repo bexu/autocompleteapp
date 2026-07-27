@@ -11,7 +11,7 @@ Produsul e organizat pe **„dosare pentru evenimente de viață"** (ex. „am v
 - Frontend (Next.js): onboarding, profil, completare formular, preview „exact ce semnezi", handoff. Auth: pagini signup/login/dashboard (better-auth).
 - API (Next.js route handlers): auth (`/api/auth/[...all]`, better-auth), CRUD profil, generare PDF, validare, semnătură (abstracție QTSP, mock în dev). Guard-uri `requireUser`/`requireRole` (RBAC) pe rutele cu date personale.
 - Bază de date (Postgres + Prisma): model canonic „cetățean" (`Profile`/`Address`, 1:1 cu `User`); câmpurile tari (CNP, serie/nr CI, IBAN) criptate per-câmp (envelope encryption, AAD = context user), accesate doar prin `src/lib/profile/repository.ts`. Validare CNP (checksum) + IBAN (mod-97). Consent ledger + audit log fără PII.
-- Task-uri pe fundal (pg-boss): reminders de termene (ex. 25.05 pentru 230), retenție/ștergere scanuri.
+- Task-uri pe fundal (pg-boss): worker separat `src/jobs/` (`npm run jobs`) — scanează zilnic dosarele „de depus" cu termen apropiat și creează remindere (praguri T30/T7/T1). Termenul dosarului (`deadlineAt`) se calculează din regula manifestului (25.05 pentru 230). Retenție/ștergere scanuri.
 
 ## Fluxuri principale
 1. **Onboarding:** cont → upload CI (seif criptat + retenție, `src/lib/documents/`) → OCR MRZ (`src/lib/ocr/`) → pre-completare profil → confirmare user + consimțământ per categorie.

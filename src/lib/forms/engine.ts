@@ -2,6 +2,7 @@ import { getProfile } from "@/lib/profile/repository";
 import { getSignatureProvider } from "@/lib/signature/provider";
 import { archiveSignedForm } from "@/lib/signature/repository";
 import { createDossier } from "@/lib/dispatch/repository";
+import { computeNextDeadline } from "@/lib/reminders/deadline";
 import { selectManifest, type FormManifest } from "./registered";
 import { mapForm, type MapResult } from "./mapping";
 import { generateFormPdf } from "./pdf";
@@ -98,11 +99,15 @@ export async function signForm(
     manifestId: manifest.id,
     result,
   });
+  const deadlineAt = manifest.deadlineRule
+    ? computeNextDeadline(manifest.deadlineRule, now)
+    : null;
   const dossier = await createDossier(userId, {
     formCode: manifest.formCode,
     manifestId: manifest.id,
     signedFormId: meta.id,
     deadline: manifest.deadline ?? null,
+    deadlineAt,
   });
   return {
     signedFormId: meta.id,

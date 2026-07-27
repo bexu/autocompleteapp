@@ -14,12 +14,19 @@ export interface DossierMeta {
   status: DossierStatus;
   submittedAt: Date | null;
   deadline: string | null;
+  deadlineAt: Date | null;
   createdAt: Date;
 }
 
 export async function createDossier(
   userId: string,
-  input: { formCode: string; manifestId: string; signedFormId?: string; deadline?: string | null },
+  input: {
+    formCode: string;
+    manifestId: string;
+    signedFormId?: string;
+    deadline?: string | null;
+    deadlineAt?: Date | null;
+  },
 ): Promise<DossierMeta> {
   const row = await prisma.dossier.create({
     data: {
@@ -29,6 +36,7 @@ export async function createDossier(
       signedFormId: input.signedFormId ?? null,
       status: "DE_DEPUS",
       deadline: input.deadline ?? null,
+      deadlineAt: input.deadlineAt ?? null,
     },
   });
   return toMeta(row);
@@ -71,6 +79,7 @@ function toMeta(row: {
   status: string;
   submittedAt: Date | null;
   deadline: string | null;
+  deadlineAt: Date | null;
   createdAt: Date;
 }): DossierMeta {
   return {
@@ -81,6 +90,7 @@ function toMeta(row: {
     status: row.status as DossierStatus,
     submittedAt: row.submittedAt,
     deadline: row.deadline,
+    deadlineAt: row.deadlineAt,
     createdAt: row.createdAt,
   };
 }

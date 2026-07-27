@@ -3,6 +3,15 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Task 1.8 Tracking termen + remindere — implementat, pe branch `feat/m1-reminders`.** (2026-07-27)
+- `Dossier.deadlineAt` calculat din regula manifestului (25 mai pentru 230).
+- `src/lib/reminders/`: `deadline.ts` (pur, calcul termen) + `service.ts` (scanDueReminders idempotent la praguri T30/T7/T1, listReminders).
+- Job pg-boss: `src/jobs/worker.ts` (entry încarcă .env → dynamic import worker-main) + `npm run jobs`, cron zilnic 06:00.
+- Remindere afișate pe dashboard. **Închis breșă GDPR:** `deleteUserData` șterge acum și dosare/formulare semnate/remindere.
+- Verificat: 75 unit + 24 integrare + 5 e2e — verzi. (1.8 verificat prin integrare — e time/cron-driven.)
+- **Ultimul din M1: 1.9 e2e complet al feliei 230 (onboarding→230→preview→semnat→handoff într-un singur test).**
+
+
 **Task 1.7 Dispatch + handoff — implementat, pe branch `feat/m1-dispatch-handoff`.** (2026-07-27)
 - Model `Dossier` (DE_DEPUS→DEPUS); `src/lib/dispatch/` (repository + handoff din manifest).
 - Manifest cu `channels` structurate (SPV/borderou, url null până la verificare) + `deadline`.

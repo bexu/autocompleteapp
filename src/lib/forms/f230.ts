@@ -41,6 +41,7 @@ export const F230_MANIFEST: FormManifest = {
     { key: "doiAni", label: "Redirecționez pe 2 ani", type: "checkbox" },
   ],
   deadline: "25 mai",
+  deadlineRule: { month: 5, day: 25 },
   channels: [
     {
       id: "spv",

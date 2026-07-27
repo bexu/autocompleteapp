@@ -61,7 +61,9 @@ export interface FormManifest {
   inputs: InputDef[];
   attachments?: string[];
   channels?: SubmissionChannel[];
-  deadline?: string; // ex. "25 mai" — termenul de depunere (informativ)
+  deadline?: string; // ex. "25 mai" — termen de depunere (afișare)
+  // Regula anuală a termenului, pentru calculul datelor de reminder.
+  deadlineRule?: { month: number; day: number };
 }
 
 const registry: FormManifest[] = [];
