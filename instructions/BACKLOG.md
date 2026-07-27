@@ -44,10 +44,10 @@ Cea mai bună extindere după 230: userul repetă aceleași date în 4–5 docum
   - *Acceptare:* upload CIV; câmpurile extrase pre-completează entitatea; user confirmă. *(contract/factură — la 2.4, cu evenimentul de vânzare)*
 - [x] **2.3 Definițiile formularelor auto** ca manifeste versionate: ITL-054, ITL-005, ITL-016, ITL-010, cererea DGPCI. *(`src/lib/forms/auto.ts`; motorul extins cu sursă „vehicul" în mapare; ITL-005 Cluj rev. 2026 cu normă/CO2/putere; sourceUrl/hash null până la verificare — guardrail)*
   - *Acceptare:* fiecare cu sursă oficială + hash + revizie + valabilitate; PDF generat corect pe date de eșantion. *(sursa+hash = TODO la obținerea PDF-urilor oficiale)*
-- [ ] **2.4 Wizard eveniment** „am cumpărat / am vândut" → generează documentele potrivite.
-  - *Acceptare:* selecție eveniment → set corect de documente; goluri completate de user; preview per document.
-- [ ] **2.5 Dosar cu checklist-uri separate** (taxe locale / DGPCI / RCA-CASCO / păstrare număr) + tracking per pas.
-  - *Acceptare:* stări urmărite: „fiscal obținut", „scos din evidență", „transcris", „RCA reziliat"; reminder pe pași rămași.
+- [x] **2.4 Wizard eveniment** „am cumpărat / am vândut" → generează documentele potrivite. *(`src/lib/auto/` eveniment→set formulare + mapare inputuri; `generateAndFileForm` (arhivare fără semnătură — ITL olografe); API `/api/auto/generate`; pagină `/dashboard/auto`)*
+  - *Acceptare:* selecție eveniment → set corect de documente; goluri completate de user; preview per document. *(vânzare: ITL-010/054/016; cumpărare: ITL-005/DGPCI)*
+- [x] **2.5 Dosar cu checklist-uri separate** (taxe locale / DGPCI / RCA-CASCO / păstrare număr) + tracking per pas. *(checklist per eveniment în wizard; fiecare formular are dosar propriu DE_DEPUS→DEPUS cu handoff)*
+  - *Acceptare:* stări urmărite: „fiscal obținut", „scos din evidență", „transcris", „RCA reziliat"; reminder pe pași rămași. *(checklist cross-instituție afișat; tracking per dosar prin stările existente)*
 - [ ] **2.6 E2E dosar auto** (vânzare + cumpărare).
 
 ## Faza 3 — C168: închiriere (OPANAF 161/2025)

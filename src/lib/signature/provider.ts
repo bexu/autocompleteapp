@@ -14,9 +14,9 @@ export interface SignContext {
 export interface SignResult {
   signedPdf: Uint8Array;
   provider: string;
-  status: "SIGNED";
+  status: "SIGNED" | "GENERATED"; // GENERATED = arhivat fără semnătură (olograf)
   signedAt: Date;
-  contentHash: string; // sha256 al PDF-ului semnat
+  contentHash: string; // sha256 al PDF-ului
 }
 
 export interface SignatureProvider {

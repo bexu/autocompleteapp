@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { getProfile } from "@/lib/profile/repository";
 import { getVehicul } from "@/lib/vehicle/repository";
 import { getSignatureProvider } from "@/lib/signature/provider";
@@ -121,4 +122,40 @@ export async function signForm(
     contentHash: result.contentHash,
     manifest,
   };
+}
+
+export interface FiledFormMeta {
+  dossierId: string;
+  formCode: string;
+  manifest: FormManifest;
+  pdf: Uint8Array;
+}
+
+/**
+ * Generează, arhivează (fără semnătură — formularele ITL se semnează olograf)
+ * și deschide un dosar „de depus". Folosit de dosarul auto.
+ */
+export async function generateAndFileForm(
+  userId: string,
+  opts: GenerateOptions,
+  now: Date = new Date(),
+): Promise<FiledFormMeta> {
+  const { manifest, pdf } = await generateForm(userId, opts);
+  const contentHash = createHash("sha256").update(pdf).digest("hex");
+  const meta = await archiveSignedForm(userId, {
+    formCode: manifest.formCode,
+    manifestId: manifest.id,
+    result: { signedPdf: pdf, provider: "none", status: "GENERATED", signedAt: now, contentHash },
+  });
+  const deadlineAt = manifest.deadlineRule
+    ? computeNextDeadline(manifest.deadlineRule, now)
+    : null;
+  const dossier = await createDossier(userId, {
+    formCode: manifest.formCode,
+    manifestId: manifest.id,
+    signedFormId: meta.id,
+    deadline: manifest.deadline ?? null,
+    deadlineAt,
+  });
+  return { dossierId: dossier.id, formCode: manifest.formCode, manifest, pdf };
 }
