@@ -27,8 +27,8 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
   - *Acceptare:* definiția = **manifest versionat** (autoritate, jurisdicție, cod, revizie, valabilitate, sursă+hash, workflow, semnătură — vezi SPEC); selecție după jurisdicție + dată; mapare declarativă profil→230; generare PDF corect completat; test pe date de eșantion.
 - [x] **1.6 Preview „exact ce semnezi" + abstracție semnătură (provider mock).** *(`previewForm` = aceleași valori mapate; `src/lib/signature/` provider mock + arhivă `SignedForm` criptată cu hash; flux preview→semnătură în UI — ADR 0010)*
   - *Acceptare:* preview fidel; interfață de semnătură cu provider mock în dev; document „semnat" arhivat.
-- [ ] **1.7 Dispatch „generate + handoff" pentru 230.**
-  - *Acceptare:* PDF final + checklist + deep-link SPV + instrucțiuni; stare dosar „de depus/depus".
+- [x] **1.7 Dispatch „generate + handoff" pentru 230.** *(`src/lib/dispatch/`: model `Dossier` DE_DEPUS→DEPUS; handoff (checklist + canale SPV/borderou din manifest); pagini dosare; semnarea deschide dosarul)*
+  - *Acceptare:* PDF final + checklist + deep-link SPV + instrucțiuni; stare dosar „de depus/depus". *(deep-link SPV = url null până la verificare — guardrail)*
 - [ ] **1.8 Tracking termen 230 (25.05) + reminder.**
   - *Acceptare:* dosarul are termen; notificare/reminder; test.
 - [ ] **1.9 E2E felia 230.**

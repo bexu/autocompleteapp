@@ -17,7 +17,7 @@ Produsul e organizat pe **„dosare pentru evenimente de viață"** (ex. „am v
 1. **Onboarding:** cont → upload CI (seif criptat + retenție, `src/lib/documents/`) → OCR MRZ (`src/lib/ocr/`) → pre-completare profil → confirmare user + consimțământ per categorie.
 2. **Completare formular:** alegere formular → motor `src/lib/forms/` (manifest versionat `selectManifest` → mapare declarativă profil→câmpuri → generare PDF cu pdf-lib) → validare → preview. Formular 230 livrat (felia 1).
 3. **Semnare:** semnare calificată prin QTSP (CSC API; provider mock în dev), arhivare document semnat.
-4. **Depunere (handoff):** PDF + checklist + deep-link (ex. SPV) + instrucțiuni; stare dosar „de depus/depus".
+4. **Depunere (handoff):** motor `src/lib/dispatch/` — semnarea deschide un `Dossier` (DE_DEPUS→DEPUS); handoff (checklist + canale SPV/borderou + termen) derivat din manifest. PDF + checklist + deep-link + instrucțiuni; userul marchează „depus" (nu depunem noi).
 
 ## Reguli de domeniu / business
 Vezi guardrails în [../CLAUDE.md](../CLAUDE.md): unealtă nu consultant (OG 71/2001 art. 25), fără auto-submit ANAF, fără automatizare SPV, semnătură doar prin QTSP. Date protejate conform Legii 190/2018 art. 4 — criptare per-câmp, zero PII în loguri. Sursa de scope: [../SPEC.md](../SPEC.md).

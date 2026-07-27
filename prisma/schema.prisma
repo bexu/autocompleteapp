@@ -29,6 +29,7 @@ model User {
   documents     Document[]
   consents      Consent[]
   signedForms   SignedForm[]
+  dossiers      Dossier[]
 
   @@map("user")
 }
@@ -211,4 +212,26 @@ model SignedForm {
 
   @@index([userId])
   @@map("signed_form")
+}
+
+// --- Dosare (dispatch + handoff, task 1.7) ---
+// Un dosar = un caz de depunere pentru un formular. Urmărește starea până la
+// „butonul de trimitere": DE_DEPUS → DEPUS (declarat de user — „generate, don't
+// submit"). Handoff-ul (checklist + canale) se derivă din manifest, nu se stochează.
+
+model Dossier {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  formCode     String
+  manifestId   String
+  signedFormId String?
+  status       String // DE_DEPUS | DEPUS
+  submittedAt  DateTime?
+  deadline     String? // informativ (ex. „25 mai")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("dossier")
 }

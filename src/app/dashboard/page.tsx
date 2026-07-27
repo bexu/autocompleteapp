@@ -33,6 +33,9 @@ export default async function DashboardPage() {
         <Link href="/dashboard/formulare/230" data-testid="link-230">
           Formular 230
         </Link>
+        <Link href="/dashboard/dosare" data-testid="link-dosare">
+          Dosarele mele
+        </Link>
       </p>
       <LogoutButton />
     </main>
