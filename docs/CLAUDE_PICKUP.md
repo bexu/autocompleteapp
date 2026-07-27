@@ -3,6 +3,14 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**FAZA 1 COMPLETĂ — felia verticală 230 production-ready.** (2026-07-27)
+- Toate taskurile 1.1–1.9 gata, fiecare pe PR separat cu CI verde.
+- 1.9: `tests/e2e/golden-path.spec.ts` leagă tot parcursul într-un singur test.
+- Acoperire totală: **76 unit + 24 integrare (DB reală) + 6 e2e**.
+- Fluxul demonstrabil: cont → încarcă buletin (OCR MRZ) → consimțământ → profil criptat → 230 → preview → semnătură (mock) → dosar → handoff (checklist + SPV) → marchează depus; + export/ștergere GDPR; + remindere de termen (pg-boss).
+- **Următorul: Faza 2 — dosar auto** („am cumpărat/vândut mașina"): entitate Vehicul, OCR CIV, manifeste ITL-054/005/016/010 + DGPCI, wizard eveniment, checklist-uri + tracking. Motorul de formulare e deja versionat (jurisdicție+dată) — manifestele auto se adaugă ca date.
+
+
 **Task 1.8 Tracking termen + remindere — implementat, pe branch `feat/m1-reminders`.** (2026-07-27)
 - `Dossier.deadlineAt` calculat din regula manifestului (25 mai pentru 230).
 - `src/lib/reminders/`: `deadline.ts` (pur, calcul termen) + `service.ts` (scanDueReminders idempotent la praguri T30/T7/T1, listReminders).
