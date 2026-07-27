@@ -108,9 +108,19 @@ export async function upsertProfile(
 export async function getProfile(userId: string): Promise<DecryptedProfile | null> {
   const profile = await prisma.profile.findUnique({
     where: { userId },
-    include: { addresses: { orderBy: { createdAt: "asc" } } },
+    // Ordine deterministă: createdAt poate fi egal (același INSERT), deci
+    // adăugăm `id` ca tiebreak stabil. Domiciliul se pune primul mai jos —
+    // formularele care cer adresa fiscală (ex. 230) folosesc `addresses.0`.
+    include: { addresses: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] } },
   });
   if (!profile) return null;
+
+  // DOMICILIU înaintea RESEDINTA (sort stabil păstrează ordinea din query în
+  // interiorul aceluiași tip) → `addresses.0` = domiciliul, când există.
+  const orderedAddresses = [...profile.addresses].sort((a, b) => {
+    if (a.tip === b.tip) return 0;
+    return a.tip === "DOMICILIU" ? -1 : 1;
+  });
 
   return {
     nume: profile.nume,
@@ -124,7 +134,7 @@ export async function getProfile(userId: string): Promise<DecryptedProfile | nul
     ciExp: profile.ciExp,
     telefon: profile.telefon,
     iban: decOptional(profile.ibanEnc, userId, "iban"),
-    addresses: profile.addresses.map((a) => ({
+    addresses: orderedAddresses.map((a) => ({
       tip: a.tip,
       strada: a.strada,
       nr: a.nr,

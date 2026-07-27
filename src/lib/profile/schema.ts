@@ -7,6 +7,13 @@ import { isValidIban, normalizeIban } from "@/lib/validation/iban";
 
 const empty = (v: unknown) => v === "" || v === null || v === undefined;
 
+// Dată opțională: null/"" (din JSON) NU trebuie coercite la epoch (new Date(null)
+// = 1970) — le tratăm ca „absent" (undefined = neschimbat în update parțial).
+const optionalDate = z.preprocess(
+  (v) => (v === "" || v === null ? undefined : v),
+  z.coerce.date().optional(),
+);
+
 const AddressInput = z.object({
   tip: z.enum(["DOMICILIU", "RESEDINTA"]),
   strada: z.string().max(200).optional(),
@@ -21,7 +28,7 @@ export const ProfileInput = z.object({
   nume: z.string().max(120).optional(),
   prenume: z.string().max(120).optional(),
   sex: z.enum(["M", "F"]).optional(),
-  dataNasterii: z.coerce.date().optional(),
+  dataNasterii: optionalDate,
 
   cnp: z
     .string()
@@ -30,7 +37,7 @@ export const ProfileInput = z.object({
   ciSerie: z.string().max(10).optional(),
   ciNr: z.string().max(20).optional(),
   ciEmitent: z.string().max(120).optional(),
-  ciExp: z.coerce.date().optional(),
+  ciExp: optionalDate,
 
   telefon: z.string().max(30).optional(),
   iban: z

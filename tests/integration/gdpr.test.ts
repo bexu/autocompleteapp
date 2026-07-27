@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db/prisma";
 import { resetEnvCache } from "@/lib/config/env";
 import { upsertProfile } from "@/lib/profile/repository";
 import { saveDocument } from "@/lib/documents/repository";
+import { signForm } from "@/lib/forms/engine";
 import {
   getConsentStatus,
   grantConsent,
@@ -60,10 +61,10 @@ describe("GDPR (integration, DB reală)", () => {
     expect(audits.every((a) => !a.detail || a.detail === "IDENTITATE")).toBe(true);
   });
 
-  it("export: adună profil (decriptat) + documente + consimțăminte", async () => {
+  it("export: adună TOATE categoriile (profil, documente, semnate, dosare, remindere, consimțăminte)", async () => {
     const userId = await makeUser();
     created.push(userId);
-    await upsertProfile(userId, { nume: "Exportescu", cnp: "1960101223143" });
+    await upsertProfile(userId, { nume: "Exportescu", prenume: "Ana", cnp: "1960101223143" });
     await saveDocument(userId, {
       tip: "CI",
       filename: "b.txt",
@@ -71,12 +72,25 @@ describe("GDPR (integration, DB reală)", () => {
       bytes: Buffer.from("x"),
     });
     await grantConsent(userId, "IDENTITATE");
+    // Semnează un 230 → creează SignedForm + Dossier.
+    await signForm(userId, {
+      formCode: "230",
+      inputs: {
+        beneficiarDenumire: "X",
+        beneficiarCif: "1",
+        beneficiarIban: "RO49AAAA1B31007593840000",
+      },
+    });
 
     const data = await exportUserData(userId);
     expect(data.profile?.nume).toBe("Exportescu");
     expect(data.profile?.cnp).toBe("1960101223143"); // decriptat pentru owner
     expect(data.documents).toHaveLength(1);
     expect(data.consents.find((c) => c.category === "IDENTITATE")?.granted).toBe(true);
+    // Fără breșă de acces: semnate + dosare sunt incluse.
+    expect(data.signedForms.length).toBeGreaterThanOrEqual(1);
+    expect(data.dossiers.length).toBeGreaterThanOrEqual(1);
+    expect(data.dossiers[0].formCode).toBe("230");
   });
 
   it("ștergere date: profil/documente/consimțăminte dispar, contul rămâne", async () => {

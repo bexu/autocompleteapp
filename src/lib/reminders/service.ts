@@ -17,30 +17,34 @@ export async function scanDueReminders(now: Date = new Date()): Promise<number> 
     where: { status: "DE_DEPUS", deadlineAt: { not: null, gt: now } },
   });
 
-  let created = 0;
+  const toCreate: {
+    userId: string;
+    dossierId: string;
+    kind: string;
+    formCode: string;
+    deadlineAt: Date;
+  }[] = [];
+
   for (const d of dossiers) {
     if (!d.deadlineAt) continue;
     const msLeft = d.deadlineAt.getTime() - now.getTime();
     for (const threshold of REMINDER_THRESHOLDS) {
       if (msLeft <= threshold * DAY_MS) {
-        try {
-          await prisma.reminder.create({
-            data: {
-              userId: d.userId,
-              dossierId: d.id,
-              kind: `T${threshold}`,
-              formCode: d.formCode,
-              deadlineAt: d.deadlineAt,
-            },
-          });
-          created++;
-        } catch {
-          // deja există (constrângere unică dossierId+kind) — ignorăm
-        }
+        toCreate.push({
+          userId: d.userId,
+          dossierId: d.id,
+          kind: `T${threshold}`,
+          formCode: d.formCode,
+          deadlineAt: d.deadlineAt,
+        });
       }
     }
   }
-  return created;
+  if (toCreate.length === 0) return 0;
+
+  // skipDuplicates → idempotent pe (dossierId, kind), fără a înghiți alte erori.
+  const res = await prisma.reminder.createMany({ data: toCreate, skipDuplicates: true });
+  return res.count;
 }
 
 export interface ReminderView {

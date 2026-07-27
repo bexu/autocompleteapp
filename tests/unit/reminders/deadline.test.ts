@@ -18,4 +18,10 @@ describe("computeNextDeadline (25 mai)", () => {
     const d = computeNextDeadline(RULE_230, new Date("2026-05-25T00:00:00Z"));
     expect(d.toISOString().slice(0, 10)).toBe("2026-05-25");
   });
+
+  it("rămâne pe aceeași zi chiar dacă e semnat în cursul zilei termenului", () => {
+    // 25 mai la 14:00 → termenul e tot 25 mai (comparație la nivel de zi)
+    const d = computeNextDeadline(RULE_230, new Date("2026-05-25T14:00:00Z"));
+    expect(d.toISOString().slice(0, 10)).toBe("2026-05-25");
+  });
 });

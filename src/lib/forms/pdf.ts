@@ -14,8 +14,8 @@ export async function generateFormPdf(
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
 
-  const page = doc.addPage([595, 842]); // A4
   const margin = 50;
+  let page = doc.addPage([595, 842]); // A4
   let y = 800;
 
   const draw = (text: string, size: number, useBold = false) => {
@@ -35,8 +35,9 @@ export async function generateFormPdf(
 
   for (const f of fields) {
     if (y < margin + 20) {
+      // pagină nouă la overflow — reasignăm pagina activă (nu o pierdem)
+      page = doc.addPage([595, 842]);
       y = 800;
-      doc.addPage([595, 842]);
     }
     draw(`${f.label}:`, 11, true);
     y -= 14;
@@ -44,6 +45,10 @@ export async function generateFormPdf(
     y -= 22;
   }
 
+  if (y < margin + 20) {
+    page = doc.addPage([595, 842]);
+    y = 800;
+  }
   y -= 10;
   draw("Verifici, semnezi și depui pe propria răspundere.", 8);
 
