@@ -42,6 +42,7 @@ export default async function DashboardPage() {
       items: [
         { href: "/dashboard/formulare/230", testid: "link-230", title: "Formular 230", desc: "Redirecționează 3,5% din impozit." },
         { href: "/dashboard/auto", testid: "link-auto", title: "Dosar auto", desc: "Am cumpărat / am vândut o mașină." },
+        { href: "/dashboard/c168", testid: "link-c168", title: "Contract închiriere (C168)", desc: "Declară contractul de locațiune la ANAF." },
       ],
     },
     {
