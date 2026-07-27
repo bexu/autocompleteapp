@@ -1,0 +1,19 @@
+// Modelul de date — sursa structurii DB (house standard).
+// Orice schimbare aici → o migrare: `npm run db:migrate`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Exemplu — înlocuiește cu modelul tău.
+model Example {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
