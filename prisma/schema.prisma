@@ -32,6 +32,7 @@ model User {
   dossiers      Dossier[]
   reminders     Reminder[]
   vehicule      Vehicul[]
+  imobile       Imobil[]
 
   @@map("user")
 }
@@ -286,4 +287,33 @@ model Vehicul {
 
   @@index([userId])
   @@map("vehicul")
+}
+
+// --- Entitatea Imobil (Faza 3 — C168 închiriere, task 3.1) ---
+// Proprietatea (apartament/casă/teren). Termenii de închiriere (chirie, monedă,
+// perioadă, chiriași) NU stau aici — vin ca inputuri la C168. Datele de imobil
+// nu sunt „date protejate" (ca CNP/CI) → stocate în clar.
+
+model Imobil {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tip             String // APARTAMENT | CASA | TEREN | SPATIU_COMERCIAL | ALTUL
+  judet           String?
+  localitate      String?
+  strada          String?
+  nr              String?
+  bloc            String?
+  scara           String?
+  etaj            String?
+  apartament      String?
+  codPostal       String?
+  suprafataMp     Int?
+  nrCadastral     String?
+  nrCarteFunciara String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@map("imobil")
 }

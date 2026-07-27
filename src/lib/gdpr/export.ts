@@ -4,6 +4,7 @@ import { listDocuments, type DocumentMeta } from "@/lib/documents/repository";
 import { listSignedForms, type SignedFormMeta } from "@/lib/signature/repository";
 import { listDossiers, type DossierMeta } from "@/lib/dispatch/repository";
 import { listVehicule, type Vehicul } from "@/lib/vehicle/repository";
+import { listImobile, type Imobil } from "@/lib/imobil/repository";
 import { getConsentStatus, type ConsentStatus } from "./consent";
 import { audit } from "./audit";
 
@@ -22,6 +23,7 @@ export interface UserDataExport {
   account: { email: string; name: string; createdAt: Date } | null;
   profile: DecryptedProfile | null;
   vehicule: Vehicul[];
+  imobile: Imobil[];
   documents: DocumentMeta[];
   signedForms: SignedFormMeta[];
   dossiers: DossierMeta[];
@@ -30,7 +32,7 @@ export interface UserDataExport {
 }
 
 export async function exportUserData(userId: string): Promise<UserDataExport> {
-  const [account, profile, vehicule, documents, signedForms, dossiers, reminderRows, consents] =
+  const [account, profile, vehicule, imobile, documents, signedForms, dossiers, reminderRows, consents] =
     await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
@@ -38,6 +40,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
       }),
       getProfile(userId),
       listVehicule(userId),
+      listImobile(userId),
       listDocuments(userId),
       listSignedForms(userId),
       listDossiers(userId),
@@ -52,6 +55,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
     account,
     profile,
     vehicule,
+    imobile,
     documents,
     signedForms,
     dossiers,
