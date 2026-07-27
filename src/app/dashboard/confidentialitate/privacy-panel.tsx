@@ -53,44 +53,55 @@ export function PrivacyPanel({ initial }: { initial: Consent[] }) {
   }
 
   return (
-    <main style={{ maxWidth: 560, margin: "3rem auto", padding: "0 1rem" }}>
-      <h1>Confidențialitate</h1>
+    <main className="container container--narrow">
+      <div className="page-head">
+        <p className="eyebrow">Datele tale</p>
+        <h1 className="page-title">Confidențialitate</h1>
+        <p className="lead">Controlezi ce prelucrăm și îți poți lua sau șterge datele oricând.</p>
+      </div>
 
-      <section>
-        <h2>Consimțământ per categorie</h2>
-        {consents.map((c) => (
-          <label key={c.category} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-            <input
-              type="checkbox"
-              checked={c.granted}
-              data-testid={`consent-${c.category}`}
-              onChange={(e) => toggle(c.category, e.target.checked)}
-            />
-            {LABELS[c.category]}
-          </label>
-        ))}
-      </section>
+      <div className="card card--pad">
+        <p className="section-label" style={{ marginTop: 0 }}>Consimțământ per categorie</p>
+        <div className="stack--sm" style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+          {consents.map((c) => (
+            <label key={c.category} className="checkbox-row" style={{ color: "var(--ink)" }}>
+              <input
+                type="checkbox"
+                checked={c.granted}
+                data-testid={`consent-${c.category}`}
+                onChange={(e) => toggle(c.category, e.target.checked)}
+                style={{ accentColor: "var(--accent)" }}
+              />
+              {LABELS[c.category]}
+            </label>
+          ))}
+        </div>
+      </div>
 
-      <section style={{ marginTop: 24 }}>
-        <h2>Drepturile tale</h2>
-        <p>
-          <a href="/api/gdpr/export" data-testid="export">
-            Descarcă toate datele (JSON)
-          </a>
-        </p>
-        <button type="button" disabled={busy} data-testid="delete-data" onClick={() => deleteData("data")}>
-          Șterge datele personale
-        </button>{" "}
-        <button
-          type="button"
-          disabled={busy}
-          data-testid="delete-account"
-          onClick={() => deleteData("account")}
-          style={{ color: "crimson" }}
-        >
-          Șterge contul
-        </button>
-      </section>
+      <div className="card card--pad" style={{ marginTop: "1.1rem" }}>
+        <p className="section-label" style={{ marginTop: 0 }}>Drepturile tale (GDPR)</p>
+        <div className="stack--sm">
+          <p>
+            <a href="/api/gdpr/export" data-testid="export" className="btn btn--ghost btn--sm">
+              ↓ Descarcă toate datele (JSON)
+            </a>
+          </p>
+          <div className="form-actions">
+            <button type="button" className="btn btn--ghost btn--sm" disabled={busy} data-testid="delete-data" onClick={() => deleteData("data")}>
+              Șterge datele personale
+            </button>
+            <button
+              type="button"
+              className="btn btn--danger btn--sm"
+              disabled={busy}
+              data-testid="delete-account"
+              onClick={() => deleteData("account")}
+            >
+              Șterge contul
+            </button>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

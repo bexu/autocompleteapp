@@ -21,48 +21,58 @@ export default async function DossierPage({
   const handoff = manifest ? buildHandoff(manifest) : null;
 
   return (
-    <main style={{ maxWidth: 560, margin: "3rem auto", padding: "0 1rem" }}>
-      <h1>Dosar — formular {dossier.formCode}</h1>
-      <p>
-        Stare: <strong data-testid="dossier-status">{dossier.status === "DEPUS" ? "Depus" : "De depus"}</strong>
-        {dossier.deadline && ` · termen: ${dossier.deadline}`}
-      </p>
+    <main className="container container--narrow">
+      <div className="page-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem" }}>
+        <div>
+          <p className="eyebrow">Dosar de depunere</p>
+          <h1 className="page-title">
+            Formular <span className="mono">{dossier.formCode}</span>
+          </h1>
+          {dossier.deadline && <p className="lead">Termen: {dossier.deadline}</p>}
+        </div>
+        <span
+          data-testid="dossier-status"
+          className={`pill ${dossier.status === "DEPUS" ? "pill--ok" : "pill--warn"}`}
+        >
+          {dossier.status === "DEPUS" ? "Depus" : "De depus"}
+        </span>
+      </div>
 
       {handoff && (
-        <>
-          <section>
-            <h2>Pași de urmat</h2>
-            <ol data-testid="checklist">
+        <div className="stack">
+          <div className="card card--pad">
+            <p className="section-label" style={{ marginTop: 0 }}>Pași de urmat</p>
+            <ol className="steps" data-testid="checklist">
               {handoff.checklist.map((s) => (
                 <li key={s.id}>{s.label}</li>
               ))}
             </ol>
-          </section>
+          </div>
 
-          <section>
-            <h2>Unde depui</h2>
-            <ul data-testid="channels">
+          <div className="card card--pad">
+            <p className="section-label" style={{ marginTop: 0 }}>Unde depui</p>
+            <ul className="stack--sm" style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.9rem" }} data-testid="channels">
               {handoff.channels.map((c) => (
                 <li key={c.id} data-testid={`channel-${c.id}`}>
-                  <strong>{c.label}</strong>
-                  {c.url && (
-                    <>
-                      {" "}
-                      <a href={c.url} target="_blank" rel="noopener noreferrer" data-testid={`channel-link-${c.id}`}>
-                        deschide
+                  <div className="row" style={{ gap: "0.5rem" }}>
+                    <strong>{c.label}</strong>
+                    {c.url && (
+                      <a href={c.url} target="_blank" rel="noopener noreferrer" data-testid={`channel-link-${c.id}`} className="btn-link">
+                        deschide ↗
                       </a>
-                    </>
-                  )}
-                  <br />
-                  <span>{c.instructions}</span>
+                    )}
+                  </div>
+                  <span className="muted" style={{ fontSize: "var(--fs-sm)" }}>{c.instructions}</span>
                 </li>
               ))}
             </ul>
-          </section>
-        </>
+          </div>
+        </div>
       )}
 
-      <SubmitButton dossierId={dossier.id} initialStatus={dossier.status} />
+      <div style={{ marginTop: "1.4rem" }}>
+        <SubmitButton dossierId={dossier.id} initialStatus={dossier.status} />
+      </div>
     </main>
   );
 }

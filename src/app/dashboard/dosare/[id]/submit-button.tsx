@@ -19,11 +19,15 @@ export function SubmitButton({ dossierId, initialStatus }: { dossierId: string; 
   }
 
   if (status === "DEPUS") {
-    return <p data-testid="status-depus" style={{ color: "green" }}>Dosar marcat ca depus.</p>;
+    return (
+      <p data-testid="status-depus" className="alert alert--ok">
+        Dosar marcat ca depus.
+      </p>
+    );
   }
 
   return (
-    <button type="button" onClick={markSubmitted} disabled={busy} data-testid="marcheaza-depus">
+    <button type="button" className="btn btn--primary" onClick={markSubmitted} disabled={busy} data-testid="marcheaza-depus">
       {busy ? "..." : "Marchează ca depus"}
     </button>
   );

@@ -89,43 +89,90 @@ export function OnboardingUpload() {
 
   if (phase === "upload") {
     return (
-      <main style={{ maxWidth: 480, margin: "3rem auto", padding: "0 1rem" }}>
-        <h1>Încarcă buletinul (CI)</h1>
-        <p>Extragem automat datele din zona MRZ. Le confirmi tu înainte de salvare.</p>
-        <form onSubmit={onUpload} style={{ display: "grid", gap: 12 }}>
-          <input type="file" name="file" required data-testid="file" />
-          <button type="submit" disabled={busy} data-testid="upload">
-            {busy ? "Se procesează..." : "Încarcă și extrage"}
-          </button>
-        </form>
-        {error && <p role="alert" data-testid="error" style={{ color: "crimson" }}>{error}</p>}
+      <main className="container container--narrow">
+        <div className="page-head">
+          <p className="eyebrow">Onboarding · pas 1</p>
+          <h1 className="page-title">Încarcă buletinul</h1>
+          <p className="lead">Extragem automat datele din zona MRZ. Le confirmi tu înainte de salvare.</p>
+        </div>
+        <div className="card card--pad">
+          <form onSubmit={onUpload} className="form">
+            <div className="field">
+              <label className="field__label" htmlFor="ob-file">Fișier CI</label>
+              <input id="ob-file" className="input" type="file" name="file" required data-testid="file" />
+            </div>
+            <button type="submit" className="btn btn--primary" disabled={busy} data-testid="upload">
+              {busy ? "Se procesează..." : "Încarcă și extrage"}
+            </button>
+          </form>
+          {error && (
+            <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>{error}</p>
+          )}
+        </div>
       </main>
     );
   }
 
   const f = extracted;
   return (
-    <main style={{ maxWidth: 480, margin: "3rem auto", padding: "0 1rem" }}>
-      <h1>Confirmă datele extrase</h1>
-      <p>Verifică și corectează dacă e nevoie, apoi salvează în profil.</p>
-      <form onSubmit={onConfirm} style={{ display: "grid", gap: 10 }}>
-        <input name="nume" defaultValue={f?.nume ?? ""} placeholder="Nume" data-testid="f-nume" />
-        <input name="prenume" defaultValue={f?.prenume ?? ""} placeholder="Prenume" data-testid="f-prenume" />
-        <input name="cnp" defaultValue={f?.cnp ?? ""} placeholder="CNP" data-testid="f-cnp" />
-        <input name="ciSerie" defaultValue={f?.ciSerie ?? ""} placeholder="Serie CI" data-testid="f-serie" />
-        <input name="ciNr" defaultValue={f?.ciNr ?? ""} placeholder="Număr CI" data-testid="f-nr" />
-        <input name="sex" defaultValue={f?.sex ?? ""} placeholder="Sex (M/F)" data-testid="f-sex" />
-        <input name="dataNasterii" defaultValue={f?.dataNasterii ?? ""} placeholder="Data nașterii" data-testid="f-dob" />
-        <input name="ciExp" defaultValue={f?.ciExp ?? ""} placeholder="Expirare CI" data-testid="f-exp" />
-        <label style={{ display: "flex", gap: 8 }}>
-          <input type="checkbox" name="consent" data-testid="consent" />
-          Sunt de acord cu procesarea datelor de identitate și a scanului.
-        </label>
-        <button type="submit" disabled={busy} data-testid="confirm">
-          {busy ? "Se salvează..." : "Confirmă și salvează"}
-        </button>
-      </form>
-      {error && <p role="alert" data-testid="error" style={{ color: "crimson" }}>{error}</p>}
+    <main className="container container--narrow">
+      <div className="page-head">
+        <p className="eyebrow">Onboarding · pas 2</p>
+        <h1 className="page-title">Confirmă datele extrase</h1>
+        <p className="lead">Verifică și corectează dacă e nevoie, apoi salvează în profil.</p>
+      </div>
+      <div className="card card--pad">
+        <form onSubmit={onConfirm} className="form">
+          <div className="grid-2">
+            <div className="field">
+              <label className="field__label">Nume</label>
+              <input className="input" name="nume" defaultValue={f?.nume ?? ""} placeholder="Nume" data-testid="f-nume" />
+            </div>
+            <div className="field">
+              <label className="field__label">Prenume</label>
+              <input className="input" name="prenume" defaultValue={f?.prenume ?? ""} placeholder="Prenume" data-testid="f-prenume" />
+            </div>
+          </div>
+          <div className="field">
+            <label className="field__label">CNP</label>
+            <input className="input input--mono" name="cnp" defaultValue={f?.cnp ?? ""} placeholder="CNP" data-testid="f-cnp" />
+          </div>
+          <div className="grid-2">
+            <div className="field">
+              <label className="field__label">Serie CI</label>
+              <input className="input input--mono" name="ciSerie" defaultValue={f?.ciSerie ?? ""} placeholder="XX" data-testid="f-serie" />
+            </div>
+            <div className="field">
+              <label className="field__label">Număr CI</label>
+              <input className="input input--mono" name="ciNr" defaultValue={f?.ciNr ?? ""} placeholder="123456" data-testid="f-nr" />
+            </div>
+          </div>
+          <div className="grid-2">
+            <div className="field">
+              <label className="field__label">Sex (M/F)</label>
+              <input className="input" name="sex" defaultValue={f?.sex ?? ""} placeholder="M/F" data-testid="f-sex" />
+            </div>
+            <div className="field">
+              <label className="field__label">Data nașterii</label>
+              <input className="input input--mono" name="dataNasterii" defaultValue={f?.dataNasterii ?? ""} placeholder="1990-01-01" data-testid="f-dob" />
+            </div>
+          </div>
+          <div className="field">
+            <label className="field__label">Expirare CI</label>
+            <input className="input input--mono" name="ciExp" defaultValue={f?.ciExp ?? ""} placeholder="2030-01-01" data-testid="f-exp" />
+          </div>
+          <label className="checkbox-row">
+            <input type="checkbox" name="consent" data-testid="consent" />
+            Sunt de acord cu procesarea datelor de identitate și a scanului.
+          </label>
+          <button type="submit" className="btn btn--primary" disabled={busy} data-testid="confirm">
+            {busy ? "Se salvează..." : "Confirmă și salvează"}
+          </button>
+        </form>
+        {error && (
+          <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>{error}</p>
+        )}
+      </div>
     </main>
   );
 }

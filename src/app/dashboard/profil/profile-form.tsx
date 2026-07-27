@@ -48,48 +48,83 @@ export function ProfileForm({ initial, cnpMask, ibanMask }: Props) {
   }
 
   return (
-    <main style={{ maxWidth: 480, margin: "3rem auto", padding: "0 1rem" }}>
-      <h1>Profilul meu</h1>
-      <form onSubmit={onSubmit} style={{ display: "grid", gap: 12 }}>
-        <label>
-          Nume
-          <input name="nume" defaultValue={initial.nume} data-testid="nume" />
-        </label>
-        <label>
-          Prenume
-          <input name="prenume" defaultValue={initial.prenume} data-testid="prenume" />
-        </label>
-        <label>
-          Telefon
-          <input name="telefon" defaultValue={initial.telefon} data-testid="telefon" />
-        </label>
-        <label>
-          CNP {cnpMask && <span data-testid="cnp-mask">(salvat: {cnpMask})</span>}
-          <input
-            name="cnp"
-            placeholder={cnpMask ? "lasă gol ca să păstrezi" : "13 cifre"}
-            data-testid="cnp"
-          />
-        </label>
-        <label>
-          IBAN {ibanMask && <span data-testid="iban-mask">(salvat: {ibanMask})</span>}
-          <input
-            name="iban"
-            placeholder={ibanMask ? "lasă gol ca să păstrezi" : "RO..."}
-            data-testid="iban"
-          />
-        </label>
-        <button type="submit" disabled={status === "saving"} data-testid="save">
-          {status === "saving" ? "Se salvează..." : "Salvează"}
-        </button>
-      </form>
-
-      {status === "saved" && <p data-testid="saved" style={{ color: "green" }}>Salvat.</p>}
-      {status === "error" && (
-        <p role="alert" data-testid="error" style={{ color: "crimson" }}>
-          Date invalide: {errorFields.join(", ") || "verifică câmpurile"}
+    <main className="container container--narrow">
+      <div className="page-head">
+        <p className="eyebrow">Date de identitate</p>
+        <h1 className="page-title">Profilul meu</h1>
+        <p className="lead">
+          Câmpurile tari (CNP, IBAN) se stochează criptat și se afișează mascat.
         </p>
-      )}
+      </div>
+
+      <div className="card card--pad">
+        <form onSubmit={onSubmit} className="form">
+          <div className="grid-2">
+            <div className="field">
+              <label className="field__label" htmlFor="pf-nume">Nume</label>
+              <input id="pf-nume" className="input" name="nume" defaultValue={initial.nume} data-testid="nume" />
+            </div>
+            <div className="field">
+              <label className="field__label" htmlFor="pf-prenume">Prenume</label>
+              <input id="pf-prenume" className="input" name="prenume" defaultValue={initial.prenume} data-testid="prenume" />
+            </div>
+          </div>
+          <div className="field">
+            <label className="field__label" htmlFor="pf-telefon">Telefon</label>
+            <input id="pf-telefon" className="input" name="telefon" defaultValue={initial.telefon} data-testid="telefon" />
+          </div>
+          <div className="field">
+            <label className="field__label" htmlFor="pf-cnp">
+              CNP{" "}
+              {cnpMask && (
+                <span className="pill pill--ok" data-testid="cnp-mask">
+                  salvat: {cnpMask}
+                </span>
+              )}
+            </label>
+            <input
+              id="pf-cnp"
+              className="input input--mono"
+              name="cnp"
+              placeholder={cnpMask ? "lasă gol ca să păstrezi" : "13 cifre"}
+              data-testid="cnp"
+            />
+          </div>
+          <div className="field">
+            <label className="field__label" htmlFor="pf-iban">
+              IBAN{" "}
+              {ibanMask && (
+                <span className="pill pill--ok" data-testid="iban-mask">
+                  salvat: {ibanMask}
+                </span>
+              )}
+            </label>
+            <input
+              id="pf-iban"
+              className="input input--mono"
+              name="iban"
+              placeholder={ibanMask ? "lasă gol ca să păstrezi" : "RO49..."}
+              data-testid="iban"
+            />
+          </div>
+          <div className="form-actions">
+            <button type="submit" className="btn btn--primary" disabled={status === "saving"} data-testid="save">
+              {status === "saving" ? "Se salvează..." : "Salvează"}
+            </button>
+            {status === "saved" && (
+              <span data-testid="saved" className="pill pill--ok">
+                Salvat
+              </span>
+            )}
+          </div>
+        </form>
+
+        {status === "error" && (
+          <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
+            Date invalide: {errorFields.join(", ") || "verifică câmpurile"}
+          </p>
+        )}
+      </div>
     </main>
   );
 }

@@ -58,79 +58,123 @@ export function AutoWizard({ vehicule }: { vehicule: VehiculOpt[] }) {
 
   if (vehicule.length === 0) {
     return (
-      <main style={{ maxWidth: 560, margin: "3rem auto", padding: "0 1rem" }}>
-        <h1>Dosar auto</h1>
-        <p data-testid="no-vehicle">Adaugă întâi un vehicul în „Vehiculele mele”.</p>
+      <main className="container container--narrow">
+        <div className="page-head">
+          <p className="eyebrow">Eveniment de viață</p>
+          <h1 className="page-title">Dosar auto</h1>
+        </div>
+        <div className="notice" data-testid="no-vehicle">
+          <span aria-hidden="true">🚗</span>
+          <span>Adaugă întâi un vehicul în „Vehiculele mele”, apoi revino aici.</span>
+        </div>
       </main>
     );
   }
 
   if (result) {
     return (
-      <main style={{ maxWidth: 560, margin: "3rem auto", padding: "0 1rem" }}>
-        <h1>{result.label} — dosar generat</h1>
-        <h2>Documente generate</h2>
-        <ul data-testid="forms">
-          {result.forms.map((f) => (
-            <li key={f.dossierId} data-testid={`form-${f.formCode}`}>
-              {f.formCode} — {f.title}{" "}
-              <a href={`/dashboard/dosare/${f.dossierId}`} data-testid={`dosar-${f.formCode}`}>
-                deschide dosarul
-              </a>
-            </li>
-          ))}
-        </ul>
-        <h2>Pași (checklist)</h2>
-        <ol data-testid="auto-checklist">
-          {result.checklist.map((s, i) => (
-            <li key={i}>{s}</li>
-          ))}
-        </ol>
+      <main className="container container--narrow">
+        <div className="page-head">
+          <p className="eyebrow">Dosar generat</p>
+          <h1 className="page-title">{result.label}</h1>
+        </div>
+
+        <div className="card card--pad">
+          <p className="section-label" style={{ marginTop: 0 }}>Documente generate</p>
+          <ul className="list" data-testid="forms">
+            {result.forms.map((f) => (
+              <li key={f.dossierId} className="list__item" data-testid={`form-${f.formCode}`}>
+                <span className="list__main">
+                  <span className="mono">{f.formCode}</span>{" "}
+                  <span className="muted" style={{ fontSize: "var(--fs-sm)" }}>— {f.title}</span>
+                </span>
+                <a href={`/dashboard/dosare/${f.dossierId}`} data-testid={`dosar-${f.formCode}`} className="btn btn--ghost btn--sm">
+                  deschide dosarul
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="card card--pad" style={{ marginTop: "1.1rem" }}>
+          <p className="section-label" style={{ marginTop: 0 }}>Pași de urmat</p>
+          <ol className="steps" data-testid="auto-checklist">
+            {result.checklist.map((s, i) => (
+              <li key={i}>{s}</li>
+            ))}
+          </ol>
+        </div>
       </main>
     );
   }
 
   return (
-    <main style={{ maxWidth: 560, margin: "3rem auto", padding: "0 1rem" }}>
-      <h1>Dosar auto</h1>
-      <p>Ce s-a întâmplat? Generăm documentele și pașii potriviți.</p>
-      <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-        <label>
-          <input type="radio" checked={event === "VANZARE"} onChange={() => setEvent("VANZARE")} data-testid="ev-vanzare" />
-          Am vândut mașina
-        </label>
-        <label>
-          <input type="radio" checked={event === "CUMPARARE"} onChange={() => setEvent("CUMPARARE")} data-testid="ev-cumparare" />
-          Am cumpărat o mașină
-        </label>
+    <main className="container container--narrow">
+      <div className="page-head">
+        <p className="eyebrow">Eveniment de viață</p>
+        <h1 className="page-title">Dosar auto</h1>
+        <p className="lead">Ce s-a întâmplat? Generăm documentele și pașii potriviți.</p>
       </div>
 
-      <form onSubmit={onSubmit} style={{ display: "grid", gap: 10 }}>
-        <label>
-          Vehicul
-          <select name="vehicleId" required data-testid="vehicleId">
-            {vehicule.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.label}
-              </option>
-            ))}
-          </select>
-        </label>
+      <div className="card card--pad">
+        <div className="row" style={{ gap: "1.2rem", marginBottom: "1.1rem" }}>
+          <label className="row" style={{ gap: "0.5rem" }}>
+            <input type="radio" checked={event === "VANZARE"} onChange={() => setEvent("VANZARE")} data-testid="ev-vanzare" style={{ accentColor: "var(--accent)" }} />
+            Am vândut mașina
+          </label>
+          <label className="row" style={{ gap: "0.5rem" }}>
+            <input type="radio" checked={event === "CUMPARARE"} onChange={() => setEvent("CUMPARARE")} data-testid="ev-cumparare" style={{ accentColor: "var(--accent)" }} />
+            Am cumpărat o mașină
+          </label>
+        </div>
 
-        {event === "VANZARE" && (
-          <>
-            <input name="contrapartaNume" placeholder="Cumpărător — nume complet" data-testid="contraparta-nume" />
-            <input name="contrapartaCnp" placeholder="Cumpărător — CNP" data-testid="contraparta-cnp" />
-            <input name="pret" placeholder="Preț (lei)" data-testid="pret" />
-            <input name="data" placeholder="Data (AAAA-LL-ZZ)" data-testid="data" />
-          </>
+        <form onSubmit={onSubmit} className="form">
+          <div className="field">
+            <label className="field__label" htmlFor="aw-vehicle">Vehicul</label>
+            <select id="aw-vehicle" className="select" name="vehicleId" required data-testid="vehicleId">
+              {vehicule.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {event === "VANZARE" && (
+            <>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field__label" htmlFor="aw-cnume">Cumpărător — nume</label>
+                  <input id="aw-cnume" className="input" name="contrapartaNume" placeholder="Nume complet" data-testid="contraparta-nume" />
+                </div>
+                <div className="field">
+                  <label className="field__label" htmlFor="aw-ccnp">Cumpărător — CNP</label>
+                  <input id="aw-ccnp" className="input input--mono" name="contrapartaCnp" placeholder="13 cifre" data-testid="contraparta-cnp" />
+                </div>
+              </div>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field__label" htmlFor="aw-pret">Preț (lei)</label>
+                  <input id="aw-pret" className="input input--mono" name="pret" placeholder="15000" data-testid="pret" />
+                </div>
+                <div className="field">
+                  <label className="field__label" htmlFor="aw-data">Data tranzacției</label>
+                  <input id="aw-data" className="input input--mono" name="data" placeholder="2026-03-01" data-testid="data" />
+                </div>
+              </div>
+            </>
+          )}
+
+          <button type="submit" className="btn btn--primary" disabled={busy} data-testid="genereaza-dosar">
+            {busy ? "Se generează..." : "Generează dosarul"}
+          </button>
+        </form>
+        {error && (
+          <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
+            {error}
+          </p>
         )}
-
-        <button type="submit" disabled={busy} data-testid="genereaza-dosar">
-          {busy ? "Se generează..." : "Generează dosarul"}
-        </button>
-      </form>
-      {error && <p role="alert" data-testid="error" style={{ color: "crimson" }}>{error}</p>}
+      </div>
     </main>
   );
 }
