@@ -54,11 +54,13 @@ Cea mai bună extindere după 230: userul repetă aceleași date în 4–5 docum
 
 ## Faza 3 — C168: închiriere (OPANAF 161/2025)
 - [x] **3.1 Entitatea `Imobil`** (minim necesar pentru C168) + migrare. *(`src/lib/imobil/` CRUD + validare; API `/api/imobile`; pagină; inclus în export+ștergere GDPR; câmpuri adresă + cadastral/CF)*
-- [ ] **3.2 OCR contract de închiriere** → locator, coproprietari, chiriași, cote, adresă, chirie, monedă, perioadă.
-- [ ] **3.3 Definiția C168** (înregistrare/modificare/încetare) + atașare contract.
+- [~] **3.2 OCR contract de închiriere** → locator, coproprietari, chiriași, cote, adresă, chirie, monedă, perioadă. *(motor extins cu sursă „imobil"; datele vin din profil + entitatea Imobil + inputuri contract. OCR pe contract free-form (fără coduri standard ca MRZ/CIV) = îmbunătățire ulterioară; wizard cu completare manuală acum.)*
+- [x] **3.3 Definiția C168** (înregistrare/modificare/încetare) + atașare contract. *(`src/lib/forms/c168.ts` manifest; API preview+generate cu Zod; wizard `/dashboard/c168`; sourceUrl/hash null până la verificare)*
   - *Acceptare:* C168 generat aproape integral din profil + OCR; valoarea = OCR + reutilizare + tracking, nu „încă un formular" (ANAF are deja formular web).
-- [ ] **3.4 Tracking modificare/încetare** contract + pregătire date pentru D212 ulterior.
-- [ ] **3.5 E2E felia C168.**
+- [x] **3.4 Tracking modificare/încetare** contract. *(operațiune = input pe C168; fiecare operațiune = dosar propriu cu handoff SPV, urmărit DE_DEPUS→DEPUS)*
+- [x] **3.5 E2E felia C168.** *(`c168.spec.ts`: imobil → contract → preview → generare → dosar SPV)*
+
+> **Faza 3 (C168) COMPLETĂ** (2026-07-27). Motorul are acum surse: profil + vehicul + imobil. OCR-ul de contract free-form (3.2) rămâne îmbunătățire ulterioară — completare manuală funcțională acum.
 
 ## Faze ulterioare (ordinea din docs/roadmap-formulare.md)
 4. **Impozit clădiri/teren** — ITL-001, ITL-003 + scoatere din evidență, certificat fiscal.

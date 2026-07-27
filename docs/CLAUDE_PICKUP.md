@@ -3,6 +3,17 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Faza 3 C168 — implementat, pe branch `feat/m3-c168`.** (2026-07-27)
+- Motor extins cu sursă „imobil" (FieldSource + mapForm + engine `opts.imobilId`).
+- `src/lib/forms/c168.ts`: manifest C168 (locator din profil + imobil + contract inputuri) + Zod la graniță.
+- API `/api/forms/c168/{preview,generate}`; wizard `/dashboard/c168` (preview→generare→dosar SPV).
+- Operațiune (înregistrare/modificare/încetare) = input; fiecare = dosar propriu (tracking 3.4).
+- **3.2 OCR contract** = îmbunătățire ulterioară (contractul e free-form, fără coduri standard); completare manuală acum.
+- Review adversarial Faza 2: 6 bug-uri reparate (atomicitate auto-case, trim mapForm, CIV fals-pozitiv/hibrid/B, Zod la /api/auto).
+- Verificat: 97 unit + 40 integrare + 12 e2e — verzi.
+- **Următorul (roadmap): impozit clădiri/teren (ITL-001/003, reutilizează Imobil), dosar copil, șomaj; SAU hardening (H.1–H.4). Recomand review adversarial pe C168 înainte.**
+
+
 **Task 2.4 + 2.5 Wizard auto — implementat, pe branch `feat/m2-auto-wizard`.** (2026-07-27)
 - `src/lib/auto/event.ts`: eveniment (VANZARE/CUMPARARE) → set de formulare + mapare inputuri + checklist per instituție.
 - `generateAndFileForm` (engine): generează + arhivează FĂRĂ semnătură (ITL se semnează olograf; provider "none", status "GENERATED") + dosar DE_DEPUS.

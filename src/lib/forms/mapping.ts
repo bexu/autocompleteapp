@@ -1,5 +1,6 @@
 import type { DecryptedProfile } from "@/lib/profile/repository";
 import type { Vehicul } from "@/lib/vehicle/repository";
+import type { Imobil } from "@/lib/imobil/repository";
 import type { FormManifest } from "./manifest";
 import { isValidCnp } from "@/lib/validation/cnp";
 import { isValidIban } from "@/lib/validation/iban";
@@ -7,6 +8,7 @@ import { isValidIban } from "@/lib/validation/iban";
 export interface FormSources {
   profile: DecryptedProfile | null;
   vehicle?: Vehicul | null;
+  imobil?: Imobil | null;
 }
 
 // Mapare declarativă: manifest + profil + inputuri → valori de câmp + erori.
@@ -54,6 +56,7 @@ export function mapForm(
     let raw: unknown;
     if (def.source.from === "profile") raw = getByPath(sources.profile, def.source.path);
     else if (def.source.from === "vehicle") raw = getByPath(sources.vehicle ?? null, def.source.path);
+    else if (def.source.from === "imobil") raw = getByPath(sources.imobil ?? null, def.source.path);
     else if (def.source.from === "input") raw = inputs[def.source.key];
     else raw = def.source.value;
 
