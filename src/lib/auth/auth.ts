@@ -6,23 +6,26 @@ import { prisma } from "@/lib/db/prisma";
 // târziu dacă e nevoie. `role` e câmp adițional pe user pentru RBAC (task 1.1).
 // Secretul și baseURL vin din mediu (validate în src/lib/config/env.ts).
 
+// Rate limiting anti brute-force / credential-stuffing (T10 threat model).
+// Praguri STRICTE în producție pe rutele de auth (better-auth default ~3/fereastră
+// e prea strict și pică suita e2e care creează multe conturi de pe același IP).
+// `AUTH_RATE_LIMIT_RELAXED=true` (setat DOAR de mediul de test — vezi
+// playwright.config.ts) relaxează pragurile pentru e2e; producția rămâne strictă.
+// Modulul rulează server-side, deci process.env e citit la runtime.
+const relaxed = process.env.AUTH_RATE_LIMIT_RELAXED === "true";
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
-  // Rate limiting activ (securitate — T10 threat model). Prag explicit generos
-  // (default-ul better-auth e prea strict — ~3/fereastră — și pică suita e2e).
-  // 100/60s/IP e protectiv în practică; reglarea fină pe rute sensibile = H.3.
-  // NB: nu comuta prin env — Next.js inline-ază process.env la build-time.
   rateLimit: {
     enabled: true,
     window: 60,
-    max: 100,
-    // better-auth are reguli implicite STRICTE pe rutele de auth (~3/fereastră)
-    // — le suprascriem cu praguri generoase (protectiv, dar nu blochează e2e).
+    max: relaxed ? 1000 : 60,
+    // Praguri per-IP pe rutele sensibile: login mai strict decât signup.
     customRules: {
-      "/sign-up/email": { window: 60, max: 100 },
-      "/sign-in/email": { window: 60, max: 100 },
+      "/sign-up/email": { window: 60, max: relaxed ? 1000 : 20 },
+      "/sign-in/email": { window: 60, max: relaxed ? 1000 : 10 },
     },
   },
   emailAndPassword: {

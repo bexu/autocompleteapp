@@ -94,6 +94,12 @@ describe("GDPR (integration, DB reală)", () => {
     expect(data.dossiers.length).toBeGreaterThanOrEqual(1);
     expect(data.dossiers[0].formCode).toBe("230");
     expect(data.vehicule.length).toBeGreaterThanOrEqual(1);
+    // Conținutul efectiv (art. 15): PDF-ul semnat și scanul sunt incluse decriptat
+    // — nu doar metadate (altfel unele date personale ar fi de neatins pentru user).
+    const pdf = data.signedForms[0].contentBase64;
+    expect(pdf).toBeTruthy();
+    expect(Buffer.from(pdf!, "base64").subarray(0, 5).toString("latin1")).toBe("%PDF-");
+    expect(data.documents[0].contentBase64).toBeTruthy();
   });
 
   it("ștergere date: profil/documente/consimțăminte dispar, contul rămâne", async () => {

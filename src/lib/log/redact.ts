@@ -29,7 +29,11 @@ const PII_KEY_FRAGMENTS = [
   "suma",
   "parola",
   "nascut",
+  "nastere", // dataNastere
+  "nasterii", // dataNasterii (camelCase → „datanasterii")
   "data_nasterii",
+  "ciexp", // data expirării CI (ciExp)
+  "expira",
   "fisier",
   // EN / framework
   "name", // include firstname/lastname/fullname (și, acceptabil, username)
@@ -46,6 +50,7 @@ const PII_KEY_FRAGMENTS = [
   "apikey",
   "scan",
   "dob",
+  "birth", // birthDate, dateOfBirth
   "birthdate",
   "dateofbirth",
   "born",

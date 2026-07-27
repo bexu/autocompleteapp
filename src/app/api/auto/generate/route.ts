@@ -7,11 +7,13 @@ import {
 } from "@/lib/forms/engine";
 import { generateAutoCase } from "@/lib/auto/service";
 import { AutoWizardSchema } from "@/lib/auto/event";
+import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
 // Wizard auto: eveniment + vehicul → generează setul de documente + dosare.
 export async function POST(req: Request) {
   try {
     const user = await requireUser();
+    guardGeneration(user.id);
     const body = await req.json().catch(() => ({}));
     const input = AutoWizardSchema.parse(body);
     const result = await generateAutoCase(user.id, input);
@@ -20,6 +22,7 @@ export async function POST(req: Request) {
     if (e instanceof UnauthorizedError) {
       return NextResponse.json({ error: "neautentificat" }, { status: 401 });
     }
+    if (e instanceof RateLimitError) return rateLimitResponse();
     if (e instanceof ZodError) {
       return NextResponse.json(
         { error: "validare", fields: e.issues.map((i) => i.path.join(".")) },
