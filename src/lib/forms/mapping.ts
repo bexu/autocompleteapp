@@ -1,7 +1,13 @@
 import type { DecryptedProfile } from "@/lib/profile/repository";
+import type { Vehicul } from "@/lib/vehicle/repository";
 import type { FormManifest } from "./manifest";
 import { isValidCnp } from "@/lib/validation/cnp";
 import { isValidIban } from "@/lib/validation/iban";
+
+export interface FormSources {
+  profile: DecryptedProfile | null;
+  vehicle?: Vehicul | null;
+}
 
 // Mapare declarativă: manifest + profil + inputuri → valori de câmp + erori.
 // Fără logică per-formular aici; totul vine din manifest.
@@ -38,7 +44,7 @@ function toStr(v: unknown): string {
 
 export function mapForm(
   manifest: FormManifest,
-  profile: DecryptedProfile | null,
+  sources: FormSources,
   inputs: Record<string, unknown>,
 ): MapResult {
   const fields: MappedField[] = [];
@@ -46,7 +52,8 @@ export function mapForm(
 
   for (const def of manifest.fields) {
     let raw: unknown;
-    if (def.source.from === "profile") raw = getByPath(profile, def.source.path);
+    if (def.source.from === "profile") raw = getByPath(sources.profile, def.source.path);
+    else if (def.source.from === "vehicle") raw = getByPath(sources.vehicle ?? null, def.source.path);
     else if (def.source.from === "input") raw = inputs[def.source.key];
     else raw = def.source.value;
 

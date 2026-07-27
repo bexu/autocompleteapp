@@ -37,7 +37,7 @@ const goodInputs = {
 
 describe("mapForm (230)", () => {
   it("mapează profilul + inputurile fără erori", () => {
-    const r = mapForm(F230_MANIFEST, profile, goodInputs);
+    const r = mapForm(F230_MANIFEST, { profile }, goodInputs);
     expect(r.errors).toHaveLength(0);
     const byKey = Object.fromEntries(r.fields.map((f) => [f.key, f.value]));
     expect(byKey.nume).toBe("Ionescu");
@@ -50,12 +50,12 @@ describe("mapForm (230)", () => {
   });
 
   it("semnalează câmp obligatoriu lipsă (profil incomplet)", () => {
-    const r = mapForm(F230_MANIFEST, { ...profile, cnp: null }, goodInputs);
+    const r = mapForm(F230_MANIFEST, { profile: { ...profile, cnp: null } }, goodInputs);
     expect(r.errors.some((e) => e.key === "cnp")).toBe(true);
   });
 
   it("semnalează IBAN beneficiar invalid", () => {
-    const r = mapForm(F230_MANIFEST, profile, {
+    const r = mapForm(F230_MANIFEST, { profile }, {
       ...goodInputs,
       beneficiarIban: "RO00INVALID",
     });

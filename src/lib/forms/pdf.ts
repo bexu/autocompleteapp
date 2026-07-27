@@ -50,21 +50,34 @@ export async function generateFormPdf(
     y = 800;
   }
   y -= 10;
-  draw("Verifici, semnezi și depui pe propria răspundere.", 8);
+  draw("Verifici, semnezi si depui pe propria raspundere.", 8);
 
   return doc.save();
 }
 
-// pdf-lib StandardFonts (WinAnsi) nu acoperă toate diacriticele — normalizăm
-// pentru redare, fără a altera datele stocate.
+// StandardFonts (WinAnsi) nu acoperă tot Unicode — normalizăm pentru redare,
+// fără a altera datele stocate. Fallback pe „?" ca pdf-lib să nu arunce.
+const SUBSCRIPTS = "₀₁₂₃₄₅₆₇₈₉";
+
 function sanitize(s: string): string {
-  return s
-    .replace(/[ăâ]/g, "a")
-    .replace(/[ĂÂ]/g, "A")
-    .replace(/î/g, "i")
-    .replace(/Î/g, "I")
-    .replace(/[șş]/g, "s")
-    .replace(/[ȘŞ]/g, "S")
-    .replace(/[țţ]/g, "t")
-    .replace(/[ȚŢ]/g, "T");
+  return (
+    s
+      .replace(/[ăâ]/g, "a") // ă â
+      .replace(/[ĂÂ]/g, "A")
+      .replace(/î/g, "i") // î
+      .replace(/Î/g, "I")
+      .replace(/[șş]/g, "s") // ș ş
+      .replace(/[ȘŞ]/g, "S")
+      .replace(/[țţ]/g, "t") // ț ţ
+      .replace(/[ȚŢ]/g, "T")
+      // subscript (CO₂) — nu e în Latin-1
+      .replace(/[₀-₉]/g, (c) => String(SUBSCRIPTS.indexOf(c)))
+      // liniuțe/ghilimele tipografice → ASCII
+      .replace(/[–—]/g, "-")
+      .replace(/[„“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      // fallback: orice în afara ASCII-printabil + Latin-1 upper → "?"
+      // (² ³ = U+00B2/B3 rămân, sunt în Latin-1).
+      .replace(/[^ -~ -ÿ]/g, "?")
+  );
 }
