@@ -3,6 +3,15 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Task 2.4 + 2.5 Wizard auto — implementat, pe branch `feat/m2-auto-wizard`.** (2026-07-27)
+- `src/lib/auto/event.ts`: eveniment (VANZARE/CUMPARARE) → set de formulare + mapare inputuri + checklist per instituție.
+- `generateAndFileForm` (engine): generează + arhivează FĂRĂ semnătură (ITL se semnează olograf; provider "none", status "GENERATED") + dosar DE_DEPUS.
+- `src/lib/auto/service.ts` `generateAutoCase`; API `/api/auto/generate`; pagină wizard `/dashboard/auto`.
+- Vânzare: ITL-010/054/016. Cumpărare: ITL-005/DGPCI (contractul îl primește de la vânzător).
+- Verificat: 88 unit + 34 integrare + 9 e2e — verzi.
+- **Următorul: 2.6 e2e dosar auto (deja acoperit parțial de auto-wizard.spec.ts; de adăugat și cumpărare) → apoi Faza 2 completă. Recomand review adversarial pe Faza 2 înainte de a merge mai departe.**
+
+
 **Task 2.3 Manifeste auto — implementat, pe branch `feat/m2-auto-manifests`.** (2026-07-27)
 - Motor extins: `FieldSource` are sursă „vehicle"; `mapForm(manifest, {profile, vehicle}, inputs)`; engine încarcă vehiculul (`opts.vehicleId`).
 - `src/lib/forms/auto.ts`: ITL-005 Cluj 2026 (cu normă/CO2/putere), ITL-016, ITL-010, ITL-054 (contract, cumpărător ca input), DGPCI. Înregistrate în `registered.ts`.
