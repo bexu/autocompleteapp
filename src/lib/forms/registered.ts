@@ -2,6 +2,8 @@ import { registerF230 } from "./f230";
 import { registerAuto } from "./auto";
 import { registerC168 } from "./c168";
 import { registerImpozit } from "./impozit";
+import { registerCopil } from "./copil";
+import { registerPetitii } from "./petitii";
 
 // Punct unic de acces la manifeste care GARANTEAZĂ înregistrarea. Importă de
 // aici (nu direct din manifest.ts) oriunde selectezi/citești manifeste —
@@ -10,6 +12,8 @@ registerF230();
 registerAuto();
 registerC168();
 registerImpozit();
+registerCopil();
+registerPetitii();
 
 export {
   selectManifest,

@@ -43,17 +43,17 @@
 
 ## Ordinea de implementare
 
-1. **230** — validează arhitectura (Felia 1, în lucru).
-2. **Dosar auto complet** — ITL-054 + ITL-005 + ITL-016 + ITL-010 + cererea DGPCI.
-3. **C168** — închiriere (înregistrare/modificare/încetare).
-4. **Impozit clădire și teren** — ITL-001, ITL-003.
-5. **Dosar copil** — alocație + CIC + stimulent + adeverință + declarații.
-6. **Dosar șomaj + prime ANOFM.**
-7. **Cadastru/CF** — înscriere, radiere, eroare materială, copii.
-8. **Dosar pensie/deces.**
-9. **PFA lifecycle.**
-10. **Urbanism/construcții.**
-11. **Petiții universale.**
+1. **230** ✅ — validează arhitectura (Felia 1, livrată).
+2. **Dosar auto complet** ✅ — ITL-054 + ITL-005 + ITL-016 + ITL-010 + cererea DGPCI.
+3. **C168** ✅ — închiriere (înregistrare/modificare/încetare).
+4. **Impozit clădire și teren** ✅ — ITL-001, ITL-003.
+5. **Dosar copil** ✅ — alocație de stat + indemnizație creștere copil (datele copilului/angajatorului ca inputuri, nu persistăm CNP-ul copilului). Stimulentul/adeverințele/declarațiile suplimentare rămân extindere ulterioară.
+6. **Petiții universale** ✅ — PetitionBuilder comun (OG 27/2002) cu instituție + subiect + conținut + solicitare; petentul din profil.
+7. **Dosar șomaj + prime ANOFM.**
+8. **Cadastru/CF** — înscriere, radiere, eroare materială, copii.
+9. **Dosar pensie/deces.**
+10. **PFA lifecycle.**
+11. **Urbanism/construcții.**
 
 **D212** rămâne în roadmap, fără a-i dedica toate resursele: SPV are precompletare din 2026, deci diferențiatorul e mai mic decât la dosarele multi-instituție.
 

@@ -3,6 +3,16 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Dosar copil + petiții universale — implementat, pe branch `feat/m5-copil-petitii`.** (2026-07-27)
+- `src/lib/forms/copil.ts`: manifeste ALOCATIE (alocație de stat) + INDEMNIZATIE (creștere copil), naționale. Solicitantul din profil; **datele copilului + angajatorul ca inputuri — NU persistăm CNP-ul copilului** (minimizare GDPR). `src/lib/copil/service.ts` `generateCopilCase` (validează ambele înainte de a persista — atomic), API `/api/copil/generate`, wizard `/dashboard/copil`.
+- `src/lib/forms/petitii.ts`: PetitionBuilder unic (OG 27/2002) — instituție (listă `INSTITUTII`) + subiect + conținut + solicitare; petentul din profil. `src/lib/petitii/service.ts`, API `/api/petitii/generate`, wizard `/dashboard/petitii`.
+- Ambele înregistrate în `registered.ts`; link-uri noi în dashboard.
+- Roadmap „după 230" (auto → C168 → impozit → copil) **complet**; petiții e bonus universal.
+- **Audit securitate adversarial** (workflow, 5 dimensiuni + verificare per finding): 6 constatări reparate — vezi [SECURITY_AUDIT_2026-07-28.md](SECURITY_AUDIT_2026-07-28.md). Notabil: job de retenție scanuri programat (era neapelat), rate-limit auth strict în prod (relax doar e2e), Zod pe 230/sign, export GDPR cu conținut decriptat, redact `dataNasterii`/`ciExp`, throttle per-user pe generare.
+- Verificat: **118 unit + 46 integrare + 16 e2e — verzi**; typecheck + lint curate.
+- **Următorul (roadmap rămas): șomaj/ANOFM, cadastru/CF, pensie/deces, PFA lifecycle, urbanism; hardening H.1 DPIA, H.2 pen-test, H.3 rate-limit distribuit/observability, H.4 legal review.**
+
+
 **Impozit clădiri/teren (ITL-001/003) — implementat, pe branch `feat/m4-impozit-imobil`.** (2026-07-27)
 - `src/lib/forms/impozit.ts`: manifeste ITL-001 (clădiri) + ITL-003 (teren) Cluj, din profil + imobil + inputuri (dobândire, cotă, valoare/categorie) + Zod.
 - Wizard `/dashboard/impozit`: alege formularul după tipul imobilului; preview→generare→dosar (handoff DITL Cluj).
