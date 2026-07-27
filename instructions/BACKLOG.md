@@ -53,7 +53,7 @@ Cea mai bună extindere după 230: userul repetă aceleași date în 4–5 docum
 > **Faza 2 COMPLETĂ** (2026-07-27) — dosar auto production-ready. + sistem de design UI/UX pentru toată aplicația (full-width dashboard cu KPI, accent civic-blue, coduri în mono, light/dark).
 
 ## Faza 3 — C168: închiriere (OPANAF 161/2025)
-- [ ] **3.1 Entitatea `Imobil`** (minim necesar pentru C168) + migrare.
+- [x] **3.1 Entitatea `Imobil`** (minim necesar pentru C168) + migrare. *(`src/lib/imobil/` CRUD + validare; API `/api/imobile`; pagină; inclus în export+ștergere GDPR; câmpuri adresă + cadastral/CF)*
 - [ ] **3.2 OCR contract de închiriere** → locator, coproprietari, chiriași, cote, adresă, chirie, monedă, perioadă.
 - [ ] **3.3 Definiția C168** (înregistrare/modificare/încetare) + atașare contract.
   - *Acceptare:* C168 generat aproape integral din profil + OCR; valoarea = OCR + reutilizare + tracking, nu „încă un formular" (ANAF are deja formular web).

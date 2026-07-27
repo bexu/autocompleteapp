@@ -13,6 +13,7 @@ export async function deleteUserData(userId: string): Promise<void> {
     prisma.dossier.deleteMany({ where: { userId } }),
     prisma.signedForm.deleteMany({ where: { userId } }),
     prisma.vehicul.deleteMany({ where: { userId } }),
+    prisma.imobil.deleteMany({ where: { userId } }),
     prisma.document.deleteMany({ where: { userId } }),
     prisma.profile.deleteMany({ where: { userId } }), // cascadă pe adrese
     prisma.consent.deleteMany({ where: { userId } }),

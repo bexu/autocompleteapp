@@ -49,6 +49,7 @@ export default async function DashboardPage() {
       items: [
         { href: "/dashboard/dosare", testid: "link-dosare", title: "Dosarele mele", desc: "Stare depunere și pași rămași." },
         { href: "/dashboard/vehicule", testid: "link-vehicule", title: "Vehiculele mele", desc: "Date din certificatul de înmatriculare." },
+        { href: "/dashboard/imobile", testid: "link-imobile", title: "Imobilele mele", desc: "Proprietăți pentru închiriere și impozit." },
       ],
     },
     {
