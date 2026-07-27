@@ -3,6 +3,13 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Task 2.2 OCR CIV — implementat, pe branch `feat/m2-ocr-civ`.** (2026-07-27)
+- `src/lib/ocr/civ.ts`: parser pe codurile armonizate UE (Directiva 1999/37/CE) + provider + factory.
+- API `/api/vehicule/ocr` (stochează CIV criptat în seif + extrage câmpuri); pagină vehicule pre-completează formularul din CIV.
+- Verificat: 79 unit + 29 integrare + 8 e2e — verzi.
+- **Următorul: 2.3 manifeste auto (ITL-054/005/016/010 + cerere DGPCI) ca manifeste versionate; apoi 2.4 wizard eveniment, 2.5 checklist-uri dosar, 2.6 e2e.**
+
+
 **Faza 2 pornită — Task 2.1 Vehicul, pe branch `feat/m2-vehicle-entity`.** (2026-07-27)
 - Entitate `Vehicul` (câmpurile SPEC + ITL-005 Cluj: normaPoluare/emisiiCo2GKm/putereKw) + migrare.
 - `src/lib/vehicle/` (schema Zod cu validare VIN/an, repository CRUD cu verificare proprietate); API `/api/vehicule` + `[id]`; pagină `/dashboard/vehicule`.
