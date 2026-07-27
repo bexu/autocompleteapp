@@ -50,6 +50,24 @@ export function OnboardingUpload() {
     setError(null);
     setBusy(true);
     const form = new FormData(e.currentTarget);
+
+    if (!form.get("consent")) {
+      setBusy(false);
+      setError("Bifează acordul pentru procesarea datelor de identitate.");
+      return;
+    }
+    // Consimțământ explicit înainte de a salva date de identitate + scanul.
+    await fetch("/api/gdpr/consent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ category: "IDENTITATE", action: "grant" }),
+    });
+    await fetch("/api/gdpr/consent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ category: "DOCUMENTE", action: "grant" }),
+    });
+
     const payload: Record<string, unknown> = {};
     for (const key of ["nume", "prenume", "cnp", "ciSerie", "ciNr", "sex", "dataNasterii", "ciExp"]) {
       const v = String(form.get(key) ?? "").trim();
@@ -99,6 +117,10 @@ export function OnboardingUpload() {
         <input name="sex" defaultValue={f?.sex ?? ""} placeholder="Sex (M/F)" data-testid="f-sex" />
         <input name="dataNasterii" defaultValue={f?.dataNasterii ?? ""} placeholder="Data nașterii" data-testid="f-dob" />
         <input name="ciExp" defaultValue={f?.ciExp ?? ""} placeholder="Expirare CI" data-testid="f-exp" />
+        <label style={{ display: "flex", gap: 8 }}>
+          <input type="checkbox" name="consent" data-testid="consent" />
+          Sunt de acord cu procesarea datelor de identitate și a scanului.
+        </label>
         <button type="submit" disabled={busy} data-testid="confirm">
           {busy ? "Se salvează..." : "Confirmă și salvează"}
         </button>

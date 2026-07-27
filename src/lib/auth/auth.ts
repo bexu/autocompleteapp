@@ -10,6 +10,12 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
+  // Rate limiting activ implicit (securitate — T10 threat model). Dezactivat
+  // doar în e2e (AUTH_RATE_LIMIT=off), unde mai multe fluxuri lovesc de pe
+  // același IP. Reglarea fină a pragurilor pe rute sensibile = task H.3.
+  rateLimit: {
+    enabled: process.env.AUTH_RATE_LIMIT !== "off",
+  },
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,

@@ -3,6 +3,14 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Task 1.4 GDPR — implementat, pe branch `feat/m1-gdpr`.** (2026-07-27)
+- `src/lib/gdpr/`: consent ledger (per categorie, versionat), export (JSON), ștergere (date/cont), audit fără PII.
+- API `/api/gdpr/{consent,export,delete}`; pagină `/dashboard/confidentialitate`; consimțământ în onboarding.
+- Rate limiting better-auth ON implicit (off doar în e2e). Modele `Consent` + `AuditLog` (fără FK, supraviețuiește ștergerii).
+- Verificat: 59 unit + 13 integrare + 4 e2e (auth, profil, onboarding, gdpr) — verzi.
+- **Următorul (miezul produsului): 1.5 motor de template-uri (manifest versionat) + formularul 230.**
+
+
 **Task 1.3 Seif documente + OCR — implementat, pe branch `feat/m1-document-vault`.** (2026-07-27)
 - Seif criptat `src/lib/documents/repository.ts`: bytes criptați (envelope, AAD=user), retenție + `purgeExpiredDocuments` (job pg-boss vine la 1.8), verificare de proprietate.
 - OCR MRZ TD1 `src/lib/ocr/` (mrz.ts + provider.ts, ADR 0007): parsează CI, derivă CNP + sex + dată; imagine-OCR amânat în spatele interfeței.

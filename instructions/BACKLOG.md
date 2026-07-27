@@ -21,7 +21,7 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
   - *Acceptare:* CRUD pe profil; câmpuri sensibile criptate; validare (checksum CNP, IBAN). Entitățile se modelează explicit (nu `Bun` generic); `Vehicul`/`Imobil` se adaugă la feliile lor.
 - [x] **1.3 Seif de documente + upload CI** + OCR → pre-completare profil. *(seif criptat + retenție/purjare `src/lib/documents/`; OCR MRZ TD1 `src/lib/ocr/` — ADR 0007; flux upload→extrage→confirmă→profil; e2e onboarding)*
   - *Acceptare:* upload securizat; OCR extrage câmpurile de bază; user confirmă înainte de salvare; scan criptat + retenție.
-- [ ] **1.4 Consimțământ + drepturi GDPR** (consent ledger, export & ștergere date).
+- [x] **1.4 Consimțământ + drepturi GDPR** (consent ledger, export & ștergere date). *(`src/lib/gdpr/`: consent ledger + export + ștergere + audit fără PII; pagină confidențialitate; rate limiting ON — ADR 0008)*
   - *Acceptare:* consimțământ per categorie; user poate exporta și șterge datele; audit fără PII.
 - [ ] **1.5 Motor de template-uri (bază) + definiția formularului 230.**
   - *Acceptare:* definiția = **manifest versionat** (autoritate, jurisdicție, cod, revizie, valabilitate, sursă+hash, workflow, semnătură — vezi SPEC); selecție după jurisdicție + dată; mapare declarativă profil→230; generare PDF corect completat; test pe date de eșantion.

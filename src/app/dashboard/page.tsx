@@ -27,6 +27,9 @@ export default async function DashboardPage() {
         <Link href="/dashboard/profil" data-testid="link-profil">
           Profilul meu
         </Link>
+        <Link href="/dashboard/confidentialitate" data-testid="link-confidentialitate">
+          Confidențialitate
+        </Link>
       </p>
       <LogoutButton />
     </main>

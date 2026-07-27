@@ -27,6 +27,7 @@ model User {
   accounts      Account[]
   profile       Profile?
   documents     Document[]
+  consents      Consent[]
 
   @@map("user")
 }
@@ -154,4 +155,37 @@ model Document {
   @@index([userId])
   @@index([retainUntil])
   @@map("document")
+}
+
+// --- GDPR: consimțământ + audit (task 1.4) ---
+// Consent ledger: o înregistrare per acordare, cu versiunea politicii; retragerea
+// setează `withdrawnAt`. Consimțământul activ = cea mai recentă acordare a
+// categoriei fără retragere.
+
+model Consent {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category      String // IDENTITATE | DOCUMENTE | CONTACT
+  policyVersion String
+  grantedAt     DateTime  @default(now())
+  withdrawnAt   DateTime?
+
+  @@index([userId])
+  @@map("consent")
+}
+
+// Audit log FĂRĂ PII și FĂRĂ FK către user — supraviețuiește ștergerii contului
+// (dovadă de conformitate). Conține doar id opac + acțiune + detaliu neutru.
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String? // opac; poate rămâne după ștergerea contului
+  action    String // CONSENT_GRANT | CONSENT_WITHDRAW | DATA_EXPORT | DATA_DELETE | ACCOUNT_DELETE
+  detail    String? // neutru (ex. categoria) — niciodată PII
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@map("audit_log")
 }
