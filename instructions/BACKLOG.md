@@ -5,7 +5,7 @@ Faze cu felii verticale. Fiecare task = un branch. „Gata" = criterii de accept
 ---
 
 ## Faza 0 — Setup & fundație de securitate
-- [ ] **0.1 Bootstrap** din template: repo, CI, lint/format, docs/ (cele două brief-uri), `CLAUDE.md`, `SPEC.md`.
+- [x] **0.1 Bootstrap** din template: repo, CI, lint/format, `CLAUDE.md`, `SPEC.md`. *(PR #1, CI verde 2026-07-27; cele două brief-uri încă lipsesc din `docs/` — de adăugat când le primim)*
   - *Acceptare:* CI verde pe un skeleton gol; `CLAUDE.md` + `SPEC.md` în repo.
 - [ ] **0.2 Management secrete & config** (nimic hardcodat).
   - *Acceptare:* secretele vin din vault/env; scanner de secrete în CI.

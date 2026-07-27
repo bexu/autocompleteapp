@@ -3,7 +3,7 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
-**Task 0.1 Bootstrap — implementat local, neîmpins încă.** (2026-07-27)
+**Task 0.1 Bootstrap — gata: PR #1, CI verde, de dat merge.** (2026-07-27)
 - Baza Next.js 16 generată (`create-next-app` — TS, ESLint, App Router, `src/`, fără Tailwind) peste template.
 - Dependențe standard instalate: Prisma 7, Zod 4, pg-boss, Vitest 4, Playwright. Scripturi + configuri (`vitest.config.ts`, `playwright.config.ts`, `output: "standalone"`).
 - Adaptare Prisma 7: `prisma.config.ts` la root, `url` scos din schema (vezi ADR 0002).
