@@ -25,6 +25,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  profile       Profile?
 
   @@map("user")
 }
@@ -71,4 +72,61 @@ model Verification {
   updatedAt  DateTime @updatedAt
 
   @@map("verification")
+}
+
+// --- Model canonic „cetățean" (task 1.2) ---
+// Sursa unică de date; formularele nu au date proprii, doar mapare (SPEC).
+// Câmpurile tari (CNP, serie/nr CI, IBAN) se stochează CRIPTAT per-câmp
+// (ADR 0005): coloanele `*Enc` conțin payload `v1:...`, niciodată în clar.
+// Numele rămâne în clar (ca la User) — necesar pentru afișare/mapare; scopul
+// de criptare v1 sunt identificatorii tari (vezi docs/threat-model.md).
+
+enum AddressType {
+  DOMICILIU
+  RESEDINTA
+}
+
+model Profile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  nume         String?
+  prenume      String?
+  sex          String?
+  dataNasterii DateTime?
+
+  // Identificatori tari — criptați per-câmp.
+  cnpEnc     String?
+  ciSerieEnc String?
+  ciNrEnc    String?
+  ciEmitent  String?
+  ciExp      DateTime?
+
+  // Contact.
+  telefon String?
+  ibanEnc String?
+
+  addresses Address[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("profile")
+}
+
+model Address {
+  id         String      @id @default(cuid())
+  profileId  String
+  profile    Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  tip        AddressType
+  strada     String?
+  nr         String?
+  localitate String?
+  uat        String?
+  judet      String?
+  codPostal  String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@map("address")
 }

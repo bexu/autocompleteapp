@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { LogoutButton } from "./logout-button";
@@ -18,6 +19,11 @@ export default async function DashboardPage() {
       </p>
       <p>
         Rol: <span data-testid="user-role">{role}</span>
+      </p>
+      <p>
+        <Link href="/dashboard/profil" data-testid="link-profil">
+          Profilul meu
+        </Link>
       </p>
       <LogoutButton />
     </main>
