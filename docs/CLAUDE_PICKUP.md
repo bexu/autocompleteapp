@@ -3,6 +3,13 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Hardening H.3 — observabilitate (request-id + logare structurată), pe branch `feat/m13-observability`.** (2026-07-28)
+- `src/lib/http/observe.ts`: wrapper `observe(name, handler)` pentru rutele API — `requestId` (din antetul `x-request-id` sau `randomUUID`), logare structurată `api_request`/`api_error` (rută/metodă/cale-fără-query/status/durată/requestId, prin logger-ul care redactează PII), și **graniță uniformă de 500** (întoarce doar `{error:"eroare internă", requestId}` + antet `x-request-id` — fără a scurge detalii/stack). Cele 11 rute de generare/semnare sunt împachetate.
+- Test unit `tests/unit/http/observe.test.ts` (propagare request-id, fără leak de detalii/PII).
+- Verificat: **165 unit + 65 integrare + 29 e2e — verzi**; typecheck + lint curate.
+- **Următorul:** H.1 DPIA (doc GDPR), H.2 pen-test (extern / audit complet), H.4 review juridic; extinderi opționale.
+
+
 **Hardening H.3 — rate-limit distribuit (Postgres), pe branch `feat/m12-dist-ratelimit`.** (2026-07-28)
 - Limiterul de generare (`src/lib/http/rate-limit.ts`) e acum **distribuit**: `checkRateLimitDb` folosește un contor fixed-window în Postgres (model nou `RateLimitWindow`, cheie opacă `gen:<userId>` — fără PII), partajat între instanțe. `guardGeneration` e acum **async** → toate cele 11 rute de generare/semnare fac `await guardGeneration(user.id)`. `checkRateLimit` in-memory rămâne pentru teste/fallback (prisma importat lazy, ca unit-urile să nu ceară DB).
 - Migrare `20260728084149_rate_limit_window` inclusă. Curățarea ferestrelor vechi (>1h) în jobul de retenție.

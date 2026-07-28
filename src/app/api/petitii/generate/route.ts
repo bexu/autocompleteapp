@@ -10,7 +10,9 @@ import { PetitieBodySchema } from "@/lib/forms/petitii";
 import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
 // Builder petiții: profil + text → o cerere generată + dosar de depus.
-export async function POST(req: Request) {
+import { observe } from "@/lib/http/observe";
+
+export const POST = observe("petitii.generate", async (req: Request) => {
   try {
     const user = await requireUser();
     await guardGeneration(user.id);
@@ -40,4 +42,4 @@ export async function POST(req: Request) {
     }
     throw e;
   }
-}
+});

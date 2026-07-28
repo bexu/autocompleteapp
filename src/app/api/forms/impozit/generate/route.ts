@@ -9,7 +9,9 @@ import {
 import { ImpozitBodySchema } from "@/lib/forms/impozit";
 import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
-export async function POST(req: Request) {
+import { observe } from "@/lib/http/observe";
+
+export const POST = observe("impozit.generate", async (req: Request) => {
   try {
     const user = await requireUser();
     await guardGeneration(user.id);
@@ -36,4 +38,4 @@ export async function POST(req: Request) {
     if (e instanceof ManifestNotFoundError) return NextResponse.json({ error: "formular indisponibil" }, { status: 404 });
     throw e;
   }
-}
+});

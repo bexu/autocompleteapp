@@ -10,7 +10,9 @@ import { COPIL_BODY_SCHEMA } from "@/lib/forms/copil";
 import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
 // Dosar nou-născut: date copil + angajator → alocație + indemnizație.
-export async function POST(req: Request) {
+import { observe } from "@/lib/http/observe";
+
+export const POST = observe("copil.generate", async (req: Request) => {
   try {
     const user = await requireUser();
     await guardGeneration(user.id);
@@ -40,4 +42,4 @@ export async function POST(req: Request) {
     }
     throw e;
   }
-}
+});

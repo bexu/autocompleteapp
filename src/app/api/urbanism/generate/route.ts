@@ -10,7 +10,9 @@ import { UrbanismBodySchema } from "@/lib/forms/urbanism";
 import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
 // Urbanism: eveniment (certificat/autorizație) + imobil → formularul potrivit.
-export async function POST(req: Request) {
+import { observe } from "@/lib/http/observe";
+
+export const POST = observe("urbanism.generate", async (req: Request) => {
   try {
     const user = await requireUser();
     await guardGeneration(user.id);
@@ -40,4 +42,4 @@ export async function POST(req: Request) {
     }
     throw e;
   }
-}
+});
