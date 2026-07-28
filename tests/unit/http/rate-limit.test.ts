@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkRateLimit, guardGeneration, RateLimitError } from "@/lib/http/rate-limit";
+import { checkRateLimit } from "@/lib/http/rate-limit";
 
 describe("checkRateLimit — fereastră glisantă", () => {
   it("permite până la `max`, apoi respinge în aceeași fereastră", () => {
@@ -26,10 +26,6 @@ describe("checkRateLimit — fereastră glisantă", () => {
     expect(checkRateLimit("userA", 1, 60_000, t0 + 1)).toBe(false);
     expect(checkRateLimit("userB", 1, 60_000, t0 + 1)).toBe(true); // altă cheie, neafectată
   });
-
-  it("guardGeneration aruncă RateLimitError la depășire", () => {
-    const uid = `u_${Math.random()}`;
-    for (let i = 0; i < 30; i++) guardGeneration(uid);
-    expect(() => guardGeneration(uid)).toThrow(RateLimitError);
-  });
 });
+// `checkRateLimitDb` + `guardGeneration` (Postgres, distribuit) sunt testate în
+// tests/integration/rate-limit.test.ts (au nevoie de DB reală).

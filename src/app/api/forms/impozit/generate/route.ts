@@ -12,7 +12,7 @@ import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/r
 export async function POST(req: Request) {
   try {
     const user = await requireUser();
-    guardGeneration(user.id);
+    await guardGeneration(user.id);
     const body = await req.json().catch(() => ({}));
     const { formCode, imobilId, ...inputs } = ImpozitBodySchema.parse(body);
     const { pdf, dossierId } = await generateAndFileForm(user.id, {
