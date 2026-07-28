@@ -3,6 +3,12 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Hardening H.1 — DPIA (evaluare impact GDPR), pe branch `docs/h1-dpia`.** (2026-07-28)
+- `docs/DPIA-2026-07-28.md`: DPIA completă (art. 35 GDPR + Legea 190/2018), **fundamentată în cod** (schema, crypto, gdpr, audit, retenție). Acoperă: necesitate, descrierea prelucrării, categorii de date + criptare, temei legal per categorie, necesitate/proporționalitate, **registru de riscuri (R1–R10)** cu risc rezidual, măsuri tehnice+organizatorice, și **§8 onest despre ce NU e încă acoperit** (KEK în vault gestionat, MFA, QTSP real, DPA-uri, pen-test, informare art. 13/14).
+- Fact-check adversarial (workflow) rulat pe fiecare afirmație vs cod (guardrail: nu supra-declara controale).
+- **Următorul:** H.2 pen-test (extern / audit complet), H.4 review juridic (extern); extinderi opționale de formulare.
+
+
 **Hardening H.3 — observabilitate (request-id + logare structurată), pe branch `feat/m13-observability`.** (2026-07-28)
 - `src/lib/http/observe.ts`: wrapper `observe(name, handler)` pentru rutele API — `requestId` (din antetul `x-request-id` sau `randomUUID`), logare structurată `api_request`/`api_error` (rută/metodă/cale-fără-query/status/durată/requestId, prin logger-ul care redactează PII), și **graniță uniformă de 500** (întoarce doar `{error:"eroare internă", requestId}` + antet `x-request-id` — fără a scurge detalii/stack). Cele 11 rute de generare/semnare sunt împachetate.
 - Test unit `tests/unit/http/observe.test.ts` (propagare request-id, fără leak de detalii/PII).
