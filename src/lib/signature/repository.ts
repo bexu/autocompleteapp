@@ -1,6 +1,10 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { decryptField, encryptField } from "@/lib/crypto/field-encryption";
 import type { SignResult } from "./provider";
+
+// Scrierea acceptă un client de tranzacție opțional (atomicitate cross-formular).
+type Db = Prisma.TransactionClient | typeof prisma;
 
 // Arhivă de documente semnate: bytes-ii criptați (envelope, AAD=user) + hash de
 // integritate + metadate semnătură. Acces cu verificare de proprietate.
@@ -22,12 +26,13 @@ export interface SignedFormMeta {
 export async function archiveSignedForm(
   userId: string,
   input: { formCode: string; manifestId: string; result: SignResult },
+  db: Db = prisma,
 ): Promise<SignedFormMeta> {
   const contentEnc = encryptField(
     Buffer.from(input.result.signedPdf).toString("base64"),
     aad(userId),
   );
-  const row = await prisma.signedForm.create({
+  const row = await db.signedForm.create({
     data: {
       userId,
       formCode: input.formCode,

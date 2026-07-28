@@ -1,4 +1,4 @@
-import { generateAndFileForm, previewForm } from "@/lib/forms/engine";
+import { generateAndFileForms } from "@/lib/forms/engine";
 import { SomajBodySchema } from "@/lib/forms/somaj";
 import type { z } from "zod";
 
@@ -41,21 +41,13 @@ export async function generateSomajCase(
     inputs: input as Record<string, unknown>,
   });
 
-  // Faza 1 — validează ambele formulare înainte de a persista ceva (atomic).
-  for (const formCode of FORMS) {
-    await previewForm(userId, optsFor(formCode));
-  }
-
-  // Faza 2 — generează + arhivează + deschide dosare.
-  const forms: SomajFormResult[] = [];
-  for (const formCode of FORMS) {
-    const filed = await generateAndFileForm(userId, optsFor(formCode));
-    forms.push({
-      formCode: filed.formCode,
-      title: filed.manifest.title,
-      dossierId: filed.dossierId,
-    });
-  }
+  // Generare atomică: validează tot, apoi persistă într-o singură tranzacție.
+  const filed = await generateAndFileForms(userId, FORMS.map(optsFor));
+  const forms: SomajFormResult[] = filed.map((f) => ({
+    formCode: f.formCode,
+    title: f.manifest.title,
+    dossierId: f.dossierId,
+  }));
 
   return { label: "Am rămas fără loc de muncă", checklist: CHECKLIST, forms };
 }

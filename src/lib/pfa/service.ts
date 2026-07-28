@@ -1,4 +1,4 @@
-import { generateAndFileForm, previewForm } from "@/lib/forms/engine";
+import { generateAndFileForms } from "@/lib/forms/engine";
 import { PfaBodySchema, PFA_EVENT_FORMS } from "@/lib/forms/pfa";
 import type { z } from "zod";
 
@@ -51,21 +51,13 @@ export async function generatePfaCase(
     inputs: input as Record<string, unknown>,
   });
 
-  // Faza 1 — validează toate formularele evenimentului înainte de a persista.
-  for (const formCode of forms) {
-    await previewForm(userId, optsFor(formCode));
-  }
-
-  // Faza 2 — generează + arhivează + deschide dosare.
-  const results: PfaFormResult[] = [];
-  for (const formCode of forms) {
-    const filed = await generateAndFileForm(userId, optsFor(formCode));
-    results.push({
-      formCode: filed.formCode,
-      title: filed.manifest.title,
-      dossierId: filed.dossierId,
-    });
-  }
+  // Generare atomică: validează tot, apoi persistă într-o singură tranzacție.
+  const filed = await generateAndFileForms(userId, forms.map((f) => optsFor(f)));
+  const results: PfaFormResult[] = filed.map((f) => ({
+    formCode: f.formCode,
+    title: f.manifest.title,
+    dossierId: f.dossierId,
+  }));
 
   return { event: input.event, label, checklist: CHECKLIST[input.event], forms: results };
 }
