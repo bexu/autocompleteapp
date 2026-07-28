@@ -8,6 +8,7 @@ import { registerSomaj } from "./somaj";
 import { registerCadastru } from "./cadastru";
 import { registerDeces } from "./deces";
 import { registerPfa } from "./pfa";
+import { registerUrbanism } from "./urbanism";
 
 // Punct unic de acces la manifeste care GARANTEAZĂ înregistrarea. Importă de
 // aici (nu direct din manifest.ts) oriunde selectezi/citești manifeste —
@@ -22,6 +23,7 @@ registerSomaj();
 registerCadastru();
 registerDeces();
 registerPfa();
+registerUrbanism();
 
 export {
   selectManifest,
