@@ -7,6 +7,7 @@ import { registerPetitii } from "./petitii";
 import { registerSomaj } from "./somaj";
 import { registerCadastru } from "./cadastru";
 import { registerDeces } from "./deces";
+import { registerPfa } from "./pfa";
 
 // Punct unic de acces la manifeste care GARANTEAZĂ înregistrarea. Importă de
 // aici (nu direct din manifest.ts) oriunde selectezi/citești manifeste —
@@ -20,6 +21,7 @@ registerPetitii();
 registerSomaj();
 registerCadastru();
 registerDeces();
+registerPfa();
 
 export {
   selectManifest,

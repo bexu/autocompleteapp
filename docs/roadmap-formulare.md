@@ -52,7 +52,7 @@
 7. **Dosar șomaj (ANOFM)** ✅ — înregistrare ca persoană în căutarea unui loc de muncă (fișa PCLM, Anexa 1) + cerere indemnizație de șomaj (Anexa 3), Legea 76/2002. Solicitantul din profil; restul ca inputuri, cu validare de format (dată, enum plată). Primele ANOFM rămân extindere ulterioară.
 8. **Cadastru/CF** ✅ — cerere de înscriere în cartea funciară (Anexa 5, Legea 7/1996, ODG ANCPI 600/2023): intabulare/notare/radiere/înscriere provizorie/actualizare/îndreptare eroare ca enum + act justificativ; reutilizează entitatea Imobil. Extras CF = pas de tip dosar/link către portalul ANCPI (ePay/MyEterra).
 9. **Dosar deces în familie (CNPP)** ✅ — ajutor de deces (Anexa 11) + pensie de urmaș (Anexa 7), Legea 360/2023. Solicitantul (membrul supraviețuitor) din profil; datele decedatului ca inputuri (nu le persistăm). Fără evaluare de eligibilitate/cuantum. Pensia CNPP (limită de vârstă etc.) rămâne extindere ulterioară.
-10. **PFA lifecycle.**
+10. **PFA lifecycle (ONRC)** ✅ — eveniment „înființare" (rezervare denumire + înregistrare, formulare 11-10-181/180) sau „mențiune" (schimbare sediu / modificare CAEN / suspendare / reluare / radiere), OUG 44/2008. Titularul din profil; CAEN validat ca 4 cifre.
 11. **Urbanism/construcții.**
 
 **D212** rămâne în roadmap, fără a-i dedica toate resursele: SPV are precompletare din 2026, deci diferențiatorul e mai mic decât la dosarele multi-instituție.

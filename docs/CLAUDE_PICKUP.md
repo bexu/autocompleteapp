@@ -3,6 +3,16 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**PFA lifecycle (ONRC) — implementat, pe branch `feat/m9-pfa`.** (2026-07-28)
+- `src/lib/forms/pfa.ts`: 3 manifeste — REZERVARE-PFA (11-10-181), INREGISTRARE-PFA (11-10-180 + anexă fiscală), MENTIUNI-PFA (schimbare/modificare CAEN/suspendare/reluare/radiere), OUG 44/2008. **Model cu eveniment** (ca la auto): INFIINTARE → rezervare + înregistrare; MENTIUNE → mențiuni. Titularul din profil; CAEN principal validat ca 4 cifre (Zod).
+- `src/lib/pfa/service.ts` `generatePfaCase` (atomic, per eveniment), API `/api/pfa/generate` (guard auth + rate-limit + Zod), wizard `/dashboard/pfa` (radio eveniment + secțiuni condiționate). Link în dashboard.
+- **Grounded prin research workflow** (onrc.ro verificat). Coduri descriptive, sourceSha256 null. myportal.onrc.ro doar numit în instrucțiuni (nu ca url asertat). Unealtă-nu-consultant: fără taxe/consultanță.
+- **Review adversarial (workflow): 2 fixuri** — (1) mențiunea cere câmpul specific operației (Zod `superRefine`: radiere→motiv, schimbare sediu→noul sediu, suspendare/reluare→dată); (2) județul sediului e un singur input (nu se mai putea contrazice între rezervare și înregistrare).
+- **Rezidual cunoscut (low, comun tuturor pachetelor multi-formular):** generarea nu e tranzacțională între formulare — un eșec tranzitoriu în faza 2 poate lăsa un dosar orfan; faza 1 (validare) prinde cazul comun. De rezolvat la nivel de motor (tranzacție partajată) ca task de hardening, nu per pachet.
+- Verificat: **158 unit + 56 integrare + 26 e2e — verzi**; typecheck + lint curate.
+- **Următorul (roadmap rămas): urbanism/construcții (ultimul pachet de formulare); hardening H.1 DPIA, H.2 pen-test, H.3 rate-limit distribuit/observability, H.4 legal review.**
+
+
 **Dosar deces în familie (CNPP) — implementat, pe branch `feat/m8-deces`.** (2026-07-28)
 - `src/lib/forms/deces.ts`: manifeste AJUTOR-DECES (Anexa 11) + PENSIE-URMAS (Anexa 7), Legea 360/2023. Solicitantul (membrul supraviețuitor) din profil; **datele decedatului (nume, CNP, certificat) ca inputuri — NU persistate** (ca la copil child-CNP). Enum-uri pe calități/plată/cauză; validare dată+CNP. **Grounded prin research workflow** (surse cnpp.ro verificate).
 - `src/lib/deces/service.ts` `generateDecesCase` (atomic), API `/api/deces/generate` (guard auth + rate-limit + Zod), wizard `/dashboard/deces` (secțiuni: decedat / certificat / ajutor / urmaș). Link în dashboard.
