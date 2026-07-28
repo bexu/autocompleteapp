@@ -10,7 +10,9 @@ import { PfaBodySchema } from "@/lib/forms/pfa";
 import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
 // Ciclul PFA: eveniment (înființare/mențiune) → setul de formulare ONRC.
-export async function POST(req: Request) {
+import { observe } from "@/lib/http/observe";
+
+export const POST = observe("pfa.generate", async (req: Request) => {
   try {
     const user = await requireUser();
     await guardGeneration(user.id);
@@ -40,4 +42,4 @@ export async function POST(req: Request) {
     }
     throw e;
   }
-}
+});

@@ -10,7 +10,9 @@ import { CadastruBodySchema } from "@/lib/forms/cadastru";
 import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
 // Dosar cadastru/CF: imobil + operațiune + act → extras CF + cerere de înscriere.
-export async function POST(req: Request) {
+import { observe } from "@/lib/http/observe";
+
+export const POST = observe("cadastru.generate", async (req: Request) => {
   try {
     const user = await requireUser();
     await guardGeneration(user.id);
@@ -40,4 +42,4 @@ export async function POST(req: Request) {
     }
     throw e;
   }
-}
+});

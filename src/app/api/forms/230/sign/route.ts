@@ -10,7 +10,9 @@ import { F230BodySchema } from "@/lib/forms/f230";
 import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
 // Semnează (provider mock/QTSP) + arhivează criptat, apoi întoarce PDF-ul semnat.
-export async function POST(req: Request) {
+import { observe } from "@/lib/http/observe";
+
+export const POST = observe("230.sign", async (req: Request) => {
   try {
     const user = await requireUser();
     await guardGeneration(user.id);
@@ -50,4 +52,4 @@ export async function POST(req: Request) {
     }
     throw e;
   }
-}
+});

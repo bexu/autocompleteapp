@@ -10,7 +10,9 @@ import { C168BodySchema } from "@/lib/forms/c168";
 import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/rate-limit";
 
 // Generează + arhivează C168 și deschide un dosar „de depus" (SPV).
-export async function POST(req: Request) {
+import { observe } from "@/lib/http/observe";
+
+export const POST = observe("c168.generate", async (req: Request) => {
   try {
     const user = await requireUser();
     await guardGeneration(user.id);
@@ -42,4 +44,4 @@ export async function POST(req: Request) {
     }
     throw e;
   }
-}
+});
