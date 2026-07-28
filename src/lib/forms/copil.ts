@@ -17,7 +17,7 @@ const copil: FieldDef[] = [
   { key: "copilNume", label: "Copil — nume", source: { from: "input", key: "copilNume" }, required: true },
   { key: "copilPrenume", label: "Copil — prenume", source: { from: "input", key: "copilPrenume" }, required: true },
   { key: "copilCnp", label: "Copil — CNP", source: { from: "input", key: "copilCnp" }, required: true, validate: "cnp" },
-  { key: "copilDataNasterii", label: "Copil — data nașterii", source: { from: "input", key: "copilDataNasterii" }, required: true },
+  { key: "copilDataNasterii", label: "Copil — data nașterii", source: { from: "input", key: "copilDataNasterii" }, required: true, validate: "date" },
 ];
 
 export const ALOCATIE_MANIFEST: FormManifest = {

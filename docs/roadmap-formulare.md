@@ -49,7 +49,7 @@
 4. **Impozit clădire și teren** ✅ — ITL-001, ITL-003.
 5. **Dosar copil** ✅ — alocație de stat + indemnizație creștere copil (datele copilului/angajatorului ca inputuri, nu persistăm CNP-ul copilului). Stimulentul/adeverințele/declarațiile suplimentare rămân extindere ulterioară.
 6. **Petiții universale** ✅ — PetitionBuilder comun (OG 27/2002) cu instituție + subiect + conținut + solicitare; petentul din profil.
-7. **Dosar șomaj + prime ANOFM.**
+7. **Dosar șomaj (ANOFM)** ✅ — înregistrare ca persoană în căutarea unui loc de muncă (fișa PCLM, Anexa 1) + cerere indemnizație de șomaj (Anexa 3), Legea 76/2002. Solicitantul din profil; restul ca inputuri, cu validare de format (dată, enum plată). Primele ANOFM rămân extindere ulterioară.
 8. **Cadastru/CF** — înscriere, radiere, eroare materială, copii.
 9. **Dosar pensie/deces.**
 10. **PFA lifecycle.**

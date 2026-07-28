@@ -3,6 +3,15 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Dosar șomaj (ANOFM) + validări de input — implementat, pe branch `feat/m6-somaj`.** (2026-07-28)
+- `src/lib/forms/somaj.ts`: manifeste INREGISTRARE-ANOFM (fișa PCLM, Anexa 1) + SOMAJ (cerere indemnizație, Anexa 3), naționale. Solicitantul din profil; restul ca inputuri. **Grounded prin research workflow** (Legea 76/2002, Ordin ANOFM 85/2002); `sourceUrl` = pagini oficiale anofm.ro *verificate că rezolvă*, `sourceSha256` null până la PDF-ul oficial. Guardrail respectat: NU calculăm eligibilitate/stagiu/cuantum (unealtă, nu consultant).
+- `src/lib/somaj/service.ts` `generateSomajCase` (atomic), API `/api/somaj/generate` (guard auth + rate-limit + Zod), wizard `/dashboard/somaj` (secțiuni: studii / încetare / indemnizație). Link în dashboard.
+- **Validări de input** (cerute explicit de Cristi): regulă nouă `date` în motor (`src/lib/validation/date.ts` + mapping) — verifică date calendaristice reale (respinge 30 feb etc.), retrofit pe toate câmpurile-dată (copil/impozit/auto/c168/somaj). Enum pe opțiunea de plată (șomaj) și pe operațiune/monedă (C168); numeric pe chirie (C168); format CIF pe 230.
+- **Review adversarial** (workflow, 4 dimensiuni): 5 constatări (toate low, input-validation) reparate: C168 perioada/tipOperatiune/chirie, 230 beneficiarCif, + corectat un format de e-mail AJOFM inventat → acum trimite la pagina oficială.
+- Verificat: **137 unit + 48 integrare + 18 e2e — verzi**; typecheck + lint curate.
+- **Următorul (roadmap rămas): cadastru/CF, pensie/deces, PFA lifecycle, urbanism; hardening H.1 DPIA, H.2 pen-test, H.3 rate-limit distribuit/observability, H.4 legal review.**
+
+
 **Dosar copil + petiții universale — implementat, pe branch `feat/m5-copil-petitii`.** (2026-07-27)
 - `src/lib/forms/copil.ts`: manifeste ALOCATIE (alocație de stat) + INDEMNIZATIE (creștere copil), naționale. Solicitantul din profil; **datele copilului + angajatorul ca inputuri — NU persistăm CNP-ul copilului** (minimizare GDPR). `src/lib/copil/service.ts` `generateCopilCase` (validează ambele înainte de a persista — atomic), API `/api/copil/generate`, wizard `/dashboard/copil`.
 - `src/lib/forms/petitii.ts`: PetitionBuilder unic (OG 27/2002) — instituție (listă `INSTITUTII`) + subiect + conținut + solicitare; petentul din profil. `src/lib/petitii/service.ts`, API `/api/petitii/generate`, wizard `/dashboard/petitii`.

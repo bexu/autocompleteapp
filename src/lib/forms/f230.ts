@@ -65,7 +65,12 @@ export const F230_MANIFEST: FormManifest = {
 // rutelor). Plafonează lungimile → nu ajunge text nemărginit în PDF/DB.
 export const F230BodySchema = z.object({
   beneficiarDenumire: z.string().max(200).optional(),
-  beneficiarCif: z.string().max(20).optional(),
+  // CIF/CUI: cifre, cu prefix opțional „RO" (nu un nume tastat greșit în câmp).
+  beneficiarCif: z
+    .string()
+    .max(20)
+    .refine((v) => v === "" || /^(RO)?\d{1,10}$/i.test(v.trim()), "CIF invalid")
+    .optional(),
   beneficiarIban: z.string().max(34).optional(),
   doiAni: z.union([z.boolean(), z.string().max(10)]).optional(),
 });
