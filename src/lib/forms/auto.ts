@@ -76,7 +76,7 @@ export const ITL_016_CLUJ: FormManifest = baseManifest({
   validFrom: "2024-01-01",
   title: "ITL-016 — Scoaterea vehiculului din evidența fiscală",
   fields: [...person, ...vehicleCore,
-    { key: "dataInstrainare", label: "Data înstrăinării", source: { from: "input", key: "dataInstrainare" }, required: true },
+    { key: "dataInstrainare", label: "Data înstrăinării", source: { from: "input", key: "dataInstrainare" }, required: true, validate: "date" },
     { key: "dobanditorNume", label: "Dobânditor (nume)", source: { from: "input", key: "dobanditorNume" }, required: true },
   ],
   inputs: [
@@ -123,7 +123,7 @@ export const ITL_054_NATIONAL: FormManifest = baseManifest({
     { key: "cumparatorCnp", label: "Cumpărător — CNP", source: { from: "input", key: "cumparatorCnp" }, required: true, validate: "cnp" },
     ...vehicleCore,
     { key: "pret", label: "Preț (lei)", source: { from: "input", key: "pret" }, required: true },
-    { key: "dataContract", label: "Data contractului", source: { from: "input", key: "dataContract" }, required: true },
+    { key: "dataContract", label: "Data contractului", source: { from: "input", key: "dataContract" }, required: true, validate: "date" },
   ],
   inputs: [
     { key: "cumparatorNume", label: "Nume complet cumpărător", required: true },

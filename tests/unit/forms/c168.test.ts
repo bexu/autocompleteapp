@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { _clearRegistry, selectManifest } from "@/lib/forms/manifest";
 import { mapForm } from "@/lib/forms/mapping";
-import { C168_MANIFEST, registerC168 } from "@/lib/forms/c168";
+import { C168_MANIFEST, C168BodySchema, registerC168 } from "@/lib/forms/c168";
 import type { DecryptedProfile } from "@/lib/profile/repository";
 import type { Imobil } from "@/lib/imobil/repository";
 
@@ -57,5 +57,44 @@ describe("C168", () => {
 
     const r2 = mapForm(C168_MANIFEST, { profile, imobil: { ...imobil, localitate: null } }, inputs);
     expect(r2.errors.some((e) => e.key === "imobilLocalitate")).toBe(true);
+  });
+
+  it("data invalidă pe perioadă / dată contract e semnalată de motor", () => {
+    const bad = mapForm(C168_MANIFEST, { profile, imobil }, { ...inputs, perioadaStart: "2026-02-30" });
+    expect(bad.errors.some((e) => e.key === "perioadaStart")).toBe(true);
+  });
+});
+
+describe("C168BodySchema — validare la graniță", () => {
+  const ok = {
+    imobilId: "im1",
+    tipOperatiune: "Înregistrare",
+    chiriasNume: "Popescu Dan",
+    chiriasCnp: "5000101123457",
+    chirie: "1500",
+    moneda: "RON",
+    perioadaStart: "2026-08-01",
+    dataContract: "2026-07-27",
+  };
+
+  it("acceptă un set valid", () => {
+    expect(C168BodySchema.safeParse(ok).success).toBe(true);
+  });
+
+  it("respinge operațiune în afara enum-ului", () => {
+    expect(C168BodySchema.safeParse({ ...ok, tipOperatiune: "stergere" }).success).toBe(false);
+  });
+
+  it("respinge monedă necunoscută", () => {
+    expect(C168BodySchema.safeParse({ ...ok, moneda: "USD" }).success).toBe(false);
+  });
+
+  it("respinge chirie ne-numerică, acceptă zecimale", () => {
+    expect(C168BodySchema.safeParse({ ...ok, chirie: "mult" }).success).toBe(false);
+    expect(C168BodySchema.safeParse({ ...ok, chirie: "1500,50" }).success).toBe(true);
+  });
+
+  it("respinge dată de început imposibilă", () => {
+    expect(C168BodySchema.safeParse({ ...ok, perioadaStart: "2026-02-30" }).success).toBe(false);
   });
 });

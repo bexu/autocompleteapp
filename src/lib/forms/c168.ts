@@ -1,19 +1,34 @@
 import { z } from "zod";
 import type { FormManifest } from "./manifest";
 import { registerManifest } from "./manifest";
+import { isValidDate } from "@/lib/validation/date";
+
+export const TIPURI_OPERATIUNE = ["Înregistrare", "Modificare", "Încetare"] as const;
+export const MONEDE = ["RON", "EUR"] as const;
+
+const optionalDate = z
+  .string()
+  .max(30)
+  .refine((v) => v === "" || isValidDate(v), "dată invalidă")
+  .optional();
 
 // Validare la granița C168 (input extern → Zod). imobilId identifică proprietatea;
-// restul sunt inputurile formularului.
+// restul sunt inputurile formularului. Operațiunea și moneda sunt seturi închise
+// (enum); chiria e o sumă (numeric); perioada și data contractului sunt date.
 export const C168BodySchema = z.object({
   imobilId: z.string().min(1, "imobil lipsă"),
-  tipOperatiune: z.string().max(30).optional(),
+  tipOperatiune: z.enum(TIPURI_OPERATIUNE).optional(),
   chiriasNume: z.string().max(200).optional(),
   chiriasCnp: z.string().max(20).optional(),
-  chirie: z.string().max(30).optional(),
-  moneda: z.string().max(10).optional(),
-  perioadaStart: z.string().max(30).optional(),
-  perioadaEnd: z.string().max(30).optional(),
-  dataContract: z.string().max(30).optional(),
+  chirie: z
+    .string()
+    .max(30)
+    .refine((v) => v === "" || /^\d+([.,]\d{1,2})?$/.test(v), "sumă invalidă")
+    .optional(),
+  moneda: z.enum(MONEDE).optional(),
+  perioadaStart: optionalDate,
+  perioadaEnd: optionalDate,
+  dataContract: optionalDate,
 });
 
 // C168 — Declarație privind înregistrarea/modificarea/încetarea contractului de
@@ -51,9 +66,9 @@ export const C168_MANIFEST: FormManifest = {
     { key: "chiriasCnp", label: "Chiriaș — CNP/CIF", source: { from: "input", key: "chiriasCnp" }, required: true },
     { key: "chirie", label: "Chirie", source: { from: "input", key: "chirie" }, required: true },
     { key: "moneda", label: "Monedă", source: { from: "input", key: "moneda" }, required: true },
-    { key: "perioadaStart", label: "De la data", source: { from: "input", key: "perioadaStart" }, required: true },
-    { key: "perioadaEnd", label: "Până la data", source: { from: "input", key: "perioadaEnd" } },
-    { key: "dataContract", label: "Data contractului", source: { from: "input", key: "dataContract" }, required: true },
+    { key: "perioadaStart", label: "De la data", source: { from: "input", key: "perioadaStart" }, required: true, validate: "date" },
+    { key: "perioadaEnd", label: "Până la data", source: { from: "input", key: "perioadaEnd" }, validate: "date" },
+    { key: "dataContract", label: "Data contractului", source: { from: "input", key: "dataContract" }, required: true, validate: "date" },
   ],
   inputs: [
     { key: "tipOperatiune", label: "Operațiune (înregistrare/modificare/încetare)", required: true },

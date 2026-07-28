@@ -9,7 +9,7 @@ export type FieldSource =
   | { from: "input"; key: string } // valoare specifică formularului, dată de user
   | { from: "const"; value: string };
 
-export type ValidationRule = "cnp" | "iban" | "percent" | "text";
+export type ValidationRule = "cnp" | "iban" | "percent" | "text" | "date";
 
 export interface FieldDef {
   key: string;

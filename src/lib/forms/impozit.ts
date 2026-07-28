@@ -39,7 +39,7 @@ export const ITL_001_CLUJ: FormManifest = {
   fields: [
     ...proprietar,
     ...imobilFields,
-    { key: "dataDobandire", label: "Data dobândirii", source: { from: "input", key: "dataDobandire" }, required: true },
+    { key: "dataDobandire", label: "Data dobândirii", source: { from: "input", key: "dataDobandire" }, required: true, validate: "date" },
     { key: "cotaParte", label: "Cotă-parte deținută", source: { from: "input", key: "cotaParte" } },
     { key: "valoareImpozabila", label: "Valoare impozabilă declarată (lei)", source: { from: "input", key: "valoareImpozabila" } },
   ],
@@ -68,7 +68,7 @@ export const ITL_003_CLUJ: FormManifest = {
   fields: [
     ...proprietar,
     ...imobilFields,
-    { key: "dataDobandire", label: "Data dobândirii", source: { from: "input", key: "dataDobandire" }, required: true },
+    { key: "dataDobandire", label: "Data dobândirii", source: { from: "input", key: "dataDobandire" }, required: true, validate: "date" },
     { key: "cotaParte", label: "Cotă-parte deținută", source: { from: "input", key: "cotaParte" } },
     { key: "categoriaFolosinta", label: "Categoria de folosință", source: { from: "input", key: "categoriaFolosinta" }, required: true },
   ],

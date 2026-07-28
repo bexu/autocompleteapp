@@ -4,6 +4,7 @@ import type { Imobil } from "@/lib/imobil/repository";
 import type { FormManifest } from "./manifest";
 import { isValidCnp } from "@/lib/validation/cnp";
 import { isValidIban } from "@/lib/validation/iban";
+import { isValidDate } from "@/lib/validation/date";
 
 export interface FormSources {
   profile: DecryptedProfile | null;
@@ -70,6 +71,8 @@ export function mapForm(
         errors.push({ key: def.key, message: `${def.label} invalid` });
       } else if (def.validate === "iban" && !isValidIban(value)) {
         errors.push({ key: def.key, message: `${def.label} invalid` });
+      } else if (def.validate === "date" && !isValidDate(value)) {
+        errors.push({ key: def.key, message: `${def.label} — dată invalidă` });
       }
     }
 
