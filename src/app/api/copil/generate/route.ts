@@ -13,7 +13,7 @@ import { guardGeneration, RateLimitError, rateLimitResponse } from "@/lib/http/r
 export async function POST(req: Request) {
   try {
     const user = await requireUser();
-    guardGeneration(user.id);
+    await guardGeneration(user.id);
     const body = await req.json().catch(() => ({}));
     const input = COPIL_BODY_SCHEMA.parse(body);
     const result = await generateCopilCase(user.id, input);

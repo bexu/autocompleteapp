@@ -317,3 +317,16 @@ model Imobil {
   @@index([userId])
   @@map("imobil")
 }
+
+// Fereastră de rate-limit (backstop distribuit, partajat între instanțe, pe
+// rutele autentificate de generare). Contor pe fereastră fixă. Cheia e opacă
+// (ex. „gen:<userId>") — FĂRĂ PII. Ferestrele vechi se curăță de jobul de retenție.
+model RateLimitWindow {
+  key         String
+  windowStart DateTime
+  count       Int      @default(0)
+
+  @@id([key, windowStart])
+  @@index([windowStart])
+  @@map("rate_limit_window")
+}

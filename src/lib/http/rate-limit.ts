@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 
-// Limitator simplu per-cheie (fereastră glisantă, in-memory). Backstop împotriva
-// abuzului pe rutele autentificate de generare (creează blob-uri criptate +
-// dosare la fiecare cerere). Limitare cunoscută: în deploy multi-instanță e
-// per-instanță — mutarea pe un store partajat (Redis/Postgres) e task de
-// hardening (H.3). Fără PII: cheia e userId-ul opac.
+// Backstop împotriva abuzului pe rutele autentificate de generare (fiecare cerere
+// creează un blob criptat + un dosar). Cheile sunt opace (ex. „gen:<userId>") —
+// FĂRĂ PII în tabel/loguri.
 
+// --- Variantă in-memory (fereastră glisantă) — folosită în teste + ca fallback.
 const hits = new Map<string, number[]>();
 
 export function checkRateLimit(
@@ -25,6 +24,26 @@ export function checkRateLimit(
   return true;
 }
 
+// --- Variantă distribuită (Postgres, fereastră fixă) — partajată între instanțe.
+// Contor atomic pe (cheie, început-de-fereastră) prin upsert + increment.
+export async function checkRateLimitDb(
+  key: string,
+  max: number,
+  windowMs: number,
+  now: number = Date.now(),
+): Promise<boolean> {
+  // Import lazy: modulul rămâne fără dependență de DB pentru varianta in-memory
+  // (unit tests) — prisma.ts cere DATABASE_URL la încărcare.
+  const { prisma } = await import("@/lib/db/prisma");
+  const windowStart = new Date(Math.floor(now / windowMs) * windowMs);
+  const row = await prisma.rateLimitWindow.upsert({
+    where: { key_windowStart: { key, windowStart } },
+    create: { key, windowStart, count: 1 },
+    update: { count: { increment: 1 } },
+  });
+  return row.count <= max;
+}
+
 // Aruncat de rutele care depășesc pragul; prins ca 429 uniform.
 export class RateLimitError extends Error {
   constructor() {
@@ -33,11 +52,28 @@ export class RateLimitError extends Error {
   }
 }
 
-/** Verifică generarea per-user; aruncă RateLimitError la depășire. */
-export function guardGeneration(userId: string, max = 30, windowMs = 60_000): void {
-  if (!checkRateLimit(`gen:${userId}`, max, windowMs)) {
-    throw new RateLimitError();
-  }
+/**
+ * Verifică generarea per-user (distribuit, Postgres); aruncă RateLimitError la
+ * depășire. Limitare fixed-window: la granița ferestrei se poate ajunge scurt
+ * până la ~2×max — acceptabil pentru un backstop.
+ */
+export async function guardGeneration(
+  userId: string,
+  max = 30,
+  windowMs = 60_000,
+): Promise<void> {
+  const ok = await checkRateLimitDb(`gen:${userId}`, max, windowMs);
+  if (!ok) throw new RateLimitError();
+}
+
+/** Curăță ferestrele expirate (apelat de jobul de retenție). */
+export async function purgeExpiredRateLimitWindows(now: Date = new Date()): Promise<number> {
+  const { prisma } = await import("@/lib/db/prisma");
+  const cutoff = new Date(now.getTime() - 3_600_000); // păstrează ~1h
+  const res = await prisma.rateLimitWindow.deleteMany({
+    where: { windowStart: { lt: cutoff } },
+  });
+  return res.count;
 }
 
 export function rateLimitResponse(): NextResponse {

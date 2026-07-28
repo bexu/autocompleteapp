@@ -3,6 +3,15 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Hardening H.3 — rate-limit distribuit (Postgres), pe branch `feat/m12-dist-ratelimit`.** (2026-07-28)
+- Limiterul de generare (`src/lib/http/rate-limit.ts`) e acum **distribuit**: `checkRateLimitDb` folosește un contor fixed-window în Postgres (model nou `RateLimitWindow`, cheie opacă `gen:<userId>` — fără PII), partajat între instanțe. `guardGeneration` e acum **async** → toate cele 11 rute de generare/semnare fac `await guardGeneration(user.id)`. `checkRateLimit` in-memory rămâne pentru teste/fallback (prisma importat lazy, ca unit-urile să nu ceară DB).
+- Migrare `20260728084149_rate_limit_window` inclusă. Curățarea ferestrelor vechi (>1h) în jobul de retenție.
+- **Rezolvă reziduul din auditul de securitate** (limiter per-instanță → distribuit). Teste: `tests/integration/rate-limit.test.ts` (prag, fereastră nouă, guard, purjare).
+- Verificat: **162 unit + 65 integrare + 29 e2e — verzi**; typecheck + lint curate.
+- ⚠️ Model Prisma nou → `npm run db:migrate` + `npx prisma generate` deja rulate local; CI face `prisma migrate deploy`. Kill dev server înainte de e2e.
+- **Următorul:** H.1 DPIA, H.2 pen-test, H.3 observabilitate (logare structurată cu request-id), H.4 review juridic.
+
+
 **Hardening H.3 — generare atomică cross-formular, pe branch `feat/m11-atomic-tx`.** (2026-07-28)
 - Motorul are acum `generateAndFileForms(userId, optsList)`: generează + validează TOATE PDF-urile (faza 1, fără scriere în DB), apoi persistă tot într-o singură tranzacție `prisma.$transaction` (totul sau nimic — niciun dosar orfan la un eșec de scriere în faza 2). `generateAndFileForm` (singular) + `signForm` sunt și ele tranzacționale.
 - `archiveSignedForm` + `createDossier` acceptă un client de tranzacție opțional (`Prisma.TransactionClient`). Cele 7 servicii multi-formular (auto/copil/somaj/cadastru/deces/pfa/urbanism) folosesc `generateAndFileForms` în loc de bucla faza1-preview/faza2-loop. Deces păstrează verificarea de coerență IBAN înainte de generare.
