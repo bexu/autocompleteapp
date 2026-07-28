@@ -3,6 +3,14 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Urbanism/construcții — implementat, pe branch `feat/m10-urbanism`. ROADMAP FORMULARE COMPLET (1–11).** (2026-07-28)
+- `src/lib/forms/urbanism.ts`: manifeste CERTIFICAT-URBANISM (F.1) + AUTORIZATIE-CONSTRUIRE (F.8), Legea 50/1991, Ordin MDRL 839/2009. **Model cu eveniment** (CERTIFICAT/AUTORIZATIE) + imobilId (ca la cadastru). Solicitantul din profil, imobilul din entitatea Imobil. Valoarea lucrărilor + durata validate numeric; data certificatului ca dată; enum pe scop/tip.
+- `src/lib/urbanism/service.ts` `generateUrbanismCase` (atomic, per eveniment), API `/api/urbanism/generate` (guard auth + rate-limit + Zod), wizard `/dashboard/urbanism` (select imobil + radio eveniment + secțiuni). Link în dashboard.
+- **Grounded prin research workflow** (Legea 50/1991 verificată). sourceUrl = legea (verificată); ISC/ghiseul.ro doar numite în prose (nu rezolvau din CI). F.1/F.8 sunt numere reale de formular oficial; formCode descriptiv.
+- Verificat: **163 unit + 59 integrare + 29 e2e — verzi**; typecheck + lint curate.
+- **Toate cele 11 pachete din roadmap-formulare sunt livrate.** Rămâne: hardening H.1 DPIA, H.2 pen-test, H.3 rate-limit distribuit/observability + tranzacție atomică cross-formular (reziduul cunoscut), H.4 review juridic; extinderi opționale (D212, pensie limită vârstă, alte UAT-uri).
+
+
 **PFA lifecycle (ONRC) — implementat, pe branch `feat/m9-pfa`.** (2026-07-28)
 - `src/lib/forms/pfa.ts`: 3 manifeste — REZERVARE-PFA (11-10-181), INREGISTRARE-PFA (11-10-180 + anexă fiscală), MENTIUNI-PFA (schimbare/modificare CAEN/suspendare/reluare/radiere), OUG 44/2008. **Model cu eveniment** (ca la auto): INFIINTARE → rezervare + înregistrare; MENTIUNE → mențiuni. Titularul din profil; CAEN principal validat ca 4 cifre (Zod).
 - `src/lib/pfa/service.ts` `generatePfaCase` (atomic, per eveniment), API `/api/pfa/generate` (guard auth + rate-limit + Zod), wizard `/dashboard/pfa` (radio eveniment + secțiuni condiționate). Link în dashboard.
