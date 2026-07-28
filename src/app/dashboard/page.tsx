@@ -44,6 +44,7 @@ export default async function DashboardPage() {
         { href: "/dashboard/auto", testid: "link-auto", title: "Dosar auto", desc: "Am cumpărat / am vândut o mașină." },
         { href: "/dashboard/c168", testid: "link-c168", title: "Contract închiriere (C168)", desc: "Declară contractul de locațiune la ANAF." },
         { href: "/dashboard/impozit", testid: "link-impozit", title: "Impozit imobil (ITL-001/003)", desc: "Declară o clădire sau un teren la taxe locale." },
+        { href: "/dashboard/cadastru", testid: "link-cadastru", title: "Cadastru / carte funciară", desc: "Cerere de înscriere în CF + extras (ANCPI)." },
         { href: "/dashboard/copil", testid: "link-copil", title: "Am devenit părinte", desc: "Alocație de stat + indemnizație creștere copil." },
         { href: "/dashboard/somaj", testid: "link-somaj", title: "Am rămas fără loc de muncă", desc: "Înregistrare ANOFM + cerere indemnizație de șomaj." },
         { href: "/dashboard/petitii", testid: "link-petitii", title: "Petiție / sesizare", desc: "Cerere oficială către o instituție publică." },

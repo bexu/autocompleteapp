@@ -3,6 +3,16 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Dosar cadastru/CF (ANCPI) — implementat, pe branch `feat/m7-cadastru`.** (2026-07-28)
+- `src/lib/forms/cadastru.ts`: manifeste CERERE-INSCRIERE-CF (Anexa 5, Legea 7/1996, ODG ANCPI 600/2023) + EXTRAS-CF (pas dosar/link). Solicitantul din profil, imobilul din entitatea Imobil (imobilId, ca la impozit/C168), operațiunea (enum intabulare/notare/radiere/…) + actul justificativ ca inputuri. **Grounded prin research workflow.**
+- `src/lib/cadastru/service.ts` `generateCadastruCase` (atomic), API `/api/cadastru/generate` (guard auth + rate-limit + Zod), wizard `/dashboard/cadastru` (select imobil + secțiuni). Link în dashboard.
+- **sourceUrl doar URL-uri verificate** (www.ancpi.ro, legislatie) — subdomeniile ePay/MyEterra/geoportal NU rezolvă din acest env, deci sunt DOAR numite în instrucțiuni, nu puse ca `url:` (guardrail „nu inventa surse").
+- **Bug prins la review+e2e:** enum opțional dintr-un `<select>` cu „—" trimite "" → `z.enum().optional()` îl respingea. Fix: helper `optionalEnum` (preprocess ""→undefined) în cadastru.ts.
+- **Review adversarial (workflow): 2 constatări reparate.** (1) HIGH pre-existent în slice-ul VEHICUL: `combustibil: z.enum().optional()` bloca salvarea când nu se alegea combustibil („Alege..."→"") — fix cu preprocess în `vehicle/schema.ts` + test unit + e2e „fără combustibil ales". (2) cadastru cerea `imobilJudet` deși e opțional pe entitate → mesaj confuz; aliniat cu impozit (doar `imobilUAT`/localitate obligatoriu).
+- Verificat: **147 unit + 50 integrare + 21 e2e — verzi**; typecheck + lint curate.
+- **Următorul (roadmap rămas): pensie/deces, PFA lifecycle, urbanism; hardening H.1 DPIA, H.2 pen-test, H.3 rate-limit distribuit/observability, H.4 legal review.**
+
+
 **Dosar șomaj (ANOFM) + validări de input — implementat, pe branch `feat/m6-somaj`.** (2026-07-28)
 - `src/lib/forms/somaj.ts`: manifeste INREGISTRARE-ANOFM (fișa PCLM, Anexa 1) + SOMAJ (cerere indemnizație, Anexa 3), naționale. Solicitantul din profil; restul ca inputuri. **Grounded prin research workflow** (Legea 76/2002, Ordin ANOFM 85/2002); `sourceUrl` = pagini oficiale anofm.ro *verificate că rezolvă*, `sourceSha256` null până la PDF-ul oficial. Guardrail respectat: NU calculăm eligibilitate/stagiu/cuantum (unealtă, nu consultant).
 - `src/lib/somaj/service.ts` `generateSomajCase` (atomic), API `/api/somaj/generate` (guard auth + rate-limit + Zod), wizard `/dashboard/somaj` (secțiuni: studii / încetare / indemnizație). Link în dashboard.
