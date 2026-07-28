@@ -3,6 +3,15 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Dosar deces în familie (CNPP) — implementat, pe branch `feat/m8-deces`.** (2026-07-28)
+- `src/lib/forms/deces.ts`: manifeste AJUTOR-DECES (Anexa 11) + PENSIE-URMAS (Anexa 7), Legea 360/2023. Solicitantul (membrul supraviețuitor) din profil; **datele decedatului (nume, CNP, certificat) ca inputuri — NU persistate** (ca la copil child-CNP). Enum-uri pe calități/plată/cauză; validare dată+CNP. **Grounded prin research workflow** (surse cnpp.ro verificate).
+- `src/lib/deces/service.ts` `generateDecesCase` (atomic), API `/api/deces/generate` (guard auth + rate-limit + Zod), wizard `/dashboard/deces` (secțiuni: decedat / certificat / ajutor / urmaș). Link în dashboard.
+- **Refactor:** `optionalEnum` + `optionalDateString` extrase în `src/lib/validation/zod.ts` (reutilizate de cadastru + deces).
+- Guardrail: unealtă-nu-consultant — NU calculăm cuantumul ajutorului (setat anual prin legea bugetului); doar completăm mecanic.
+- Verificat: **152 unit + 52 integrare + 23 e2e — verzi**; typecheck + lint curate.
+- **Următorul (roadmap rămas): PFA lifecycle, urbanism; hardening H.1 DPIA, H.2 pen-test, H.3 rate-limit distribuit/observability, H.4 legal review.**
+
+
 **Dosar cadastru/CF (ANCPI) — implementat, pe branch `feat/m7-cadastru`.** (2026-07-28)
 - `src/lib/forms/cadastru.ts`: manifeste CERERE-INSCRIERE-CF (Anexa 5, Legea 7/1996, ODG ANCPI 600/2023) + EXTRAS-CF (pas dosar/link). Solicitantul din profil, imobilul din entitatea Imobil (imobilId, ca la impozit/C168), operațiunea (enum intabulare/notare/radiere/…) + actul justificativ ca inputuri. **Grounded prin research workflow.**
 - `src/lib/cadastru/service.ts` `generateCadastruCase` (atomic), API `/api/cadastru/generate` (guard auth + rate-limit + Zod), wizard `/dashboard/cadastru` (select imobil + secțiuni). Link în dashboard.

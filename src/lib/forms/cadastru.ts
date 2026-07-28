@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { FieldDef, FormManifest } from "./manifest";
 import { registerManifest } from "./manifest";
-import { isValidDate } from "@/lib/validation/date";
+import { optionalDateString, optionalEnum } from "@/lib/validation/zod";
 
 // Dosar cadastru / carte funciară (ANCPI/OCPI, Legea 7/1996; formularul „Cerere
 // de înscriere" = Anexa 5 la Regulamentul aprobat prin ODG ANCPI 600/2023).
@@ -117,12 +117,6 @@ export const EXTRAS_CF_MANIFEST: FormManifest = {
   ],
 };
 
-// Enum opțional venit dintr-un <select>: un „—" trimite "" (nu undefined), deci
-// tratăm "" ca „necompletat" înainte de validarea enum-ului.
-function optionalEnum<T extends readonly [string, ...string[]]>(values: T) {
-  return z.preprocess((v) => (v === "" ? undefined : v), z.enum(values).optional());
-}
-
 // Validare la granița dosarului de cadastru. imobilId identifică proprietatea;
 // enum pe felul înscrierii / comunicare / regim / scop extras; dată pe actData.
 export const CadastruBodySchema = z.object({
@@ -131,11 +125,7 @@ export const CadastruBodySchema = z.object({
   descriereDrept: z.string().max(500).optional(),
   actTip: z.string().max(200).optional(),
   actNumar: z.string().max(60).optional(),
-  actData: z
-    .string()
-    .max(30)
-    .refine((v) => v === "" || isValidDate(v), "dată invalidă")
-    .optional(),
+  actData: optionalDateString,
   actEmitent: z.string().max(200).optional(),
   modComunicare: optionalEnum(MOD_COMUNICARE),
   regimSolutionare: optionalEnum(REGIM_SOLUTIONARE),

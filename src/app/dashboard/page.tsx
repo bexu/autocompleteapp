@@ -47,6 +47,7 @@ export default async function DashboardPage() {
         { href: "/dashboard/cadastru", testid: "link-cadastru", title: "Cadastru / carte funciară", desc: "Cerere de înscriere în CF + extras (ANCPI)." },
         { href: "/dashboard/copil", testid: "link-copil", title: "Am devenit părinte", desc: "Alocație de stat + indemnizație creștere copil." },
         { href: "/dashboard/somaj", testid: "link-somaj", title: "Am rămas fără loc de muncă", desc: "Înregistrare ANOFM + cerere indemnizație de șomaj." },
+        { href: "/dashboard/deces", testid: "link-deces", title: "Deces în familie", desc: "Ajutor de deces + pensie de urmaș (CNPP)." },
         { href: "/dashboard/petitii", testid: "link-petitii", title: "Petiție / sesizare", desc: "Cerere oficială către o instituție publică." },
       ],
     },
