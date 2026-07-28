@@ -3,6 +3,14 @@
 > Actualizează la sfârșitul fiecărei sesiuni, ca următoarea (AI sau om) să reia rapid.
 
 ## Unde am rămas
+**Hardening H.3 — generare atomică cross-formular, pe branch `feat/m11-atomic-tx`.** (2026-07-28)
+- Motorul are acum `generateAndFileForms(userId, optsList)`: generează + validează TOATE PDF-urile (faza 1, fără scriere în DB), apoi persistă tot într-o singură tranzacție `prisma.$transaction` (totul sau nimic — niciun dosar orfan la un eșec de scriere în faza 2). `generateAndFileForm` (singular) + `signForm` sunt și ele tranzacționale.
+- `archiveSignedForm` + `createDossier` acceptă un client de tranzacție opțional (`Prisma.TransactionClient`). Cele 7 servicii multi-formular (auto/copil/somaj/cadastru/deces/pfa/urbanism) folosesc `generateAndFileForms` în loc de bucla faza1-preview/faza2-loop. Deces păstrează verificarea de coerență IBAN înainte de generare.
+- **Rezolvă reziduul low semnalat la review-ul PFA** (generarea nu era tranzacțională între formulare). Test nou `tests/integration/atomic-generation.test.ts` (all-or-nothing).
+- Verificat: **163 unit + 61 integrare + 29 e2e — verzi**; typecheck + lint curate.
+- **Următorul:** restul de hardening — H.1 DPIA, H.2 pen-test, H.3 observabilitate/rate-limit distribuit, H.4 review juridic; extinderi opționale (D212, pensie limită de vârstă, alte UAT-uri).
+
+
 **Urbanism/construcții — implementat, pe branch `feat/m10-urbanism`. ROADMAP FORMULARE COMPLET (1–11).** (2026-07-28)
 - `src/lib/forms/urbanism.ts`: manifeste CERTIFICAT-URBANISM (F.1) + AUTORIZATIE-CONSTRUIRE (F.8), Legea 50/1991, Ordin MDRL 839/2009. **Model cu eveniment** (CERTIFICAT/AUTORIZATIE) + imobilId (ca la cadastru). Solicitantul din profil, imobilul din entitatea Imobil. Valoarea lucrărilor + durata validate numeric; data certificatului ca dată; enum pe scop/tip.
 - `src/lib/urbanism/service.ts` `generateUrbanismCase` (atomic, per eveniment), API `/api/urbanism/generate` (guard auth + rate-limit + Zod), wizard `/dashboard/urbanism` (select imobil + radio eveniment + secțiuni). Link în dashboard.

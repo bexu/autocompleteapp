@@ -1,7 +1,12 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 
 // Dosare: starea de depunere a unui formular. „generate, don't submit" — userul
 // declară „depus"; noi nu depunem în locul lui.
+
+// Scrierile acceptă un client de tranzacție opțional, ca generarea unui set de
+// formulare (ex. dosar auto/deces) să fie atomică — totul sau nimic.
+type Db = Prisma.TransactionClient | typeof prisma;
 
 export const DOSSIER_STATUS = ["DE_DEPUS", "DEPUS"] as const;
 export type DossierStatus = (typeof DOSSIER_STATUS)[number];
@@ -27,8 +32,9 @@ export async function createDossier(
     deadline?: string | null;
     deadlineAt?: Date | null;
   },
+  db: Db = prisma,
 ): Promise<DossierMeta> {
-  const row = await prisma.dossier.create({
+  const row = await db.dossier.create({
     data: {
       userId,
       formCode: input.formCode,
