@@ -29,3 +29,24 @@ test("gestionare vehicule: adaugă și șterge", async ({ page }) => {
   await page.getByTestId("vehicule-list").getByRole("button", { name: "șterge" }).first().click();
   await expect(page.getByTestId("vehicule-list")).not.toContainText("BMW 320d");
 });
+
+// Regresie: combustibilul e opțional — a-l lăsa pe „Alege..." NU trebuie să
+// blocheze salvarea (un <select> gol trimite "", nu undefined).
+test("gestionare vehicule: salvează fără combustibil ales", async ({ page }) => {
+  const email = `e2e_veh_nofuel_${Date.now()}_${Math.floor(Math.random() * 1e6)}@example.com`;
+  await page.goto("/signup");
+  await page.getByTestId("name").fill("Veh NoFuel");
+  await page.getByTestId("email").fill(email);
+  await page.getByTestId("password").fill("parola-tare-123");
+  await page.getByTestId("submit").click();
+  await expect(page).toHaveURL(/\/dashboard/);
+
+  await page.goto("/dashboard/vehicule");
+  await page.getByTestId("v-marca").fill("Dacia");
+  await page.getByTestId("v-model").fill("Sandero");
+  await page.getByTestId("v-nr").fill("CJ 99 XYZ");
+  // NU alegem combustibil — rămâne pe „Alege...".
+  await page.getByTestId("v-add").click();
+
+  await expect(page.getByTestId("vehicule-list")).toContainText("Dacia Sandero");
+});

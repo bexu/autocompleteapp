@@ -44,7 +44,12 @@ export const VehiculInput = z.object({
     (v) => (v === "" || v === null ? undefined : v),
     z.coerce.number().int().min(1900).max(2100).optional(),
   ),
-  combustibil: z.enum(COMBUSTIBIL).optional(),
+  // Un <select> cu „Alege..." trimite "" (nu undefined) → tratăm "" ca necompletat
+  // înainte de enum, altfel un combustibil neales ar bloca salvarea (opțional).
+  combustibil: z.preprocess(
+    (v) => (v === "" || v === null ? undefined : v),
+    z.enum(COMBUSTIBIL).optional(),
+  ),
   normaPoluare: z.string().max(30).optional(),
   emisiiCo2GKm: posInt,
   putereKw: posInt,
