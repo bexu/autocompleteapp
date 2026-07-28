@@ -50,7 +50,7 @@
 5. **Dosar copil** ✅ — alocație de stat + indemnizație creștere copil (datele copilului/angajatorului ca inputuri, nu persistăm CNP-ul copilului). Stimulentul/adeverințele/declarațiile suplimentare rămân extindere ulterioară.
 6. **Petiții universale** ✅ — PetitionBuilder comun (OG 27/2002) cu instituție + subiect + conținut + solicitare; petentul din profil.
 7. **Dosar șomaj (ANOFM)** ✅ — înregistrare ca persoană în căutarea unui loc de muncă (fișa PCLM, Anexa 1) + cerere indemnizație de șomaj (Anexa 3), Legea 76/2002. Solicitantul din profil; restul ca inputuri, cu validare de format (dată, enum plată). Primele ANOFM rămân extindere ulterioară.
-8. **Cadastru/CF** — înscriere, radiere, eroare materială, copii.
+8. **Cadastru/CF** ✅ — cerere de înscriere în cartea funciară (Anexa 5, Legea 7/1996, ODG ANCPI 600/2023): intabulare/notare/radiere/înscriere provizorie/actualizare/îndreptare eroare ca enum + act justificativ; reutilizează entitatea Imobil. Extras CF = pas de tip dosar/link către portalul ANCPI (ePay/MyEterra).
 9. **Dosar pensie/deces.**
 10. **PFA lifecycle.**
 11. **Urbanism/construcții.**
