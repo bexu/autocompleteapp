@@ -28,6 +28,7 @@ test("upload CI → OCR → confirmare → profil pre-completat", async ({ page 
     mimeType: "text/plain",
     buffer: Buffer.from(MRZ, "utf8"),
   });
+  await page.getByTestId("acord-scan").check();
   await page.getByTestId("upload").click();
 
   // OCR a extras câmpurile → sunt pre-completate în formularul de confirmare.

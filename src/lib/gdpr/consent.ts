@@ -77,3 +77,23 @@ export async function getConsentStatus(userId: string): Promise<ConsentStatus[]>
     };
   });
 }
+
+/** Ridicată când o prelucrare cere un consimțământ care nu e (sau nu mai e) activ. */
+export class ConsentRequiredError extends Error {
+  constructor(public readonly category: ConsentCategory) {
+    super(`Consimțământ necesar: ${category}`);
+    this.name = "ConsentRequiredError";
+  }
+}
+
+/**
+ * Poartă de prelucrare: aruncă dacă userul nu a acordat (sau și-a retras)
+ * consimțământul pentru categoria cerută. GDPR art. 7(3) — retragerea trebuie
+ * să oprească prelucrarea, nu doar să scrie un rând în registru.
+ */
+export async function requireConsent(
+  userId: string,
+  category: ConsentCategory,
+): Promise<void> {
+  if (!(await hasConsent(userId, category))) throw new ConsentRequiredError(category);
+}

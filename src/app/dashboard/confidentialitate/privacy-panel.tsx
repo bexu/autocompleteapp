@@ -57,11 +57,20 @@ export function PrivacyPanel({ initial }: { initial: Consent[] }) {
       <div className="page-head">
         <p className="eyebrow">Datele tale</p>
         <h1 className="page-title">Confidențialitate</h1>
-        <p className="lead">Controlezi ce prelucrăm și îți poți lua sau șterge datele oricând.</p>
+        <p className="lead">
+          Controlezi ce prelucrăm și îți poți lua sau șterge datele oricând.{" "}
+          <a href="/confidentialitate" className="btn-link" data-testid="link-politica">
+            Politica de confidențialitate ↗
+          </a>
+        </p>
       </div>
 
       <div className="card card--pad">
         <p className="section-label" style={{ marginTop: 0 }}>Consimțământ per categorie</p>
+        <p className="muted" style={{ fontSize: "var(--fs-sm)", marginTop: "-0.3rem" }}>
+          Retragerea opreşte prelucrarea pe viitor: fără acordul „Documente” nu mai poți
+          încărca scanuri, iar cele existente se șterg la termenul de retenție.
+        </p>
         <div className="stack--sm" style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
           {consents.map((c) => (
             <label key={c.category} className="checkbox-row" style={{ color: "var(--ink)" }}>

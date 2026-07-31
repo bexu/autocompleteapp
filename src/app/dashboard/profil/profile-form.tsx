@@ -3,7 +3,18 @@
 import { useState } from "react";
 
 interface Props {
-  initial: { nume: string; prenume: string; telefon: string };
+  initial: {
+    nume: string;
+    prenume: string;
+    telefon: string;
+    // Domiciliul — folosit de aproape toate formularele (adresa contribuabilului
+    // /solicitantului). Fără el, actele se generează cu adresa goală.
+    judet: string;
+    localitate: string;
+    strada: string;
+    nr: string;
+    codPostal: string;
+  };
   cnpMask: string | null;
   ibanMask: string | null;
 }
@@ -29,6 +40,20 @@ export function ProfileForm({ initial, cnpMask, ibanMask }: Props) {
     const iban = String(form.get("iban") ?? "").trim();
     if (cnp) payload.cnp = cnp;
     if (iban) payload.iban = iban;
+
+    // Domiciliul (adresa 0 din profil) — sursa pentru câmpurile de adresă din
+    // formulare. Trimis doar dacă userul a completat ceva.
+    const adresa = {
+      tip: "DOMICILIU" as const,
+      judet: String(form.get("judet") ?? "").trim(),
+      localitate: String(form.get("localitate") ?? "").trim(),
+      strada: String(form.get("strada") ?? "").trim(),
+      nr: String(form.get("nr") ?? "").trim(),
+      codPostal: String(form.get("codPostal") ?? "").trim(),
+    };
+    if (Object.values(adresa).some((v) => v && v !== "DOMICILIU")) {
+      payload.addresses = [adresa];
+    }
 
     const res = await fetch("/api/profile", {
       method: "PUT",
@@ -71,7 +96,36 @@ export function ProfileForm({ initial, cnpMask, ibanMask }: Props) {
           </div>
           <div className="field">
             <label className="field__label" htmlFor="pf-telefon">Telefon</label>
-            <input id="pf-telefon" className="input" name="telefon" defaultValue={initial.telefon} data-testid="telefon" />
+            <input id="pf-telefon" className="input" name="telefon" defaultValue={initial.telefon} inputMode="tel" data-testid="telefon" />
+          </div>
+
+          <p className="section-label">Domiciliu</p>
+          <p className="muted" style={{ fontSize: "var(--fs-sm)", marginTop: "-0.3rem" }}>
+            Apare ca adresă a solicitantului pe aproape toate formularele.
+          </p>
+          <div className="grid-2">
+            <div className="field">
+              <label className="field__label" htmlFor="pf-judet">Județ</label>
+              <input id="pf-judet" className="input" name="judet" defaultValue={initial.judet} data-testid="judet" />
+            </div>
+            <div className="field">
+              <label className="field__label" htmlFor="pf-localitate">Localitate</label>
+              <input id="pf-localitate" className="input" name="localitate" defaultValue={initial.localitate} data-testid="localitate" />
+            </div>
+          </div>
+          <div className="grid-2">
+            <div className="field">
+              <label className="field__label" htmlFor="pf-strada">Stradă</label>
+              <input id="pf-strada" className="input" name="strada" defaultValue={initial.strada} data-testid="strada" />
+            </div>
+            <div className="field">
+              <label className="field__label" htmlFor="pf-nr">Număr</label>
+              <input id="pf-nr" className="input" name="nr" defaultValue={initial.nr} data-testid="nr" />
+            </div>
+          </div>
+          <div className="field">
+            <label className="field__label" htmlFor="pf-cp">Cod poștal <span className="muted">(opțional)</span></label>
+            <input id="pf-cp" className="input input--mono" name="codPostal" defaultValue={initial.codPostal} inputMode="numeric" maxLength={6} data-testid="cod-postal" />
           </div>
           <div className="field">
             <label className="field__label" htmlFor="pf-cnp">

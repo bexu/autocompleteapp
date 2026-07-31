@@ -8,6 +8,8 @@ import {
   type DocumentType,
 } from "@/lib/documents/repository";
 import { getOcrProvider, type IdCardFields } from "@/lib/ocr/provider";
+import { ConsentRequiredError, requireConsent } from "@/lib/gdpr/consent";
+import { guardGeneration, RateLimitError } from "@/lib/http/rate-limit";
 import { logger } from "@/lib/log/logger";
 
 // Upload document → stocare criptată + (pentru CI) extragere OCR. NU salvează
@@ -32,12 +34,26 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const user = await requireUser();
+    // Upload-ul e o prelucrare costisitoare (criptare + OCR) → plafonat ca
+    // rutele de generare.
+    await guardGeneration(user.id);
+    // Scanurile se prelucrează pe bază de consimțământ (GDPR art. 6(1)(a));
+    // retras → nu mai acceptăm documente (art. 7(3)).
+    await requireConsent(user.id, "DOCUMENTE");
+
+    // Refuzăm mărimea ÎNAINTE de a citi corpul, nu după ce l-am bufferizat.
+    const declared = Number(req.headers.get("content-length") ?? 0);
+    if (declared > MAX_DOCUMENT_BYTES * 2) return bad("Fișier prea mare.", 413);
+
     const form = await req.formData();
     const file = form.get("file");
     const tip = String(form.get("tip") ?? "");
 
     if (!(file instanceof File)) return bad("Fișier lipsă.");
     if (!(DOCUMENT_TYPES as readonly string[]).includes(tip)) return bad("Tip invalid.");
+    // `File.size` e cunoscut fără a materializa conținutul.
+    if (file.size === 0) return bad("Fișier gol.");
+    if (file.size > MAX_DOCUMENT_BYTES) return bad("Fișier prea mare.", 413);
 
     const bytes = Buffer.from(await file.arrayBuffer());
     if (bytes.length === 0) return bad("Fișier gol.");
@@ -59,6 +75,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ document: meta, extracted });
   } catch (e) {
     if (e instanceof UnauthorizedError) return bad("neautentificat", 401);
+    if (e instanceof RateLimitError) return bad("prea multe cereri", 429);
+    if (e instanceof ConsentRequiredError) {
+      return NextResponse.json(
+        { error: "consimțământ necesar", category: e.category },
+        { status: 403 },
+      );
+    }
     logger.error("Eroare la POST /api/documents", {});
     return bad("eroare internă", 500);
   }

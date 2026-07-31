@@ -15,6 +15,8 @@ export default async function ProfilPage() {
   if (!session) redirect("/login");
 
   const p = await getProfile(session.user.id);
+  // getProfile sortează adresele cu DOMICILIU pe poziția 0 (vezi repository).
+  const dom = p?.addresses?.[0];
 
   return (
     <ProfileForm
@@ -22,6 +24,11 @@ export default async function ProfilPage() {
         nume: p?.nume ?? "",
         prenume: p?.prenume ?? "",
         telefon: p?.telefon ?? "",
+        judet: dom?.judet ?? "",
+        localitate: dom?.localitate ?? "",
+        strada: dom?.strada ?? "",
+        nr: dom?.nr ?? "",
+        codPostal: dom?.codPostal ?? "",
       }}
       cnpMask={maskTail(p?.cnp ?? null)}
       ibanMask={maskTail(p?.iban ?? null)}
