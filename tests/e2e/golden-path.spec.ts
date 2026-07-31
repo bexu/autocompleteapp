@@ -30,6 +30,7 @@ test("felia 230 completă: onboarding → 230 → preview → semnat → handoff
     mimeType: "text/plain",
     buffer: Buffer.from(MRZ, "utf8"),
   });
+  await page.getByTestId("acord-scan").check();
   await page.getByTestId("upload").click();
   await expect(page.getByTestId("f-cnp")).toHaveValue("1960101223143");
   await expect(page.getByTestId("f-nume")).toHaveValue("IONESCU");

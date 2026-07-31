@@ -52,10 +52,26 @@ export function OnboardingUpload() {
     setBusy(true);
     const form = new FormData(e.currentTarget);
     form.set("tip", "CI");
+
+    // Scanurile se prelucrează pe bază de consimțământ — îl acordăm explicit,
+    // pe baza bifei din formular, înainte de a trimite fișierul.
+    await fetch("/api/gdpr/consent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ category: "DOCUMENTE", action: "grant" }),
+    });
+
     const res = await fetch("/api/documents", { method: "POST", body: form });
     setBusy(false);
     if (!res.ok) {
-      setError("Încărcare eșuată.");
+      const b = await res.json().catch(() => ({}));
+      setError(
+        res.status === 403
+          ? "Ai nevoie de acordul pentru prelucrarea scanurilor (Confidențialitate)."
+          : res.status === 413
+            ? "Fișierul e prea mare (max. 8 MB)."
+            : `Încărcare eșuată${b.error ? ": " + b.error : "."}`,
+      );
       return;
     }
     const data = await res.json();
@@ -126,6 +142,14 @@ export function OnboardingUpload() {
               <label className="field__label" htmlFor="ob-file">Fișier CI (zona MRZ ca text, sau scan)</label>
               <input id="ob-file" className="input" type="file" name="file" required data-testid="file" />
             </div>
+            <label className="row" style={{ gap: "0.5rem", alignItems: "flex-start" }}>
+              <input type="checkbox" required data-testid="acord-scan" style={{ accentColor: "var(--accent)", marginTop: "0.2rem" }} />
+              <span style={{ fontSize: "var(--fs-sm)" }}>
+                Sunt de acord cu prelucrarea scanului pentru extragerea datelor. Scanul se
+                stochează criptat și se șterge automat după 30 de zile. Îți poți retrage
+                acordul oricând din <a href="/dashboard/confidentialitate" className="btn-link">Confidențialitate</a>.
+              </span>
+            </label>
             <div className="form-actions">
               <button type="submit" className="btn btn--primary" disabled={busy} data-testid="upload">
                 {busy ? "Se procesează..." : "Încarcă și extrage"}

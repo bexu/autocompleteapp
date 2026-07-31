@@ -53,10 +53,24 @@ export function VehiculePanel({ initial }: { initial: Vehicul[] }) {
     setBusy(true);
     const fd = new FormData();
     fd.set("file", file);
+
+    // Scanul se prelucrează pe bază de consimțământ (bifa de mai jos).
+    await fetch("/api/gdpr/consent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ category: "DOCUMENTE", action: "grant" }),
+    });
+
     const res = await fetch("/api/vehicule/ocr", { method: "POST", body: fd });
     setBusy(false);
     if (!res.ok) {
-      setError("Nu am putut citi CIV-ul. Completează manual.");
+      setError(
+        res.status === 403
+          ? "Ai nevoie de acordul pentru prelucrarea scanurilor (Confidențialitate)."
+          : res.status === 413
+            ? "Fișierul e prea mare (max. 8 MB)."
+            : "Nu am putut citi CIV-ul. Completează manual.",
+      );
       return;
     }
     const { extracted } = await res.json();
@@ -145,6 +159,10 @@ export function VehiculePanel({ initial }: { initial: Vehicul[] }) {
             Ai certificatul de înmatriculare (CIV)? Încarcă-l ca să pre-completăm câmpurile:{" "}
             <input type="file" onChange={onCivUpload} disabled={busy} data-testid="civ-file" />
           </label>
+          <span style={{ display: "block", fontSize: "var(--fs-sm)", marginTop: "0.4rem" }} className="muted">
+            Prin încărcare ești de acord cu prelucrarea scanului pentru extragerea datelor;
+            se stochează criptat și se șterge automat după 30 de zile.
+          </span>
         </div>
 
         <form onSubmit={onAdd} className="form">
