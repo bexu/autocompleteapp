@@ -9,7 +9,12 @@ import { logger } from "@/lib/log/logger";
 // logăm doar metoda, calea (fără query), status, durată, requestId. Logger-ul
 // aplică oricum `redact` pe tot ce iese.
 
-type RouteHandler = (req: Request) => Promise<Response> | Response;
+// Handler de rută; `Ctx` acoperă argumentele suplimentare ale rutelor dinamice
+// (ex. `{ params }` la /api/dossiers/[id]/...).
+type RouteHandler<Ctx extends unknown[] = []> = (
+  req: Request,
+  ...rest: Ctx
+) => Promise<Response> | Response;
 
 function pathOf(url: string): string {
   try {
@@ -26,12 +31,15 @@ function resolveRequestId(header: string | null): string {
   return header && /^[\w.-]{1,128}$/.test(header) ? header : randomUUID();
 }
 
-export function observe(name: string, handler: RouteHandler): RouteHandler {
-  return async (req: Request): Promise<Response> => {
+export function observe<Ctx extends unknown[] = []>(
+  name: string,
+  handler: RouteHandler<Ctx>,
+): RouteHandler<Ctx> {
+  return async (req: Request, ...rest: Ctx): Promise<Response> => {
     const requestId = resolveRequestId(req.headers.get("x-request-id"));
     const start = Date.now();
     try {
-      const res = await handler(req);
+      const res = await handler(req, ...rest);
       res.headers.set("x-request-id", requestId);
       logger.info("api_request", {
         route: name,
