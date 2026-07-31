@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { apiErrorItems, apiErrorTitle, type ApiErrorBody } from "@/lib/forms/error-text";
 
 interface ImobilOpt { id: string; label: string; }
 interface FormResult { formCode: string; title: string; dossierId: string; }
@@ -17,7 +18,7 @@ const AUT_KEYS = ["tipLucrare", "descriereLucrare", "valoareLucrari", "certifica
 export function UrbanismWizard({ imobile, enums }: { imobile: ImobilOpt[]; enums: Enums }) {
   const [event, setEvent] = useState<"CERTIFICAT" | "AUTORIZATIE">("CERTIFICAT");
   const [result, setResult] = useState<CaseResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ title: string; items: string[] } | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -35,12 +36,8 @@ export function UrbanismWizard({ imobile, enums }: { imobile: ImobilOpt[]; enums
     });
     setBusy(false);
     if (!res.ok) {
-      const b = await res.json().catch(() => ({}));
-      setError(
-        b.error === "validare"
-          ? "Verifică profilul, imobilul și câmpurile obligatorii: " + (b.fields ?? []).join(", ")
-          : "Generare eșuată: " + (b.error ?? ""),
-      );
+      const b: ApiErrorBody = await res.json().catch(() => ({}));
+      setError({ title: apiErrorTitle(b), items: apiErrorItems(b) });
       return;
     }
     setResult(await res.json());
@@ -156,7 +153,7 @@ export function UrbanismWizard({ imobile, enums }: { imobile: ImobilOpt[]; enums
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="u-val">Valoarea lucrărilor (lei)</label>
-                  <input id="u-val" className="input input--mono" name="valoareLucrari" placeholder="150000" required data-testid="valoare-lucrari" />
+                  <input id="u-val" className="input input--mono" name="valoareLucrari" inputMode="decimal" placeholder="150000" required data-testid="valoare-lucrari" />
                 </div>
               </div>
               <div className="field">
@@ -170,7 +167,7 @@ export function UrbanismWizard({ imobile, enums }: { imobile: ImobilOpt[]; enums
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="u-cdata">Certificat urbanism — dată</label>
-                  <input id="u-cdata" className="input input--mono" name="certificatUrbanismData" placeholder="2026-05-10" required data-testid="cert-data" />
+                  <input id="u-cdata" type="date" className="input input--mono" name="certificatUrbanismData" required data-testid="cert-data" />
                 </div>
               </div>
               <div className="grid-2">
@@ -180,7 +177,7 @@ export function UrbanismWizard({ imobile, enums }: { imobile: ImobilOpt[]; enums
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="u-dur">Durata execuției (luni) <span className="muted">(opțional)</span></label>
-                  <input id="u-dur" className="input input--mono" name="durataExecutieLuni" placeholder="12" data-testid="durata" />
+                  <input id="u-dur" className="input input--mono" name="durataExecutieLuni" inputMode="numeric" maxLength={3} placeholder="12" data-testid="durata" />
                 </div>
               </div>
             </>
@@ -191,9 +188,16 @@ export function UrbanismWizard({ imobile, enums }: { imobile: ImobilOpt[]; enums
           </button>
         </form>
         {error && (
-          <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
-            {error}
-          </p>
+          <div role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
+            <strong>{error.title}</strong>
+            {error.items.length > 0 && (
+              <ul style={{ margin: "0.4rem 0 0", paddingLeft: "1.1rem" }}>
+                {error.items.map((it) => (
+                  <li key={it}>{it}</li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </div>
     </main>

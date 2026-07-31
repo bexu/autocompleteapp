@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { apiErrorItems, apiErrorTitle, type ApiErrorBody } from "@/lib/forms/error-text";
 
 interface VehiculOpt {
   id: string;
@@ -22,7 +23,7 @@ interface CaseResult {
 export function AutoWizard({ vehicule }: { vehicule: VehiculOpt[] }) {
   const [event, setEvent] = useState<"VANZARE" | "CUMPARARE">("VANZARE");
   const [result, setResult] = useState<CaseResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ title: string; items: string[] } | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -45,12 +46,8 @@ export function AutoWizard({ vehicule }: { vehicule: VehiculOpt[] }) {
     });
     setBusy(false);
     if (!res.ok) {
-      const b = await res.json().catch(() => ({}));
-      setError(
-        b.error === "validare"
-          ? "Completează profilul și datele vehiculului: " + (b.fields ?? []).join(", ")
-          : "Generare eșuată: " + (b.error ?? ""),
-      );
+      const b: ApiErrorBody = await res.json().catch(() => ({}));
+      setError({ title: apiErrorTitle(b), items: apiErrorItems(b) });
       return;
     }
     setResult(await res.json());
@@ -149,17 +146,17 @@ export function AutoWizard({ vehicule }: { vehicule: VehiculOpt[] }) {
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="aw-ccnp">Cumpărător — CNP</label>
-                  <input id="aw-ccnp" className="input input--mono" name="contrapartaCnp" placeholder="13 cifre" required data-testid="contraparta-cnp" />
+                  <input id="aw-ccnp" className="input input--mono" name="contrapartaCnp" inputMode="numeric" maxLength={13} pattern="\d{13}" required data-testid="contraparta-cnp" />
                 </div>
               </div>
               <div className="grid-2">
                 <div className="field">
                   <label className="field__label" htmlFor="aw-pret">Preț (lei)</label>
-                  <input id="aw-pret" className="input input--mono" name="pret" placeholder="15000" required data-testid="pret" />
+                  <input id="aw-pret" className="input input--mono" name="pret" inputMode="decimal" placeholder="15000" required data-testid="pret" />
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="aw-data">Data tranzacției</label>
-                  <input id="aw-data" className="input input--mono" name="data" placeholder="2026-03-01" required data-testid="data" />
+                  <input id="aw-data" type="date" className="input input--mono" name="data" required data-testid="data" />
                 </div>
               </div>
             </>
@@ -170,9 +167,16 @@ export function AutoWizard({ vehicule }: { vehicule: VehiculOpt[] }) {
           </button>
         </form>
         {error && (
-          <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
-            {error}
-          </p>
+          <div role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
+            <strong>{error.title}</strong>
+            {error.items.length > 0 && (
+              <ul style={{ margin: "0.4rem 0 0", paddingLeft: "1.1rem" }}>
+                {error.items.map((it) => (
+                  <li key={it}>{it}</li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </div>
     </main>

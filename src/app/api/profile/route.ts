@@ -33,9 +33,10 @@ function handleError(e: unknown, op: string): NextResponse {
     return NextResponse.json({ error: "neautentificat" }, { status: 401 });
   }
   if (e instanceof ZodError) {
-    // Doar path-urile câmpurilor, fără valorile (PII).
+    // Doar path-urile câmpurilor + mesajul regulii, fără valorile (PII).
     const fields = e.issues.map((i) => i.path.join("."));
-    return NextResponse.json({ error: "validare", fields }, { status: 400 });
+    const details = e.issues.map((i) => ({ field: i.path.join("."), message: i.message }));
+    return NextResponse.json({ error: "validare", fields, details }, { status: 400 });
   }
   logger.error("Eroare la /api/profile", { op });
   return NextResponse.json({ error: "eroare internă" }, { status: 500 });

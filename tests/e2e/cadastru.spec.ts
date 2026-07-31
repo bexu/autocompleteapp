@@ -50,39 +50,25 @@ test("wizard cadastru: extras CF + cerere de înscriere + checklist", async ({ p
   await expect(page.getByTestId("dossier-status")).toHaveText("De depus");
 });
 
-// Validare: dată a actului imposibilă → eroare, nu generare.
-test("wizard cadastru: dată a actului invalidă e respinsă", async ({ page }) => {
-  const email = `e2e_cad_bad_${Date.now()}_${Math.floor(Math.random() * 1e6)}@example.com`;
+// Validare server (defense in depth): inputul nativ de dată previne deja o dată
+// imposibilă în UI, dar API-ul trebuie să o respingă oricum.
+test("API cadastru: dată imposibilă e respinsă de server", async ({ page }) => {
+  const email = `e2e_cad_api_${Date.now()}_${Math.floor(Math.random() * 1e6)}@example.com`;
   await page.goto("/signup");
-  await page.getByTestId("name").fill("Cad Bad");
+  await page.getByTestId("name").fill("Api Test");
   await page.getByTestId("email").fill(email);
   await page.getByTestId("password").fill("parola-tare-123");
   await page.getByTestId("submit").click();
   await expect(page).toHaveURL(/\/dashboard/);
 
-  await page.goto("/dashboard/profil");
-  await page.getByTestId("nume").fill("Ionescu");
-  await page.getByTestId("prenume").fill("Ana");
-  await page.getByTestId("cnp").fill("1960101223143");
-  await page.getByTestId("save").click();
-  await expect(page.getByTestId("cnp-mask")).toContainText("3143");
-
-  await page.goto("/dashboard/imobile");
-  await page.getByTestId("im-tip").selectOption("APARTAMENT");
-  await page.getByTestId("im-localitate").fill("Cluj-Napoca");
-  await page.getByTestId("im-cf").fill("CF999");
-  await page.getByTestId("im-add").click();
-  await expect(page.getByTestId("imobile-list")).toContainText("Cluj-Napoca");
-
-  await page.goto("/dashboard/cadastru");
-  await page.getByTestId("fel-inscriere").selectOption("Notare");
-  await page.getByTestId("descriere-drept").fill("interdicție");
-  await page.getByTestId("act-tip").fill("hotărâre");
-  await page.getByTestId("act-numar").fill("55");
-  await page.getByTestId("act-data").fill("2026-02-30"); // imposibil
-  await page.getByTestId("act-emitent").fill("Judecătoria X");
-  await page.getByTestId("genereaza-dosar").click();
-
-  await expect(page.getByTestId("error")).toBeVisible();
-  await expect(page.getByTestId("error")).toContainText("actData");
+  const res = await page.request.post("/api/cadastru/generate", { data: {
+    imobilId: "inexistent", felInscriere: "Intabulare", descriereDrept: "proprietate",
+    actTip: "act notarial", actNumar: "1", actData: "2026-02-30", actEmitent: "BNP X",
+    modComunicare: "E-mail", scopExtras: "Extras de carte funciară pentru informare",
+  } });
+  expect(res.status()).toBe(400);
+  const b = await res.json();
+  expect(b.error).toBe("validare");
+  expect(b.fields).toContain("actData");
+  expect(JSON.stringify(b.details)).toContain("dată invalidă");
 });

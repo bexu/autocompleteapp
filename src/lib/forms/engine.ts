@@ -10,6 +10,7 @@ import { computeNextDeadline } from "@/lib/reminders/deadline";
 import { selectManifest, type FormManifest } from "./registered";
 import { mapForm, type MapResult } from "./mapping";
 import { generateFormPdf } from "./pdf";
+import { fillTemplate, getTemplate } from "./template";
 
 // Motorul de formulare: selectează manifestul (cod + jurisdicție + dată),
 // mapează profilul + inputurile, validează, generează PDF. Un formular nou =
@@ -76,7 +77,13 @@ export async function generateForm(
   opts: GenerateOptions,
 ): Promise<GenerateResult> {
   const { manifest, fields } = await resolveAndMap(userId, opts);
-  const pdf = await generateFormPdf(manifest, fields);
+  // Dacă avem tipizatul OFICIAL înregistrat pentru acest manifest, îl completăm
+  // (acroform sau overlay). Altfel generăm documentul propriu (workflow
+  // „generated") — vezi src/lib/forms/template.ts.
+  const template = getTemplate(manifest.id);
+  const pdf = template
+    ? await fillTemplate(template, fields)
+    : await generateFormPdf(manifest, fields);
   return { manifest, fields, pdf };
 }
 

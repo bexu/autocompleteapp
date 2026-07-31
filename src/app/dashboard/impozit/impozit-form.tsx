@@ -179,7 +179,7 @@ export function ImpozitForm({ imobile }: { imobile: ImobilOpt[] }) {
           <div className="grid-2">
             <div className="field">
               <label className="field__label" htmlFor="i-data">Data dobândirii</label>
-              <input id="i-data" className="input input--mono" name="dataDobandire" placeholder="2026-03-01" required data-testid="impozit-data" />
+              <input id="i-data" type="date" className="input input--mono" name="dataDobandire" required data-testid="impozit-data" />
             </div>
             <div className="field">
               <label className="field__label" htmlFor="i-cota">Cotă-parte</label>
@@ -189,7 +189,7 @@ export function ImpozitForm({ imobile }: { imobile: ImobilOpt[] }) {
           {formCode === "ITL-001" ? (
             <div className="field">
               <label className="field__label" htmlFor="i-val">Valoare impozabilă (lei)</label>
-              <input id="i-val" className="input input--mono" name="valoareImpozabila" placeholder="250000" data-testid="impozit-valoare" />
+              <input id="i-val" className="input input--mono" name="valoareImpozabila" inputMode="decimal" placeholder="250000" data-testid="impozit-valoare" />
             </div>
           ) : (
             <div className="field">

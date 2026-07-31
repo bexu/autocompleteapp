@@ -34,7 +34,7 @@ function handle(e: unknown): NextResponse {
   }
   if (e instanceof ZodError) {
     return NextResponse.json(
-      { error: "validare", fields: e.issues.map((i) => i.path.join(".")) },
+      { error: "validare", fields: e.issues.map((i) => i.path.join(".")), details: e.issues.map((i) => ({ field: i.path.join("."), message: i.message })) },
       { status: 400 },
     );
   }

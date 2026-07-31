@@ -175,7 +175,7 @@ export function OnboardingUpload() {
           </div>
           <div className="field">
             <label className="field__label">CNP</label>
-            <input className="input input--mono" name="cnp" defaultValue={f?.cnp ?? ""} placeholder="CNP" data-testid="f-cnp" />
+            <input className="input input--mono" name="cnp" defaultValue={f?.cnp ?? ""} inputMode="numeric" maxLength={13} data-testid="f-cnp" />
           </div>
           <div className="grid-2">
             <div className="field">
@@ -199,7 +199,7 @@ export function OnboardingUpload() {
           </div>
           <div className="field">
             <label className="field__label">Expirare CI</label>
-            <input className="input input--mono" name="ciExp" defaultValue={f?.ciExp ?? ""} placeholder="2030-01-01" data-testid="f-exp" />
+            <input type="date" className="input input--mono" name="ciExp" defaultValue={f?.ciExp ?? ""} data-testid="f-exp" />
           </div>
           <label className="checkbox-row">
             <input type="checkbox" name="consent" data-testid="consent" />

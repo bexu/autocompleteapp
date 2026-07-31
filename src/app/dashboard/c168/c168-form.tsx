@@ -171,13 +171,13 @@ export function C168Form({ imobile }: { imobile: ImobilOpt[] }) {
             </div>
             <div className="field">
               <label className="field__label" htmlFor="c-ccnp">Chiriaș — CNP/CIF</label>
-              <input id="c-ccnp" className="input input--mono" name="chiriasCnp" placeholder="13 cifre" required data-testid="c168-chirias-cnp" />
+              <input id="c-ccnp" className="input input--mono" name="chiriasCnp" inputMode="numeric" maxLength={13} pattern="\d{13}" required data-testid="c168-chirias-cnp" />
             </div>
           </div>
           <div className="grid-2">
             <div className="field">
               <label className="field__label" htmlFor="c-chirie">Chirie</label>
-              <input id="c-chirie" className="input input--mono" name="chirie" placeholder="1500" required data-testid="c168-chirie" />
+              <input id="c-chirie" className="input input--mono" name="chirie" inputMode="decimal" placeholder="1500" required data-testid="c168-chirie" />
             </div>
             <div className="field">
               <label className="field__label" htmlFor="c-moneda">Monedă</label>
@@ -190,16 +190,16 @@ export function C168Form({ imobile }: { imobile: ImobilOpt[] }) {
           <div className="grid-2">
             <div className="field">
               <label className="field__label" htmlFor="c-start">De la data</label>
-              <input id="c-start" className="input input--mono" name="perioadaStart" placeholder="2026-08-01" required data-testid="c168-start" />
+              <input id="c-start" type="date" className="input input--mono" name="perioadaStart" required data-testid="c168-start" />
             </div>
             <div className="field">
               <label className="field__label" htmlFor="c-end">Până la data</label>
-              <input id="c-end" className="input input--mono" name="perioadaEnd" placeholder="2027-08-01" data-testid="c168-end" />
+              <input id="c-end" type="date" className="input input--mono" name="perioadaEnd" data-testid="c168-end" />
             </div>
           </div>
           <div className="field">
             <label className="field__label" htmlFor="c-data">Data contractului</label>
-            <input id="c-data" className="input input--mono" name="dataContract" placeholder="2026-07-27" required data-testid="c168-data" />
+            <input id="c-data" type="date" className="input input--mono" name="dataContract" required data-testid="c168-data" />
           </div>
           <button type="submit" className="btn btn--primary" disabled={busy} data-testid="c168-previzualizeaza">
             {busy ? "Se procesează..." : "Previzualizează"}

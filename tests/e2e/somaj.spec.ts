@@ -43,35 +43,28 @@ test("wizard șomaj: înregistrare ANOFM + indemnizație + checklist", async ({ 
   await expect(page.getByTestId("dossier-status")).toHaveText("De depus");
 });
 
-// Validare de input: dată de încetare imposibilă → eroare, nu generare.
-test("wizard șomaj: dată de încetare invalidă e respinsă", async ({ page }) => {
-  const email = `e2e_somaj_bad_${Date.now()}_${Math.floor(Math.random() * 1e6)}@example.com`;
+// Validare server (defense in depth): inputul nativ de dată previne deja o dată
+// imposibilă în UI, dar API-ul trebuie să o respingă oricum.
+test("API șomaj: dată imposibilă e respinsă de server", async ({ page }) => {
+  const email = `e2e_somaj_api_${Date.now()}_${Math.floor(Math.random() * 1e6)}@example.com`;
   await page.goto("/signup");
-  await page.getByTestId("name").fill("Somaj Bad");
+  await page.getByTestId("name").fill("Api Test");
   await page.getByTestId("email").fill(email);
   await page.getByTestId("password").fill("parola-tare-123");
   await page.getByTestId("submit").click();
   await expect(page).toHaveURL(/\/dashboard/);
 
-  await page.goto("/dashboard/profil");
-  await page.getByTestId("nume").fill("Ionescu");
-  await page.getByTestId("prenume").fill("Andrei");
-  await page.getByTestId("cnp").fill("1960101223143");
-  await page.getByTestId("save").click();
-  await expect(page.getByTestId("cnp-mask")).toContainText("3143");
-
-  await page.goto("/dashboard/somaj");
-  await page.getByTestId("ultima-forma").fill("Studii superioare");
-  await page.getByTestId("act-absolvire").fill("Diplomă X 123");
-  await page.getByTestId("stare-civila").fill("Necăsătorit");
-  await page.getByTestId("cetatenie").fill("Română");
-  await page.getByTestId("capacitate-munca").fill("Aptă");
-  await page.getByTestId("ultimul-angajator").fill("ACME SRL");
-  await page.getByTestId("data-incetare").fill("2026-02-30"); // 30 feb — imposibil
-  await page.getByTestId("motiv-incetare").fill("Concediere");
-  await page.getByTestId("adeverinta-medicala").fill("Nr. 55");
-  await page.getByTestId("genereaza-dosar").click();
-
-  await expect(page.getByTestId("error")).toBeVisible();
-  await expect(page.getByTestId("error")).toContainText("dataIncetare");
+  const res = await page.request.post("/api/somaj/generate", { data: {
+      ultimaFormaInvatamant: "Studii superioare", actAbsolvire: "Diplomă X",
+      stareCivila: "Necăsătorit", cetatenie: "Română", capacitateMunca: "Aptă",
+      ultimulAngajator: "ACME SRL", dataIncetare: "2026-02-30",
+      motivIncetare: "Concediere", adeverintaMedicala: "Nr. 55",
+      optiunePlata: "Virament bancar",
+    } });
+  expect(res.status()).toBe(400);
+  const b = await res.json();
+  expect(b.error).toBe("validare");
+  expect(b.fields).toContain("dataIncetare");
+  // mesaj util, nu doar cheia
+  expect(JSON.stringify(b.details)).toContain("dată invalidă");
 });

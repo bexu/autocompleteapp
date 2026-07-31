@@ -1,0 +1,3 @@
+# Tipizatele oficiale se versionează (sunt documente publice) — dar NU se comit
+# fișiere de test/temporare aici.
+*.tmp

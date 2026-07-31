@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { apiErrorItems, apiErrorTitle, type ApiErrorBody } from "@/lib/forms/error-text";
 
 interface InstitutieOpt {
   id: string;
@@ -16,7 +17,7 @@ interface Result {
 
 export function PetitiiWizard({ institutii }: { institutii: InstitutieOpt[] }) {
   const [result, setResult] = useState<Result | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ title: string; items: string[] } | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -37,12 +38,8 @@ export function PetitiiWizard({ institutii }: { institutii: InstitutieOpt[] }) {
     });
     setBusy(false);
     if (!res.ok) {
-      const b = await res.json().catch(() => ({}));
-      setError(
-        b.error === "validare"
-          ? "Completează profilul și câmpurile obligatorii: " + (b.fields ?? []).join(", ")
-          : "Generare eșuată: " + (b.error ?? ""),
-      );
+      const b: ApiErrorBody = await res.json().catch(() => ({}));
+      setError({ title: apiErrorTitle(b), items: apiErrorItems(b) });
       return;
     }
     setResult(await res.json());
@@ -106,9 +103,16 @@ export function PetitiiWizard({ institutii }: { institutii: InstitutieOpt[] }) {
           </button>
         </form>
         {error && (
-          <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
-            {error}
-          </p>
+          <div role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
+            <strong>{error.title}</strong>
+            {error.items.length > 0 && (
+              <ul style={{ margin: "0.4rem 0 0", paddingLeft: "1.1rem" }}>
+                {error.items.map((it) => (
+                  <li key={it}>{it}</li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </div>
     </main>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { apiErrorItems, apiErrorTitle, type ApiErrorBody } from "@/lib/forms/error-text";
 
 interface FormResult {
   formCode: string;
@@ -39,7 +40,7 @@ const MENTIUNE_KEYS = [
 export function PfaWizard({ enums }: { enums: Enums }) {
   const [event, setEvent] = useState<"INFIINTARE" | "MENTIUNE">("INFIINTARE");
   const [result, setResult] = useState<CaseResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ title: string; items: string[] } | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -57,12 +58,8 @@ export function PfaWizard({ enums }: { enums: Enums }) {
     });
     setBusy(false);
     if (!res.ok) {
-      const b = await res.json().catch(() => ({}));
-      setError(
-        b.error === "validare"
-          ? "Verifică profilul și câmpurile obligatorii: " + (b.fields ?? []).join(", ")
-          : "Generare eșuată: " + (b.error ?? ""),
-      );
+      const b: ApiErrorBody = await res.json().catch(() => ({}));
+      setError({ title: apiErrorTitle(b), items: apiErrorItems(b) });
       return;
     }
     setResult(await res.json());
@@ -175,7 +172,7 @@ export function PfaWizard({ enums }: { enums: Enums }) {
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="p-caen">Cod CAEN principal (4 cifre)</label>
-                  <input id="p-caen" className="input input--mono" name="codCaenPrincipal" placeholder="6201" required data-testid="caen-principal" />
+                  <input id="p-caen" className="input input--mono" name="codCaenPrincipal" inputMode="numeric" maxLength={4} placeholder="6201" required data-testid="caen-principal" />
                 </div>
               </div>
               <div className="field">
@@ -189,7 +186,7 @@ export function PfaWizard({ enums }: { enums: Enums }) {
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="p-data">Data începerii activității</label>
-                  <input id="p-data" className="input input--mono" name="dataInceput" placeholder="2026-09-01" required data-testid="data-inceput" />
+                  <input id="p-data" type="date" className="input input--mono" name="dataInceput" required data-testid="data-inceput" />
                 </div>
               </div>
               <div className="field">
@@ -250,7 +247,7 @@ export function PfaWizard({ enums }: { enums: Enums }) {
               <div className="grid-2">
                 <div className="field">
                   <label className="field__label" htmlFor="p-msusp">Suspendare — până la <span className="muted">(opțional)</span></label>
-                  <input id="p-msusp" className="input input--mono" name="dataSuspendarePanaLa" placeholder="2027-09-01" data-testid="data-suspendare" />
+                  <input id="p-msusp" type="date" className="input input--mono" name="dataSuspendarePanaLa" data-testid="data-suspendare" />
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="p-mrel">Reluare — data <span className="muted">(opțional)</span></label>
@@ -280,9 +277,16 @@ export function PfaWizard({ enums }: { enums: Enums }) {
           </button>
         </form>
         {error && (
-          <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
-            {error}
-          </p>
+          <div role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
+            <strong>{error.title}</strong>
+            {error.items.length > 0 && (
+              <ul style={{ margin: "0.4rem 0 0", paddingLeft: "1.1rem" }}>
+                {error.items.map((it) => (
+                  <li key={it}>{it}</li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </div>
     </main>
