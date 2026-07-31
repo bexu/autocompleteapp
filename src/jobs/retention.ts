@@ -1,5 +1,6 @@
 import { purgeExpiredDocuments } from "@/lib/documents/repository";
 import { purgeExpiredRateLimitWindows } from "@/lib/http/rate-limit";
+import { purgeStaleReminders } from "@/lib/reminders/service";
 import { logger } from "@/lib/log/logger";
 
 // Job de retenție: șterge scanurile cu retenția expirată (GDPR art. 5(1)(e) —
@@ -12,6 +13,7 @@ export const RETENTION_QUEUE = "retention-purge";
 export async function runRetentionJob(now: Date = new Date()): Promise<number> {
   const purged = await purgeExpiredDocuments(now);
   const rateLimitWindows = await purgeExpiredRateLimitWindows(now);
-  logger.info("Job retenție rulat", { purged, rateLimitWindows });
+  const staleReminders = await purgeStaleReminders(now);
+  logger.info("Job retenție rulat", { purged, rateLimitWindows, staleReminders });
   return purged;
 }

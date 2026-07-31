@@ -66,3 +66,25 @@ export async function listReminders(userId: string): Promise<ReminderView[]> {
     deadlineAt: r.deadlineAt,
   }));
 }
+
+/**
+ * Curăță reminderele rămase fără rost: dosare depuse între timp sau cu termenul
+ * trecut. Rulat de jobul de retenție — altfel alarma rămâne veșnic pe dashboard.
+ */
+export async function purgeStaleReminders(now: Date = new Date()): Promise<number> {
+  // `Reminder` nu are relație Prisma către `Dossier` (doar dossierId), deci
+  // aflăm întâi dosarele depuse și ștergem după id.
+  const depuse = await prisma.dossier.findMany({
+    where: { status: "DEPUS" },
+    select: { id: true },
+  });
+  const res = await prisma.reminder.deleteMany({
+    where: {
+      OR: [
+        { deadlineAt: { lt: now } },
+        ...(depuse.length > 0 ? [{ dossierId: { in: depuse.map((d) => d.id) } }] : []),
+      ],
+    },
+  });
+  return res.count;
+}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { listDossiers } from "@/lib/dispatch/repository";
+import { getManifestById } from "@/lib/forms/registered";
 
 export default async function DosarePage() {
   const session = await getSession();
@@ -32,7 +33,13 @@ export default async function DosarePage() {
               style={{ fontWeight: 560 }}
             >
               <span className="mono">{d.formCode}</span>
-              {d.deadline && <span className="muted" style={{ fontSize: "var(--fs-sm)" }}> · termen {d.deadline}</span>}
+              <span className="muted" style={{ fontSize: "var(--fs-sm)" }}>
+                {" "}— {getManifestById(d.manifestId)?.title ?? "formular"}
+              </span>
+              <span className="muted" style={{ fontSize: "var(--fs-sm)", display: "block", fontWeight: 400 }}>
+                generat {d.createdAt.toISOString().slice(0, 10)}
+                {d.deadline ? ` · termen ${d.deadline}` : ""}
+              </span>
             </Link>
             <span
               data-testid={`status-${d.id}`}

@@ -62,7 +62,11 @@ export async function getDossier(userId: string, id: string): Promise<DossierMet
   return toMeta(row);
 }
 
-/** Userul declară dosarul depus (nu depunem noi). */
+/**
+ * Userul declară dosarul depus (nu depunem noi). Reminderele dosarului se sting
+ * odată cu depunerea — altfel alarma „termene apropiate" ar rămâne pe dashboard
+ * la nesfârșit.
+ */
 export async function markSubmitted(
   userId: string,
   id: string,
@@ -70,11 +74,42 @@ export async function markSubmitted(
 ): Promise<DossierMeta | null> {
   const row = await prisma.dossier.findUnique({ where: { id } });
   if (!row || row.userId !== userId) return null;
+  const [updated] = await prisma.$transaction([
+    prisma.dossier.update({ where: { id }, data: { status: "DEPUS", submittedAt: now } }),
+    prisma.reminder.deleteMany({ where: { dossierId: id } }),
+  ]);
+  return toMeta(updated);
+}
+
+/** Anulează declarația de depunere (un click greșit nu trebuie să fie definitiv). */
+export async function markNotSubmitted(
+  userId: string,
+  id: string,
+): Promise<DossierMeta | null> {
+  const row = await prisma.dossier.findUnique({ where: { id } });
+  if (!row || row.userId !== userId) return null;
   const updated = await prisma.dossier.update({
     where: { id },
-    data: { status: "DEPUS", submittedAt: now },
+    data: { status: "DE_DEPUS", submittedAt: null },
   });
   return toMeta(updated);
+}
+
+/**
+ * Șterge un dosar greșit împreună cu documentul arhivat și reminderele lui.
+ * Atomic — nu lăsăm documente orfane în arhivă.
+ */
+export async function deleteDossier(userId: string, id: string): Promise<boolean> {
+  const row = await prisma.dossier.findUnique({ where: { id } });
+  if (!row || row.userId !== userId) return false;
+  await prisma.$transaction([
+    prisma.reminder.deleteMany({ where: { dossierId: id } }),
+    prisma.dossier.delete({ where: { id } }),
+    ...(row.signedFormId
+      ? [prisma.signedForm.deleteMany({ where: { id: row.signedFormId, userId } })]
+      : []),
+  ]);
+  return true;
 }
 
 function toMeta(row: {
