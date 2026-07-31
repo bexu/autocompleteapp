@@ -8,7 +8,7 @@ interface Field {
   value: string;
 }
 
-export function Form230() {
+export function Form230({ qualified = false }: { qualified?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<Field[] | null>(null);
@@ -104,12 +104,19 @@ export function Form230() {
               Înapoi
             </button>
             <button type="button" className="btn btn--primary" onClick={onSign} disabled={busy} data-testid="semneaza">
-              {busy ? "Se semnează..." : "Semnează și arhivează"}
+              {busy ? "Se generează..." : "Generează și arhivează"}
             </button>
           </div>
+          {!qualified && (
+            <p className="muted" style={{ fontSize: "var(--fs-sm)", marginTop: "0.6rem" }} data-testid="nota-semnatura">
+              Documentul se generează și se arhivează, dar <strong>nu poartă încă o
+              semnătură electronică calificată</strong> — semnătura o aplici tu (olograf
+              la depunere sau cu certificatul propriu).
+            </p>
+          )}
           {signed && (
             <p data-testid="signed" className="alert alert--ok" style={{ marginTop: "1rem" }}>
-              Semnat, arhivat și descărcat.{" "}
+              Generat, arhivat și descărcat.{" "}
               {dossierId && (
                 <a href={`/dashboard/dosare/${dossierId}`} data-testid="vezi-dosar">
                   Vezi pașii de depunere →

@@ -56,3 +56,12 @@ export function getSignatureProvider(): SignatureProvider {
   // contractul + integrarea CSC există (task 2.x). Vezi ADR 0010.
   return new MockSignatureProvider();
 }
+
+/**
+ * Semnătura curentă e calificată (QTSP real) sau doar simulată (dev)?
+ * UI-ul NU trebuie să pretindă „semnat electronic" cât timp rulează mock-ul —
+ * ar induce userul în eroare despre valoarea juridică a documentului.
+ */
+export function isQualifiedSignature(): boolean {
+  return getSignatureProvider().name !== "mock";
+}
