@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { apiErrorItems, apiErrorTitle, type ApiErrorBody } from "@/lib/forms/error-text";
 
 interface ImobilOpt {
   id: string;
@@ -29,7 +30,7 @@ interface Enums {
 
 export function CadastruWizard({ imobile, enums }: { imobile: ImobilOpt[]; enums: Enums }) {
   const [result, setResult] = useState<CaseResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ title: string; items: string[] } | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -50,12 +51,8 @@ export function CadastruWizard({ imobile, enums }: { imobile: ImobilOpt[]; enums
     });
     setBusy(false);
     if (!res.ok) {
-      const b = await res.json().catch(() => ({}));
-      setError(
-        b.error === "validare"
-          ? "Verifică profilul, imobilul și câmpurile obligatorii: " + (b.fields ?? []).join(", ")
-          : "Generare eșuată: " + (b.error ?? ""),
-      );
+      const b: ApiErrorBody = await res.json().catch(() => ({}));
+      setError({ title: apiErrorTitle(b), items: apiErrorItems(b) });
       return;
     }
     setResult(await res.json());
@@ -160,7 +157,7 @@ export function CadastruWizard({ imobile, enums }: { imobile: ImobilOpt[]; enums
           <div className="grid-2">
             <div className="field">
               <label className="field__label" htmlFor="cad-actdata">Data actului</label>
-              <input id="cad-actdata" className="input input--mono" name="actData" placeholder="2026-05-10" required data-testid="act-data" />
+              <input id="cad-actdata" type="date" className="input input--mono" name="actData" required data-testid="act-data" />
             </div>
             <div className="field">
               <label className="field__label" htmlFor="cad-actem">Emitent</label>
@@ -204,9 +201,16 @@ export function CadastruWizard({ imobile, enums }: { imobile: ImobilOpt[]; enums
           </button>
         </form>
         {error && (
-          <p role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
-            {error}
-          </p>
+          <div role="alert" data-testid="error" className="alert alert--error" style={{ marginTop: "0.9rem" }}>
+            <strong>{error.title}</strong>
+            {error.items.length > 0 && (
+              <ul style={{ margin: "0.4rem 0 0", paddingLeft: "1.1rem" }}>
+                {error.items.map((it) => (
+                  <li key={it}>{it}</li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </div>
     </main>

@@ -23,13 +23,13 @@ export async function POST(req: Request) {
     }
     if (e instanceof ZodError) {
       return NextResponse.json(
-        { error: "validare", fields: e.issues.map((i) => i.path.join(".")) },
+        { error: "validare", fields: e.issues.map((i) => i.path.join(".")), details: e.issues.map((i) => ({ field: i.path.join("."), message: i.message })) },
         { status: 400 },
       );
     }
     if (e instanceof FormValidationError) {
       return NextResponse.json(
-        { error: "validare", fields: e.errors.map((x) => x.key) },
+        { error: "validare", fields: e.errors.map((x) => x.key), details: e.errors.map((x) => ({ field: x.key, message: x.message })) },
         { status: 400 },
       );
     }

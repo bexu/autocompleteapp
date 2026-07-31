@@ -86,6 +86,8 @@ export function ProfileForm({ initial, cnpMask, ibanMask }: Props) {
               id="pf-cnp"
               className="input input--mono"
               name="cnp"
+              inputMode="numeric"
+              maxLength={13}
               placeholder={cnpMask ? "lasă gol ca să păstrezi" : "13 cifre"}
               data-testid="cnp"
             />

@@ -105,7 +105,7 @@ function splitLongWord(word: string, font: PDFFont, size: number): string[] {
 // fără a altera datele stocate. Fallback pe „?" ca pdf-lib să nu arunce.
 const SUBSCRIPTS = "₀₁₂₃₄₅₆₇₈₉";
 
-function sanitize(s: string): string {
+export function sanitize(s: string): string {
   return (
     s
       .replace(/[ăâ]/g, "a") // ă â
