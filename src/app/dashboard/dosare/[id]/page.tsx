@@ -30,12 +30,24 @@ export default async function DossierPage({
           </h1>
           {dossier.deadline && <p className="lead">Termen: {dossier.deadline}</p>}
         </div>
-        <span
-          data-testid="dossier-status"
-          className={`pill ${dossier.status === "DEPUS" ? "pill--ok" : "pill--warn"}`}
-        >
-          {dossier.status === "DEPUS" ? "Depus" : "De depus"}
-        </span>
+        <div className="row" style={{ gap: "0.7rem", alignItems: "center" }}>
+          {dossier.signedFormId && (
+            <a
+              href={`/api/dossiers/${dossier.id}/pdf`}
+              download
+              className="btn btn--primary btn--sm"
+              data-testid="download-pdf"
+            >
+              Descarcă PDF
+            </a>
+          )}
+          <span
+            data-testid="dossier-status"
+            className={`pill ${dossier.status === "DEPUS" ? "pill--ok" : "pill--warn"}`}
+          >
+            {dossier.status === "DEPUS" ? "Depus" : "De depus"}
+          </span>
+        </div>
       </div>
 
       {handoff && (
