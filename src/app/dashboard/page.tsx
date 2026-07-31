@@ -64,6 +64,7 @@ export default async function DashboardPage() {
     {
       label: "Cont & date",
       items: [
+        { href: "/dashboard/documente", testid: "link-documente", title: "Documentele mele", desc: "Scanurile urcate, criptate, cu dată de ștergere." },
         { href: "/dashboard/confidentialitate", testid: "link-confidentialitate", title: "Confidențialitate", desc: "Consimțământ, export și ștergere date." },
       ],
     },
